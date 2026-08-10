@@ -20,6 +20,7 @@ FRONTMATTER_RE = re.compile(r"\A---[ \t]*\n(.*?)\n---[ \t]*\n", re.DOTALL)
 KV_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$")
 
 CHAPTER_RE = re.compile(r"^Chương\s+([IVXLCDM]+|\d+)\s*$")
+SECTION_RE = re.compile(r"^Mục\s+(\d+)\s*$")
 ARTICLE_RE = re.compile(r"^Điều\s+(\d+)\.\s*(.*)$")
 CLAUSE_RE = re.compile(r"^(\d+)\.\s")
 POINT_RE = re.compile(r"^[a-zđ]\)\s")
@@ -62,10 +63,13 @@ class Article:
     """Offset đầu dòng "Điều N. ..." — dòng này không thuộc khoản nào."""
 
     clauses: list[Clause] = field(default_factory=list)
+    section: str | None = None
     chapter_header_start: int | None = None
-    """Offset đầu khối "Chương X", chỉ đặt cho Điều ĐẦU TIÊN của chương đó.
+    section_header_start: int | None = None
+    """Offset đầu khối "Chương X" / "Mục N", chỉ đặt cho Điều ĐẦU TIÊN nằm dưới
+    tiêu đề đó.
 
-    Tiêu đề Điều và tiêu đề Chương nằm ngoài mọi khoản, nên nếu không có hai
+    Tiêu đề Điều, Chương và Mục đều nằm ngoài mọi khoản, nên nếu không có các
     offset này thì chúng không thuộc chunk nào và trở thành lỗ thủng trong phép
     tính coverage.
     """
@@ -148,11 +152,11 @@ def _scan_lines(body: str) -> list[_Line]:
     return lines
 
 
-def _chapter_label(lines: list[_Line], index: int) -> str:
-    """"Chương I" kèm tiêu đề chương ở dòng kế tiếp nếu có.
+def _heading_label(lines: list[_Line], index: int) -> str:
+    """"Chương I" hoặc "Mục 2" kèm tiêu đề ở dòng kế tiếp nếu có.
 
-    Tiêu đề chương là tuỳ chọn, nên chỉ nhận dòng không-rỗng kế tiếp khi nó
-    không phải một ranh giới cấu trúc khác.
+    Tiêu đề là tuỳ chọn, nên chỉ nhận dòng không-rỗng kế tiếp khi nó không phải
+    một ranh giới cấu trúc khác.
     """
     label = lines[index].stripped
     for following in lines[index + 1 :]:
@@ -161,6 +165,7 @@ def _chapter_label(lines: list[_Line], index: int) -> str:
         if (
             ARTICLE_RE.match(following.stripped)
             or CHAPTER_RE.match(following.stripped)
+            or SECTION_RE.match(following.stripped)
             or CLAUSE_RE.match(following.stripped)
             or POINT_RE.match(following.stripped)
         ):
@@ -221,16 +226,30 @@ def _build_clauses(
 def parse_body(body: str, doc_id: str) -> list[Article]:
     lines = _scan_lines(body)
     chapters: dict[int, str] = {}
+    sections: dict[int, str] = {}
     chapter_starts: dict[int, int] = {}
+    section_starts: dict[int, int] = {}
     headers: list[tuple[int, int, str]] = []
     boundaries: list[int] = []
 
     current_chapter: str | None = None
+    current_section: str | None = None
     pending_chapter_start: int | None = None
+    pending_section_start: int | None = None
+
     for index, line in enumerate(lines):
         if CHAPTER_RE.match(line.stripped):
-            current_chapter = _chapter_label(lines, index)
+            current_chapter = _heading_label(lines, index)
+            current_section = None
             pending_chapter_start = line.start
+            pending_section_start = None
+            boundaries.append(index)
+            continue
+        if SECTION_RE.match(line.stripped):
+            # Mục là ranh giới thật: không chặn ở đây thì cả khối tiêu đề Mục bị
+            # nuốt vào khoản cuối của Điều đứng trước nó.
+            current_section = _heading_label(lines, index)
+            pending_section_start = line.start
             boundaries.append(index)
             continue
         article = ARTICLE_RE.match(line.stripped)
@@ -239,9 +258,14 @@ def parse_body(body: str, doc_id: str) -> list[Article]:
             boundaries.append(index)
             if current_chapter is not None:
                 chapters[index] = current_chapter
+            if current_section is not None:
+                sections[index] = current_section
             if pending_chapter_start is not None:
                 chapter_starts[index] = pending_chapter_start
                 pending_chapter_start = None
+            if pending_section_start is not None:
+                section_starts[index] = pending_section_start
+                pending_section_start = None
 
     articles: list[Article] = []
     for index, article_no, title in headers:
@@ -254,7 +278,9 @@ def parse_body(body: str, doc_id: str) -> list[Article]:
                 article_title=title,
                 header_start=lines[index].start,
                 clauses=_build_clauses(body, lines, index + 1, stop, doc_id, article_no),
+                section=sections.get(index),
                 chapter_header_start=chapter_starts.get(index),
+                section_header_start=section_starts.get(index),
             )
         )
     return articles

@@ -102,6 +102,32 @@ def test_tieu_de_chuong_nam_trong_chunk_dau_cua_chuong(docs):
     assert "TIẾP NHẬN VÀ LƯU TRỮ" in first_of_chapter_two.text
 
 
+def test_muc_la_ranh_gioi_khong_bi_nuot(docs):
+    """Không chặn ở Mục thì cả khối tiêu đề Mục bị nuốt vào khoản cuối của Điều trước."""
+    _, art4 = article(docs, "qc_99_2099", 4)
+    assert all("Mục 1" not in c.text for c in art4.clauses)
+
+
+def test_tieu_de_muc_nam_trong_chunk_dau_cua_muc(docs):
+    document, _ = article(docs, "qc_99_2099", 5)
+    first = next(c for c in chunk_document(document) if c.article_no == 5)
+    assert first.text.startswith("Mục 1")
+    assert "THỜI HẠN VÀ HUỶ DỮ LIỆU" in first.text
+
+
+def test_section_gan_dung_cho_tung_dieu(docs):
+    document = next(d for d in docs if d.meta.doc_id == "qc_99_2099")
+    sections = {a.article_no: a.section for a in document.articles}
+    assert sections[4] is None
+    assert sections[5] == "Mục 1. THỜI HẠN VÀ HUỶ DỮ LIỆU"
+
+
+def test_section_di_theo_chunk(chunks):
+    chunk = next(c for c in chunks if c.doc_id == "qc_99_2099" and c.article_no == 5)
+    assert chunk.section == "Mục 1. THỜI HẠN VÀ HUỶ DỮ LIỆU"
+    assert chunk.chapter == "Chương II. TIẾP NHẬN VÀ LƯU TRỮ"
+
+
 def test_article_title_vao_indexed_text(chunks):
     """Chunk thứ hai trở đi của một Điều không có tiêu đề trong text, phải có ở nhãn."""
     later = next(c for c in chunks if c.chunk_id == "qc_99_2099#a4#c1#p1")
