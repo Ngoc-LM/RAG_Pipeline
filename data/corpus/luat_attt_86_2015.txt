@@ -68,6 +68,10 @@ Người nào có hành vi vi phạm quy định của Luật này thì tùy the
 Chương II
 BẢO ĐẢM AN TOÀN THÔNG TIN MẠNG
 
+
+Mục 1
+BẢO VỆ THÔNG TIN MẠNG
+
 Điều 9. Phân loại thông tin
 1. Cơ quan, tổ chức sở hữu thông tin phân loại thông tin theo thuộc tính bí mật để có biện pháp bảo vệ phù hợp.
 2. Thông tin thuộc phạm vi bí mật nhà nước được phân loại và bảo vệ theo quy định của pháp luật về bảo vệ bí mật nhà nước.

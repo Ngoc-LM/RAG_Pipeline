@@ -79,6 +79,10 @@ Chính phủ quy định chi tiết khoản này.
 Chương II
 BẢO VỆ DỮ LIỆU CÁ NHÂN
 
+
+Mục 1
+BẢO VỆ DỮ LIỆU CÁ NHÂN TRONG QUÁ TRÌNH XỬ LÝ DỮ LIỆU CÁ NHÂN
+
 Điều 9. Sự đồng ý của chủ thể dữ liệu cá nhân
 1. Sự đồng ý của chủ thể dữ liệu cá nhân là việc chủ thể dữ liệu cá nhân cho phép xử lý dữ liệu cá nhân của mình, trừ trường hợp pháp luật có quy định khác.
 2. Sự đồng ý của chủ thể dữ liệu cá nhân chỉ có hiệu lực khi dựa trên sự tự nguyện và biết rõ các thông tin sau đây:
@@ -101,6 +105,10 @@ d) Sự im lặng hoặc không phản hồi không được coi là sự đồn
 1. Dữ liệu cá nhân được thu thập phải được sự đồng ý của chủ thể dữ liệu cá nhân trước khi thu thập, trừ trường hợp pháp luật có quy định khác.
 2. Cơ quan Đảng, Nhà nước có thẩm quyền được phân tích, tổng hợp dữ liệu cá nhân từ nguồn dữ liệu tự thu thập hoặc được chia sẻ, cung cấp, chuyển giao, khai thác, sử dụng để phục vụ công tác lãnh đạo, chỉ đạo, quản lý nhà nước, phát triển kinh tế - xã hội theo quy định của pháp luật.
 3. Cơ quan, tổ chức, cá nhân không thuộc quy định tại khoản 2 Điều này được phân tích, tổng hợp dữ liệu cá nhân từ nguồn dữ liệu cá nhân được phép xử lý theo quy định của pháp luật.
+Điều 12. Mã hóa, giải mã dữ liệu cá nhân
+1. Mã hóa dữ liệu cá nhân là việc chuyển đổi dữ liệu cá nhân sang dạng không nhận biết được dữ liệu cá nhân nếu không được giải mã; dữ liệu cá nhân sau khi được mã hóa vẫn là dữ liệu cá nhân.
+2. Dữ liệu cá nhân là bí mật nhà nước phải được mã hóa, giải mã theo quy định của pháp luật về bảo vệ bí mật nhà nước và pháp luật về cơ yếu.
+3. Cơ quan, tổ chức, cá nhân quyết định việc mã hóa, giải mã dữ liệu cá nhân phù hợp với hoạt động xử lý dữ liệu cá nhân.
 Điều 13. Chỉnh sửa dữ liệu cá nhân
 1. Chủ thể dữ liệu cá nhân được tự mình chỉnh sửa dữ liệu cá nhân của mình đối với một số loại dữ liệu cá nhân theo thỏa thuận với bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân; đề nghị bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân chỉnh sửa dữ liệu cá nhân của mình.
 2. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân chỉnh sửa dữ liệu cá nhân sau khi chủ thể dữ liệu cá nhân yêu cầu hoặc chỉnh sửa dữ liệu cá nhân theo quy định của pháp luật; yêu cầu bên xử lý dữ liệu cá nhân, bên thứ ba chỉnh sửa dữ liệu cá nhân của chủ thể dữ liệu cá nhân.
@@ -146,10 +154,6 @@ d) Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ 
 e) Chuyển giao dữ liệu cá nhân trong các trường hợp quy định tại khoản 1 Điều 19 của Luật này.
 2. Việc chuyển giao dữ liệu cá nhân trong các trường hợp quy định tại khoản 1 Điều này có thu phí hoặc không thu phí thì không được xác định là mua, bán dữ liệu cá nhân.
 3. Chính phủ quy định chi tiết Điều này.
-Điều 18. Các hoạt động khác trong xử lý dữ liệu cá nhân
-1. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên xử lý dữ liệu cá nhân, bên thứ ba lưu trữ dữ liệu cá nhân theo hình thức phù hợp với hoạt động của mình và có biện pháp bảo vệ dữ liệu cá nhân trong quá trình lưu trữ theo quy định của pháp luật.
-2. Việc lưu trữ, truy cập, truy xuất, kết nối, điều phối, xác nhận, xác thực dữ liệu cá nhân, hoạt động khác tác động đến dữ liệu cá nhân thực hiện theo quy định của Luật này, pháp luật về dữ liệu, các quy định khác của pháp luật có liên quan và theo thỏa thuận giữa các bên.
-3. Ưu tiên khai thác, sử dụng dữ liệu cá nhân vào hoạt động phục vụ quản lý nhà nước, hoạt động của các đơn vị sự nghiệp công lập để phục vụ thí điểm một số cơ chế, chính sách đặc biệt tạo đột phá phát triển khoa học, công nghệ, đổi mới sáng tạo và chuyển đổi số quốc gia.
 Điều 19. Xử lý dữ liệu cá nhân trong trường hợp không cần sự đồng ý của chủ thể dữ liệu cá nhân
 1. Các trường hợp xử lý dữ liệu cá nhân không cần sự đồng ý của chủ thể dữ liệu cá nhân bao gồm:
 a) Để bảo vệ tính mạng, sức khỏe, danh dự, nhân phẩm, quyền, lợi ích hợp pháp của chủ thể dữ liệu cá nhân hoặc người khác trong trường hợp cấp bách; bảo vệ quyền hoặc lợi ích chính đáng của mình, của người khác hoặc lợi ích của Nhà nước, của cơ quan tổ chức một cách cần thiết trước hành vi xâm phạm lợi ích nói trên. Bên kiểm soát dữ liệu cá nhân, bên xử lý dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên thứ ba có trách nhiệm chứng minh trường hợp này;
@@ -185,14 +189,6 @@ d) Các trường hợp khác theo quy định của Chính phủ.
 5. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên xử lý dữ liệu cá nhân cập nhật, bổ sung hồ sơ đánh giá tác động xử lý dữ liệu cá nhân khi có sự thay đổi về nội dung hồ sơ đã gửi cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân.
 6. Cơ quan nhà nước có thẩm quyền không phải thực hiện quy định về đánh giá tác động xử lý dữ liệu cá nhân quy định tại Điều này.
 7. Chính phủ quy định thành phần hồ sơ, điều kiện, trình tự, thủ tục đánh giá tác động xử lý dữ liệu cá nhân.
-Điều 22. Cập nhật hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới
-1. Hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới được cập nhật định kỳ 06 tháng khi có sự thay đổi hoặc cập nhật ngay trong các trường hợp quy định tại khoản 2 Điều này.
-2. Các trường hợp thay đổi cần cập nhật ngay bao gồm:
-a) Khi cơ quan, tổ chức, đơn vị được tổ chức lại, chấm dứt hoạt động, giải thể, phá sản theo quy định của pháp luật;
-b) Khi có sự thay đổi thông tin về tổ chức, cá nhân cung cấp dịch vụ bảo vệ dữ liệu cá nhân;
-c) Khi phát sinh hoặc thay đổi ngành, nghề, dịch vụ kinh doanh liên quan đến xử lý dữ liệu cá nhân đã đăng ký trong hồ sơ đánh giá tác động xử lý dữ liệu cá nhân, hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới.
-3. Việc cập nhật hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới được thực hiện trên Cổng thông tin quốc gia về bảo vệ dữ liệu cá nhân hoặc tại cơ quan chuyên trách bảo vệ dữ liệu cá nhân.
-4. Chính phủ quy định chi tiết Điều này.
 Điều 23. Thông báo vi phạm quy định về bảo vệ dữ liệu cá nhân
 1. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên thứ ba phát hiện vi phạm quy định về bảo vệ dữ liệu cá nhân có thể gây tổn hại đến quốc phòng, an ninh quốc gia, trật tự, an toàn xã hội hoặc xâm phạm đến tính mạng, sức khỏe, danh dự, nhân phẩm, tài sản của chủ thể dữ liệu cá nhân thì phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân chậm nhất là 72 giờ kể từ khi phát hiện hành vi vi phạm. Trường hợp bên xử lý dữ liệu cá nhân phát hiện hành vi vi phạm phải thông báo kịp thời cho bên kiểm soát dữ liệu cá nhân hoặc bên kiểm soát và xử lý dữ liệu cá nhân.
 2. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân phải lập biên bản xác nhận về việc xảy ra hành vi vi phạm quy định về bảo vệ dữ liệu cá nhân, phối hợp với cơ quan chuyên trách bảo vệ dữ liệu cá nhân xử lý hành vi vi phạm.
@@ -203,6 +199,7 @@ c) Không bảo đảm quyền hoặc thực hiện không đúng quyền của 
 d) Trường hợp khác theo quy định của pháp luật.
 4. Cơ quan chuyên trách bảo vệ dữ liệu cá nhân có trách nhiệm tiếp nhận thông báo, xử lý hành vi vi phạm quy định về bảo vệ dữ liệu cá nhân. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên thứ ba và cơ quan, tổ chức, cá nhân có liên quan có trách nhiệm ngăn chặn hành vi vi phạm, khắc phục hậu quả xảy ra và phối hợp cơ quan chuyên trách bảo vệ dữ liệu cá nhân trong xử lý hành vi vi phạm quy định về bảo vệ dữ liệu cá nhân.
 5. Chính phủ quy định nội dung thông báo vi phạm quy định về bảo vệ dữ liệu cá nhân.
+
 
 Mục 2
 BẢO VỆ DỮ LIỆU CÁ NHÂN TRONG MỘT SỐ HOẠT ĐỘNG
