@@ -75,6 +75,7 @@ class Chunk:
     char_start: int
     char_end: int
     n_tokens: int
+    section: str | None = None
     is_lead_in: bool = False
 
     @property
@@ -234,12 +235,20 @@ def _clause_range(group: Sequence[Clause]) -> str:
 def _header_prefix_start(article: Article) -> int:
     """Điểm lùi về của chunk đầu tiên trong một Điều.
 
-    Lùi tới đầu dòng "Điều N."; nếu Điều đó mở đầu một Chương thì lùi tiếp tới
-    đầu khối "Chương X" để tiêu đề chương cũng nằm trong chunk.
+    Lùi tới đầu dòng "Điều N."; nếu Điều đó mở đầu một Chương hoặc một Mục thì
+    lùi tiếp tới đầu khối tiêu đề đó. Lấy mốc sớm nhất khi có nhiều tiêu đề
+    chồng lên nhau (Chương X rồi Mục 1 rồi Điều N).
     """
-    if article.chapter_header_start is not None:
-        return article.chapter_header_start
-    return article.header_start
+    candidates = [
+        offset
+        for offset in (
+            article.chapter_header_start,
+            article.section_header_start,
+            article.header_start,
+        )
+        if offset is not None
+    ]
+    return min(candidates)
 
 
 def chunk_article(document: Document, article: Article) -> list[Chunk]:
@@ -302,6 +311,7 @@ def _make_chunk(
         effective_from=meta.effective_from,
         effective_to=meta.effective_to,
         chapter=article.chapter,
+        section=article.section,
         article_no=article.article_no,
         article_title=article.article_title,
         clause_range=clause_range,

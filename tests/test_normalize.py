@@ -218,6 +218,57 @@ def test_cat_tu_noi_nhan():
     assert "Như trên" not in text
 
 
+def test_cat_tu_dong_gach_duoi():
+    """Dòng kẻ ngăn trước phần công bố; bước nối dòng đã dính câu công bố vào nó."""
+    raw = body(
+        """
+        Điều 1. Phạm vi
+        Nội dung của điều một.
+        ______________________________________
+        Luật này được Quốc hội thông qua ngày 26 tháng 6 năm 2025.
+        """
+    )
+    text, _ = normalize(raw)
+    assert "____" not in text
+    assert "thông qua ngày" not in text
+    assert "Nội dung của điều một." in text
+
+
+def test_select_articles_bo_muc_mo_coi():
+    """Tiêu đề Mục không còn Điều nào bên dưới sẽ tạo lỗ thủng coverage."""
+    raw = body(
+        """
+        Điều 1. Một
+        Nội dung một.
+        Mục 4
+        BIỆN PHÁP BẢO ĐẢM
+        Điều 9. Chín
+        Nội dung chín.
+        """
+    )
+    lines = select_articles(raw, {"articles": [1]}).split("\n")
+    assert "Mục 4" not in lines
+    assert "BIỆN PHÁP BẢO ĐẢM" not in lines
+    assert "Điều 1. Một" in lines
+
+
+def test_select_articles_giu_tieu_de_muc_khi_con_dieu():
+    raw = body(
+        """
+        Điều 1. Một
+        Nội dung một.
+        Mục 4
+        BIỆN PHÁP BẢO ĐẢM
+        Điều 9. Chín
+        Nội dung chín.
+        """
+    )
+    lines = select_articles(raw, {"articles": [9]}).split("\n")
+    assert "Mục 4" in lines
+    assert "BIỆN PHÁP BẢO ĐẢM" in lines
+    assert "Điều 1. Một" not in lines
+
+
 def test_khong_thay_moc_bat_dau_thi_canh_bao():
     text, report = normalize("Một đoạn văn không có cấu trúc gì.\n")
     assert any("không tìm thấy" in w for w in report.warnings)

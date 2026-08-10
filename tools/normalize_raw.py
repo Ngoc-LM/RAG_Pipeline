@@ -39,7 +39,13 @@ HEADINGS = (CHAPTER_RE, SECTION_RE, ARTICLE_RE)
 ARTICLE_TITLE_RE = re.compile(r"^Điều\s+(\d+)\.\s*(.*)$")
 PAGE_NUMBER_RE = re.compile(r"^\d+$")
 START_RE = re.compile(r"^(Chương\s+[IVXLCDM]+|Điều\s+1\.)")
-TAIL_RE = re.compile(r"^(Nơi nhận|PHỤ LỤC|Phụ lục|Biểu mẫu)\b")
+TAIL_RE = re.compile(r"^(Nơi nhận|PHỤ LỤC|Phụ lục|Biểu mẫu)\b|^_{5,}")
+"""Mốc kết thúc phần quy phạm.
+
+Dãy gạch dưới là dòng kẻ ngăn trước phần công bố ("Luật này được Quốc hội ...
+thông qua ngày ..."). Bước nối dòng chạy trước bước cắt nên câu công bố đã dính
+vào dòng kẻ, cắt theo dòng kẻ là bỏ được cả hai.
+"""
 SENTENCE_END = ".;:!?"
 
 REPEATED_LINE_THRESHOLD = 3
@@ -484,26 +490,31 @@ def select_articles(
     wanted = _wanted_numbers(keep)
     lines = text.split("\n")
     out: list[str] = []
-    chapter_block: list[str] = []
-    chapter_emitted = True
+    pending: dict[str, list[str] | None] = {"chapter": None, "section": None}
+
+    def capture(start: int) -> tuple[list[str], int]:
+        block = [lines[start]]
+        cursor = start + 1
+        while (
+            cursor < len(lines)
+            and lines[cursor].strip()
+            and not _is_structural(lines[cursor].strip())
+        ):
+            block.append(lines[cursor])
+            cursor += 1
+        return block, cursor
 
     index = 0
     while index < len(lines):
         stripped = lines[index].strip()
 
         if CHAPTER_RE.match(stripped):
-            block = [lines[index]]
-            cursor = index + 1
-            while (
-                cursor < len(lines)
-                and lines[cursor].strip()
-                and not _is_structural(lines[cursor].strip())
-            ):
-                block.append(lines[cursor])
-                cursor += 1
-            chapter_block = block
-            chapter_emitted = False
-            index = cursor
+            pending["chapter"], index = capture(index)
+            pending["section"] = None
+            continue
+
+        if SECTION_RE.match(stripped):
+            pending["section"], index = capture(index)
             continue
 
         match = ARTICLE_RE.match(stripped)
@@ -511,16 +522,21 @@ def select_articles(
             cursor = index + 1
             while cursor < len(lines) and not (
                 CHAPTER_RE.match(lines[cursor].strip())
+                or SECTION_RE.match(lines[cursor].strip())
                 or ARTICLE_RE.match(lines[cursor].strip())
             ):
                 cursor += 1
             if int(match.group(1)) in wanted:
-                if not chapter_emitted and chapter_block:
-                    if out:
+                # Tiêu đề Chương/Mục chỉ được giữ khi thực sự còn Điều nằm dưới
+                # nó, nếu không sẽ thành tiêu đề mồ côi và tạo lỗ thủng coverage.
+                for level in ("chapter", "section"):
+                    block = pending[level]
+                    if block is not None:
+                        if out:
+                            out.append("")
+                        out.extend(block)
                         out.append("")
-                    out.extend(chapter_block)
-                    out.append("")
-                    chapter_emitted = True
+                        pending[level] = None
                 out.extend(lines[index:cursor])
             index = cursor
             continue
