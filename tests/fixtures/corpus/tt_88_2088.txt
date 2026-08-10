@@ -1,0 +1,37 @@
+---
+doc_id: tt_88_2088
+title: "Thông tư 88/2088/TT-GL hướng dẫn báo cáo kho dữ liệu thử nghiệm"
+doc_type: thong_tu
+issued_date: "2088-07-01"
+effective_from: "2088-09-01"
+effective_to: "2099-04-30"
+status: expired
+---
+
+Chương I
+HƯỚNG DẪN CHUNG
+
+Điều 1. Đối tượng áp dụng
+Thông tư này áp dụng đối với các bộ phận có đăng ký sử dụng kho dữ liệu thử nghiệm và đơn vị được giao quản lý kho.
+
+Điều 2. Kỳ báo cáo
+1. Báo cáo định kỳ được lập theo quý, chốt số liệu vào ngày cuối cùng của quý.
+2. Báo cáo đột xuất được lập khi có sự cố lộ lọt dữ liệu, theo yêu cầu tại khoản 3 Điều 4 của Thông tư này.
+3. Kỳ báo cáo đầu tiên được tính từ ngày Thông tư này có hiệu lực.
+
+Chương II
+NỘI DUNG VÀ TRÁCH NHIỆM
+
+Điều 3. Nội dung báo cáo định kỳ
+1. Số lượng tập dữ liệu đang lưu trữ, phân theo mức bảo vệ.
+2. Số lượt truy cập dữ liệu nhạy cảm trong kỳ, kèm danh sách người truy cập.
+3. Danh mục tập dữ liệu đã huỷ trong kỳ và số hiệu biên bản huỷ tương ứng.
+4. Các trường hợp chuyển dữ liệu ra ngoài phạm vi kho, nêu rõ căn cứ cho phép.
+
+Điều 4. Trách nhiệm của đơn vị quản lý
+1. Tổng hợp báo cáo của các bộ phận và gửi người đứng đầu đơn vị trong thời hạn mười ngày làm việc kể từ ngày chốt số liệu.
+2. Lưu trữ báo cáo và tài liệu kèm theo trong thời hạn năm năm.
+3. Khi phát hiện sự cố lộ lọt dữ liệu, yêu cầu bộ phận liên quan lập báo cáo đột xuất trong thời hạn hai mươi bốn giờ.
+
+Điều 5. Hiệu lực thi hành
+Thông tư này hết hiệu lực kể từ ngày Quy chế 99/2099/QC-GL có hiệu lực thi hành. Các báo cáo đã lập theo Thông tư này trước thời điểm nêu trên vẫn có giá trị lưu trữ theo quy định tại khoản 2 Điều 4.

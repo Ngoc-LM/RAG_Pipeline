@@ -1,107 +1,283 @@
-"""Đọc data/corpus/ thành Document đã chuẩn hoá, giữ trục ký tự ổn định.
+"""Đọc văn bản QPPL thành cấu trúc Chương / Điều / Khoản.
 
-Quy ước trục ký tự (gold_spans trong eval/questions.json phải theo đúng quy ước
-này): body = phần sau khối frontmatter, đã NFC-normalize, đã đổi CRLF/CR thành
-LF, đã strip hai đầu. `run.py dump-bodies` ghi đúng chuỗi đó ra
-outputs/bodies/<doc_id>.txt để soạn gold span mà không phải đoán.
+Ranh giới cấu trúc chỉ được nhận ở ĐẦU DÒNG. Trong văn bản QPPL, các từ "Điều",
+"Chương", "khoản" xuất hiện dày đặc bên trong nội dung dưới dạng tham chiếu chéo
+("quy định tại khoản 2 Điều 9"), nên bất kỳ cách nhận dạng nào không neo vào đầu
+dòng đều sẽ cắt nhầm giữa câu.
 """
 
 from __future__ import annotations
 
-import json
+import logging
+import re
 import unicodedata
+from dataclasses import dataclass, field
 from pathlib import Path
 
-from src.schema import Document
+logger = logging.getLogger(__name__)
 
-FRONTMATTER_FENCE = "---"
-REQUIRED_KEYS = ("doc_id", "title")
-SUPPORTED_SUFFIXES = (".md", ".txt")
+FRONTMATTER_RE = re.compile(r"\A---[ \t]*\n(.*?)\n---[ \t]*\n", re.DOTALL)
+KV_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$")
 
+CHAPTER_RE = re.compile(r"^Chương\s+([IVXLCDM]+|\d+)\s*$")
+ARTICLE_RE = re.compile(r"^Điều\s+(\d+)\.\s*(.*)$")
+CLAUSE_RE = re.compile(r"^(\d+)\.\s")
+POINT_RE = re.compile(r"^[a-zđ]\)\s")
 
-class FrontmatterError(ValueError):
-    """Frontmatter thiếu key bắt buộc hoặc sai định dạng."""
-
-
-def normalize_text(raw: str) -> str:
-    """Chuẩn hoá về dạng duy nhất mà mọi char offset trong repo tham chiếu tới."""
-    text = raw.replace("\r\n", "\n").replace("\r", "\n")
-    return unicodedata.normalize("NFC", text).strip()
+REQUIRED_KEYS = ("doc_id", "title", "doc_type", "issued_date", "effective_from", "status")
+VALID_STATUS = ("active", "expired")
 
 
-def parse_frontmatter(raw: str, source: str) -> tuple[dict[str, str], str]:
-    """Tách khối `--- key: value ---` ở đầu file khỏi phần thân.
+class ParseError(ValueError):
+    """Frontmatter sai định dạng, hoặc offset của clause không khớp body."""
 
-    Cố ý chỉ hỗ trợ `key: value` phẳng thay vì kéo thêm PyYAML — corpus không
-    cần cấu trúc lồng nhau, và giữ dependency đúng như ràng buộc đề bài.
+
+@dataclass(frozen=True)
+class DocMeta:
+    doc_id: str
+    title: str
+    doc_type: str
+    issued_date: str
+    effective_from: str
+    effective_to: str | None
+    status: str
+
+
+@dataclass(frozen=True)
+class Clause:
+    """Một khoản. clause_no = 0 nghĩa là Điều không chia khoản."""
+
+    clause_no: int
+    text: str
+    char_start: int
+    char_end: int
+
+
+@dataclass(frozen=True)
+class Article:
+    chapter: str | None
+    article_no: int
+    article_title: str
+    clauses: list[Clause] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class Document:
+    meta: DocMeta
+    body: str
+    articles: list[Article] = field(default_factory=list)
+
+
+def _parse_scalar(raw: str) -> str | None:
+    """null / rỗng -> None; bóc một lớp nháy nếu có."""
+    value = raw.strip()
+    if value in ("null", "~", ""):
+        return None
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        return value[1:-1]
+    return value
+
+
+def parse_frontmatter(raw: str, source: str) -> tuple[DocMeta, str]:
+    """Tách khối `--- key: value ---` khỏi thân văn bản.
+
+    Regex + xử lý tay thay vì pyyaml: frontmatter ở đây chỉ có scalar phẳng,
+    kéo cả một parser YAML về chỉ để đọc bảy dòng là không đáng.
     """
     text = raw.replace("\r\n", "\n").replace("\r", "\n").lstrip("﻿")
-    if not text.startswith(FRONTMATTER_FENCE):
-        raise FrontmatterError(f"{source}: thiếu khối frontmatter mở đầu bằng '---'")
-    end = text.find(f"\n{FRONTMATTER_FENCE}", len(FRONTMATTER_FENCE))
-    if end == -1:
-        raise FrontmatterError(f"{source}: frontmatter không có '---' đóng")
+    match = FRONTMATTER_RE.match(text)
+    if match is None:
+        raise ParseError(f"{source}: không tìm thấy khối frontmatter '---' hợp lệ ở đầu file")
 
-    block = text[len(FRONTMATTER_FENCE) : end]
-    body_start = text.find("\n", end + 1 + len(FRONTMATTER_FENCE))
-    body = "" if body_start == -1 else text[body_start + 1 :]
-
-    meta: dict[str, str] = {}
-    for lineno, line in enumerate(block.split("\n"), start=2):
+    fields: dict[str, str | None] = {}
+    for offset, line in enumerate(match.group(1).split("\n"), start=2):
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
-        if ":" not in stripped:
-            raise FrontmatterError(f"{source}:{lineno}: dòng không có dạng 'key: value'")
-        key, _, value = stripped.partition(":")
-        meta[key.strip()] = value.strip().strip("'\"")
+        kv = KV_RE.match(stripped)
+        if kv is None:
+            raise ParseError(f"{source}:{offset}: không đúng dạng 'key: value' -> {stripped!r}")
+        fields[kv.group(1)] = _parse_scalar(kv.group(2))
 
-    missing = [k for k in REQUIRED_KEYS if not meta.get(k)]
+    missing = [key for key in REQUIRED_KEYS if not fields.get(key)]
     if missing:
-        raise FrontmatterError(f"{source}: frontmatter thiếu key bắt buộc {missing}")
+        raise ParseError(f"{source}: frontmatter thiếu key bắt buộc {missing}")
+    if fields["status"] not in VALID_STATUS:
+        raise ParseError(
+            f"{source}: status={fields['status']!r} không hợp lệ, phải thuộc {VALID_STATUS}"
+        )
+
+    meta = DocMeta(
+        doc_id=str(fields["doc_id"]),
+        title=str(fields["title"]),
+        doc_type=str(fields["doc_type"]),
+        issued_date=str(fields["issued_date"]),
+        effective_from=str(fields["effective_from"]),
+        effective_to=fields.get("effective_to"),
+        status=str(fields["status"]),
+    )
+    body = unicodedata.normalize("NFC", text[match.end() :])
     return meta, body
+
+
+@dataclass(frozen=True)
+class _Line:
+    start: int
+    stripped: str
+    end: int
+    """Offset ngay sau ký tự không-khoảng-trắng cuối cùng của dòng."""
+
+
+def _scan_lines(body: str) -> list[_Line]:
+    lines: list[_Line] = []
+    position = 0
+    for raw in body.splitlines(keepends=True):
+        content = raw.rstrip()
+        lines.append(_Line(start=position, stripped=content.strip(), end=position + len(content)))
+        position += len(raw)
+    return lines
+
+
+def _chapter_label(lines: list[_Line], index: int) -> str:
+    """"Chương I" kèm tiêu đề chương ở dòng kế tiếp nếu có.
+
+    Tiêu đề chương là tuỳ chọn, nên chỉ nhận dòng không-rỗng kế tiếp khi nó
+    không phải một ranh giới cấu trúc khác.
+    """
+    label = lines[index].stripped
+    for following in lines[index + 1 :]:
+        if not following.stripped:
+            continue
+        if (
+            ARTICLE_RE.match(following.stripped)
+            or CHAPTER_RE.match(following.stripped)
+            or CLAUSE_RE.match(following.stripped)
+            or POINT_RE.match(following.stripped)
+        ):
+            return label
+        return f"{label}. {following.stripped}"
+    return label
+
+
+def _build_clauses(
+    body: str, lines: list[_Line], first: int, stop: int, doc_id: str, article_no: int
+) -> list[Clause]:
+    """Cắt vùng nội dung của một Điều thành các khoản.
+
+    Số khoản phải tăng liên tiếp từ 1. Dòng "3." xuất hiện khi đang chờ khoản 2
+    gần như luôn là đánh số trong nội dung chứ không phải ranh giới khoản, nên
+    được coi là văn bản thường và ghi cảnh báo.
+    """
+    groups: list[tuple[int, list[_Line]]] = []
+    expected = 1
+
+    for line in lines[first:stop]:
+        match = CLAUSE_RE.match(line.stripped)
+        if match is not None:
+            number = int(match.group(1))
+            if number == expected:
+                groups.append((number, [line]))
+                expected += 1
+                continue
+            logger.warning(
+                "%s Điều %d: bỏ qua ranh giới khoản '%s' (đang chờ khoản %d), "
+                "coi là nội dung thường",
+                doc_id,
+                article_no,
+                line.stripped[:40],
+                expected,
+            )
+        if not line.stripped:
+            if groups:
+                groups[-1][1].append(line)
+            continue
+        if groups:
+            groups[-1][1].append(line)
+        else:
+            groups.append((0, [line]))
+
+    clauses: list[Clause] = []
+    for number, member_lines in groups:
+        filled = [line for line in member_lines if line.stripped]
+        if not filled:
+            continue
+        start, end = filled[0].start, filled[-1].end
+        clauses.append(
+            Clause(clause_no=number, text=body[start:end], char_start=start, char_end=end)
+        )
+    return clauses
+
+
+def parse_body(body: str, doc_id: str) -> list[Article]:
+    lines = _scan_lines(body)
+    chapters: dict[int, str] = {}
+    headers: list[tuple[int, int, str]] = []
+    boundaries: list[int] = []
+
+    current_chapter: str | None = None
+    for index, line in enumerate(lines):
+        if CHAPTER_RE.match(line.stripped):
+            current_chapter = _chapter_label(lines, index)
+            boundaries.append(index)
+            continue
+        article = ARTICLE_RE.match(line.stripped)
+        if article is not None:
+            headers.append((index, int(article.group(1)), article.group(2).strip()))
+            boundaries.append(index)
+            if current_chapter is not None:
+                chapters[index] = current_chapter
+
+    articles: list[Article] = []
+    for index, article_no, title in headers:
+        later = [b for b in boundaries if b > index]
+        stop = min(later) if later else len(lines)
+        articles.append(
+            Article(
+                chapter=chapters.get(index),
+                article_no=article_no,
+                article_title=title,
+                clauses=_build_clauses(body, lines, index + 1, stop, doc_id, article_no),
+            )
+        )
+    return articles
+
+
+def _verify_offsets(document: Document) -> None:
+    """Offset phải cắt lại đúng text. Dùng raise thay vì assert vì `python -O`
+    sẽ bỏ assert, mà mất bất biến này thì mọi gold_span đều vô nghĩa."""
+    for article in document.articles:
+        for clause in article.clauses:
+            actual = document.body[clause.char_start : clause.char_end]
+            if actual != clause.text:
+                raise ParseError(
+                    f"lệch offset: doc_id={document.meta.doc_id} "
+                    f"article_no={article.article_no} clause_no={clause.clause_no} "
+                    f"[{clause.char_start}, {clause.char_end}) "
+                    f"body={actual[:60]!r} != text={clause.text[:60]!r}"
+                )
 
 
 def load_document(path: Path) -> Document:
     meta, body = parse_frontmatter(path.read_text(encoding="utf-8"), path.name)
-    normalized = normalize_text(body)
-    if not normalized:
-        raise FrontmatterError(f"{path.name}: phần thân rỗng")
-    return Document(
-        doc_id=meta["doc_id"],
-        title=meta["title"],
-        body=normalized,
-        meta={k: v for k, v in meta.items() if k not in ("doc_id", "title")},
-        source_path=path.name,
-    )
+    document = Document(meta=meta, body=body, articles=parse_body(body, meta.doc_id))
+    _verify_offsets(document)
+    return document
 
 
-def load_corpus(corpus_dir: Path) -> list[Document]:
-    """Đọc mọi .md/.txt trong thư mục, sắp theo doc_id cho ổn định."""
-    if not corpus_dir.is_dir():
-        raise FileNotFoundError(f"Không thấy thư mục corpus: {corpus_dir}")
-    paths = sorted(p for p in corpus_dir.iterdir() if p.suffix.lower() in SUPPORTED_SUFFIXES)
+def load_corpus(directory: Path) -> list[Document]:
+    """Đọc mọi .txt trong thư mục, sắp theo doc_id."""
+    directory = Path(directory)
+    if not directory.is_dir():
+        raise FileNotFoundError(f"Không thấy thư mục corpus: {directory}")
+    paths = sorted(p for p in directory.iterdir() if p.suffix.lower() == ".txt")
     if not paths:
-        raise FileNotFoundError(f"Không có file {SUPPORTED_SUFFIXES} nào trong {corpus_dir}")
+        raise FileNotFoundError(f"Không có file .txt nào trong {directory}")
 
-    docs = [load_document(p) for p in paths]
+    documents = [load_document(path) for path in paths]
     seen: dict[str, str] = {}
-    for doc in docs:
-        if doc.doc_id in seen:
-            raise FrontmatterError(
-                f"doc_id trùng '{doc.doc_id}' giữa {seen[doc.doc_id]} và {doc.source_path}"
-            )
-        seen[doc.doc_id] = doc.source_path
-    return sorted(docs, key=lambda d: d.doc_id)
-
-
-def write_documents(docs: list[Document], out_path: Path, body_dir: Path) -> None:
-    """Ghi documents.json và bản body thuần để đối chiếu gold span."""
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    body_dir.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(
-        json.dumps([d.to_json() for d in docs], ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    for doc in docs:
-        (body_dir / f"{doc.doc_id}.txt").write_text(doc.body, encoding="utf-8")
+    for document in documents:
+        doc_id = document.meta.doc_id
+        if doc_id in seen:
+            raise ParseError(f"doc_id trùng '{doc_id}' giữa {seen[doc_id]} và {document.meta.title}")
+        seen[doc_id] = document.meta.title
+    return sorted(documents, key=lambda d: d.meta.doc_id)
