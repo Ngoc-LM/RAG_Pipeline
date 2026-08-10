@@ -1,0 +1,5 @@
+numpy==2.4.6
+rank-bm25==0.2.2
+google-genai==2.17.0
+groq==1.6.0
+pytest==9.1.1
