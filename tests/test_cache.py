@@ -4,10 +4,19 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
 import pytest
 
-from src import config
-from src.llm import CacheMiss, CallKey, cached_call
+from src import config, llm
+from src.llm import (
+    CacheMiss,
+    CallKey,
+    _l2_normalize,
+    cached_call,
+    embed_texts,
+    is_retryable,
+    with_backoff,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -102,3 +111,105 @@ def test_moi_task_ghi_vao_thu_muc_rieng():
         key = make_key(task=task)
         cached_call(key, lambda: task, offline=False)
         assert key.path.parent.name == task
+
+
+# --- phân loại lỗi retryable ---------------------------------------------
+class _Status(Exception):
+    def __init__(self, status_code: int) -> None:
+        super().__init__(f"HTTP {status_code}")
+        self.status_code = status_code
+
+
+def test_retry_theo_status_code():
+    assert is_retryable(_Status(429)) is True
+    assert is_retryable(_Status(503)) is True
+    assert is_retryable(_Status(400)) is False
+    assert is_retryable(_Status(404)) is False
+
+
+def test_khong_retry_khi_message_tinh_co_chua_so_500():
+    """Regression: phân loại bằng substring biến lỗi tham số thành 6 lần thử vô ích."""
+    assert is_retryable(RuntimeError("max_output_tokens 500 vượt giới hạn")) is False
+    assert is_retryable(ValueError("quota field must be 429 characters")) is False
+
+
+def test_retry_loi_mang_thuan():
+    assert is_retryable(ConnectionError("connection reset")) is True
+    assert is_retryable(TimeoutError("timed out")) is True
+
+
+def test_with_backoff_khong_thu_lai_loi_khong_retryable():
+    calls: list[int] = []
+
+    def fn() -> None:
+        calls.append(1)
+        raise RuntimeError("max_output_tokens 500")
+
+    with pytest.raises(RuntimeError):
+        with_backoff(fn, what="test")
+    assert len(calls) == 1
+
+
+def test_with_backoff_tra_ve_ket_qua_khi_thanh_cong():
+    assert with_backoff(lambda: "xong", what="test") == "xong"
+
+
+# --- chuẩn hoá L2 ---------------------------------------------------------
+def test_l2_normalize_cho_norm_bang_mot():
+    matrix = np.array([[3.0, 4.0], [1.0, 0.0]], dtype=np.float32)
+    assert np.allclose(np.linalg.norm(_l2_normalize(matrix), axis=1), 1.0)
+
+
+def test_l2_normalize_vector_rong_thi_raise():
+    with pytest.raises(ValueError, match="norm = 0"):
+        _l2_normalize(np.array([[0.0, 0.0]], dtype=np.float32))
+
+
+# --- dedup embedding ------------------------------------------------------
+class _FakeModels:
+    def __init__(self) -> None:
+        self.calls: list[list[str]] = []
+
+    def embed_content(self, *, model, contents, config):  # noqa: ANN001
+        self.calls.append(list(contents))
+        return type(
+            "Response",
+            (),
+            {"embeddings": [type("E", (), {"values": [float(len(t)), 1.0]})() for t in contents]},
+        )()
+
+
+class _FakeClient:
+    def __init__(self) -> None:
+        self.models = _FakeModels()
+
+
+def test_embed_dedup_text_trung_chi_goi_api_mot_lan(monkeypatch):
+    fake = _FakeClient()
+    monkeypatch.setattr(llm, "gemini_client", lambda: fake)
+
+    matrix = embed_texts(
+        ["alpha", "beta", "alpha", "alpha"],
+        task_type=config.EMBED_TASK_DOCUMENT,
+        offline=False,
+    )
+
+    assert len(fake.models.calls) == 1
+    assert fake.models.calls[0] == ["alpha", "beta"]
+    assert matrix.shape == (4, 2)
+    assert np.allclose(matrix[0], matrix[2])
+    assert np.allclose(matrix[0], matrix[3])
+    assert not np.allclose(matrix[0], matrix[1])
+
+
+def test_embed_lan_hai_doc_hoan_toan_tu_cache(monkeypatch):
+    fake = _FakeClient()
+    monkeypatch.setattr(llm, "gemini_client", lambda: fake)
+    kwargs = {"task_type": config.EMBED_TASK_DOCUMENT, "offline": False}
+
+    first = embed_texts(["alpha", "beta"], **kwargs)
+    second = embed_texts(["beta", "alpha"], offline=True, task_type=config.EMBED_TASK_DOCUMENT)
+
+    assert len(fake.models.calls) == 1
+    assert np.allclose(first[0], second[1])
+    assert np.allclose(first[1], second[0])

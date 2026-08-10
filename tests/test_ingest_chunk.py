@@ -8,7 +8,14 @@ from pathlib import Path
 import pytest
 
 from src import config
-from src.chunk import Chunk, chunk_corpus, chunk_document, split_sentences
+from src.chunk import (
+    Chunk,
+    chunk_corpus,
+    chunk_document,
+    estimate_tokens,
+    split_sentences,
+    verify_coverage,
+)
 from src.ingest import ParseError, load_corpus, parse_body, parse_frontmatter
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "corpus"
@@ -49,7 +56,7 @@ def test_offset_lech_thi_raise_kem_context():
     document = Document(
         meta=DocMeta("d1", "T", "luat", "2099-01-01", "2099-01-01", None, "active"),
         body="nội dung thật",
-        articles=[Article(None, 7, "tiêu đề", [Clause(3, "sai lệch", 0, 5)])],
+        articles=[Article(None, 7, "tiêu đề", 0, [Clause(3, "sai lệch", 0, 5)])],
     )
     with pytest.raises(ParseError) as excinfo:
         _verify_offsets(document)
@@ -58,6 +65,50 @@ def test_offset_lech_thi_raise_kem_context():
 
 
 # --- ranh giới cấu trúc ---------------------------------------------------
+def test_hop_chunk_phu_toan_bo_body(docs):
+    """Phần body không được chunk nào phủ chỉ được chứa khoảng trắng.
+
+    Tiêu đề "Điều N." và khối "Chương X" nằm ngoài mọi khoản; nếu chúng không
+    được kéo vào chunk đầu của Điều thì gold_span chạm tiêu đề sẽ không bao giờ
+    đạt THETA_COVERAGE, và Recall@k bằng 0 ở mọi arm mà không có gì báo lỗi.
+    """
+    for document in docs:
+        verify_coverage(document, chunk_document(document))
+
+
+def test_verify_coverage_bat_duoc_lo_thung(docs):
+    """Bỏ bớt một chunk thì hàm kiểm tra phải raise, không im lặng."""
+    document = docs[0]
+    full = chunk_document(document)
+    with pytest.raises(ValueError, match="lỗ thủng coverage"):
+        verify_coverage(document, full[1:])
+
+
+def test_tieu_de_dieu_nam_trong_chunk_dau(docs):
+    for document in docs:
+        for art in document.articles:
+            first = next(
+                c for c in chunk_document(document) if c.article_no == art.article_no
+            )
+            assert f"Điều {art.article_no}." in first.text
+            assert art.article_title in first.text
+
+
+def test_tieu_de_chuong_nam_trong_chunk_dau_cua_chuong(docs):
+    document = next(d for d in docs if d.meta.doc_id == "qc_99_2099")
+    chunks = chunk_document(document)
+    first_of_chapter_two = next(c for c in chunks if c.article_no == 4)
+    assert "Chương II" in first_of_chapter_two.text
+    assert "TIẾP NHẬN VÀ LƯU TRỮ" in first_of_chapter_two.text
+
+
+def test_article_title_vao_indexed_text(chunks):
+    """Chunk thứ hai trở đi của một Điều không có tiêu đề trong text, phải có ở nhãn."""
+    later = next(c for c in chunks if c.chunk_id == "qc_99_2099#a4#c1#p1")
+    assert later.article_title not in later.text
+    assert later.article_title in later.indexed_text
+
+
 def test_no_cross_article_merge(docs, chunks):
     """Không chunk nào chứa nội dung của hai Điều khác nhau."""
     for chunk in chunks:
@@ -196,14 +247,20 @@ def test_long_clause_split(docs):
     for left, right in zip(parts, parts[1:]):
         assert left.char_end - right.char_start > 0, "hai phần liền kề phải chồng lấn"
 
+    # Part đầu đã lùi về khối tiêu đề Chương II, nên hợp bắt đầu sớm hơn khoản.
     union = interval_union([(c.char_start, c.char_end) for c in parts])
-    assert union == [(clause.char_start, clause.char_end)]
+    assert union == [(parts[0].char_start, clause.char_end)]
+    assert parts[0].char_start == document.body.index("Chương II")
 
 
 def test_moi_phan_khong_vuot_tran_qua_nhieu(docs):
-    document, _ = article(docs, "qc_99_2099", 4)
+    """Trần áp cho nội dung khoản; chunk đầu của Điều còn cõng thêm khối tiêu đề."""
+    document, art = article(docs, "qc_99_2099", 4)
     parts = [c for c in chunk_document(document) if c.chunk_id.startswith("qc_99_2099#a4#c1#")]
-    assert all(p.n_tokens <= config.CHUNK_MAX_TOKENS for p in parts)
+    header = document.body[parts[0].char_start : art.clauses[0].char_start]
+    allowance = config.CHUNK_MAX_TOKENS + estimate_tokens(header)
+    assert parts[0].n_tokens <= allowance
+    assert all(p.n_tokens <= config.CHUNK_MAX_TOKENS for p in parts[1:])
 
 
 # --- gộp khoản ngắn -------------------------------------------------------
@@ -280,14 +337,20 @@ def test_khong_bao_gio_vua_gop_vua_cat(docs, chunks):
         ]
         assert touching, f"{chunk.chunk_id} không chạm khoản nào"
 
+        # Chunk đầu của mỗi Điều cõng thêm khối tiêu đề nằm trước khoản đầu tiên.
+        prefix = document.body[chunk.char_start : touching[0].char_start]
+        if prefix.strip():
+            assert f"Điều {chunk.article_no}." in prefix
+        core_start = max(chunk.char_start, touching[0].char_start)
+
         if len(touching) == 1:
             clause = touching[0]
-            assert clause.char_start <= chunk.char_start
+            assert clause.char_start <= core_start
             assert chunk.char_end <= clause.char_end
             assert chunk.clause_range == str(clause.clause_no)
             continue
 
-        assert chunk.char_start == touching[0].char_start
+        assert core_start == touching[0].char_start
         assert chunk.char_end == touching[-1].char_end
         for clause in touching:
             assert chunk.char_start <= clause.char_start and clause.char_end <= chunk.char_end, (

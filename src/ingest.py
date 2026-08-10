@@ -58,7 +58,17 @@ class Article:
     chapter: str | None
     article_no: int
     article_title: str
+    header_start: int
+    """Offset đầu dòng "Điều N. ..." — dòng này không thuộc khoản nào."""
+
     clauses: list[Clause] = field(default_factory=list)
+    chapter_header_start: int | None = None
+    """Offset đầu khối "Chương X", chỉ đặt cho Điều ĐẦU TIÊN của chương đó.
+
+    Tiêu đề Điều và tiêu đề Chương nằm ngoài mọi khoản, nên nếu không có hai
+    offset này thì chúng không thuộc chunk nào và trở thành lỗ thủng trong phép
+    tính coverage.
+    """
 
 
 @dataclass(frozen=True)
@@ -211,13 +221,16 @@ def _build_clauses(
 def parse_body(body: str, doc_id: str) -> list[Article]:
     lines = _scan_lines(body)
     chapters: dict[int, str] = {}
+    chapter_starts: dict[int, int] = {}
     headers: list[tuple[int, int, str]] = []
     boundaries: list[int] = []
 
     current_chapter: str | None = None
+    pending_chapter_start: int | None = None
     for index, line in enumerate(lines):
         if CHAPTER_RE.match(line.stripped):
             current_chapter = _chapter_label(lines, index)
+            pending_chapter_start = line.start
             boundaries.append(index)
             continue
         article = ARTICLE_RE.match(line.stripped)
@@ -226,6 +239,9 @@ def parse_body(body: str, doc_id: str) -> list[Article]:
             boundaries.append(index)
             if current_chapter is not None:
                 chapters[index] = current_chapter
+            if pending_chapter_start is not None:
+                chapter_starts[index] = pending_chapter_start
+                pending_chapter_start = None
 
     articles: list[Article] = []
     for index, article_no, title in headers:
@@ -236,7 +252,9 @@ def parse_body(body: str, doc_id: str) -> list[Article]:
                 chapter=chapters.get(index),
                 article_no=article_no,
                 article_title=title,
+                header_start=lines[index].start,
                 clauses=_build_clauses(body, lines, index + 1, stop, doc_id, article_no),
+                chapter_header_start=chapter_starts.get(index),
             )
         )
     return articles

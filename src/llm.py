@@ -22,21 +22,9 @@ import numpy as np
 
 from src import config
 
-TASK_DIRS: Final[tuple[str, ...]] = ("embed", "generate", "rerank", "judge")
-_RETRYABLE_MARKERS: Final[tuple[str, ...]] = (
-    "429",
-    "rate limit",
-    "resource_exhausted",
-    "quota",
-    "500",
-    "502",
-    "503",
-    "504",
-    "unavailable",
-    "deadline",
-    "timeout",
-    "connection",
-)
+RETRYABLE_STATUS: Final[frozenset[int]] = frozenset({408, 409, 425, 429, 500, 502, 503, 504})
+_STATUS_ATTRS: Final[tuple[str, ...]] = ("status_code", "code", "status")
+_sdk_transport_types: tuple[type[BaseException], ...] | None = None
 
 
 class CacheMiss(RuntimeError):
@@ -103,16 +91,55 @@ class CallKey:
         return _canonical(self.input)[:200]
 
 
+def _transport_types() -> tuple[type[BaseException], ...]:
+    """Lỗi tầng vận chuyển của hai SDK, nạp trễ để không kéo SDK vào lúc import."""
+    global _sdk_transport_types
+    if _sdk_transport_types is None:
+        collected: list[type[BaseException]] = []
+        try:
+            import groq
+
+            collected.extend([groq.APIConnectionError, groq.APITimeoutError])
+        except Exception:  # noqa: BLE001 - thiếu SDK thì bỏ qua
+            pass
+        _sdk_transport_types = tuple(collected)
+    return _sdk_transport_types
+
+
+def _status_code(exc: BaseException) -> int | None:
+    """Đọc mã HTTP từ exception của SDK.
+
+    google-genai đặt ở `.code`, groq ở `.status_code`. Không suy ra từ nội dung
+    message: chuỗi "max_output_tokens 500" sẽ khớp marker "500" và biến một lỗi
+    tham số vĩnh viễn thành sáu lần thử lại vô ích.
+    """
+    for attribute in _STATUS_ATTRS:
+        value = getattr(exc, attribute, None)
+        if isinstance(value, bool):
+            continue
+        if isinstance(value, int):
+            return value
+        if isinstance(value, str) and value.isdigit():
+            return int(value)
+    return None
+
+
+def is_retryable(exc: BaseException) -> bool:
+    if isinstance(exc, (ConnectionError, TimeoutError, *_transport_types())):
+        return True
+    code = _status_code(exc)
+    return code is not None and code in RETRYABLE_STATUS
+
+
 def with_backoff(fn: Callable[[], Any], *, what: str) -> Any:
     """Thử lại với backoff luỹ thừa + jitter cho 429 và lỗi mạng tạm thời."""
     last: Exception | None = None
     for attempt in range(config.RETRY_MAX_ATTEMPTS):
         try:
             return fn()
-        except Exception as exc:  # noqa: BLE001 - phân loại bằng nội dung lỗi
+        except Exception as exc:  # noqa: BLE001 - phân loại lại bằng is_retryable
             last = exc
-            message = f"{type(exc).__name__} {exc}".lower()
-            if not any(marker in message for marker in _RETRYABLE_MARKERS):
+            if not is_retryable(exc):
                 raise
             if attempt == config.RETRY_MAX_ATTEMPTS - 1:
                 break
@@ -295,9 +322,11 @@ def _l2_normalize(matrix: np.ndarray) -> np.ndarray:
     if np.any(norms == 0):
         raise ValueError("Có embedding vector rỗng (norm = 0)")
     normalized = matrix / norms
-    assert np.allclose(np.linalg.norm(normalized, axis=1), 1.0, atol=1e-5), (
-        "Chuẩn hoá L2 thất bại"
-    )
+    result = np.linalg.norm(normalized, axis=1)
+    if not np.allclose(result, 1.0, atol=1e-5):
+        raise ValueError(
+            f"Chuẩn hoá L2 thất bại: norm nằm trong [{result.min():.6f}, {result.max():.6f}]"
+        )
     return normalized
 
 
@@ -309,26 +338,31 @@ def embed_texts(texts: Sequence[str], *, task_type: str, offline: bool) -> np.nd
     """
     keys = [_embed_key(text, task_type) for text in texts]
     vectors: list[list[float] | None] = [None] * len(texts)
-    missing: list[int] = []
 
+    # Gom theo digest: chunk trùng nội dung (rất hay gặp với các khoản dẫn chiếu
+    # giống hệt nhau) chỉ tốn đúng một lời gọi API, không phải một lời gọi mỗi lần
+    # xuất hiện.
+    pending: dict[str, list[int]] = {}
     for index, key in enumerate(keys):
         if key.path.is_file():
             vectors[index] = json.loads(key.path.read_text(encoding="utf-8"))["response"]
         else:
-            missing.append(index)
+            pending.setdefault(key.digest, []).append(index)
 
-    if missing and offline:
+    if pending and offline:
+        sample = keys[next(iter(pending.values()))[0]]
         raise CacheMiss(
-            f"Cache miss ở chế độ --offline: {len(missing)} text chưa embed.\n"
-            f"  ví dụ key : {keys[missing[0]].digest}\n"
+            f"Cache miss ở chế độ --offline: {len(pending)} text chưa embed.\n"
+            f"  ví dụ key : {sample.digest}\n"
             f"  model     : {config.EMBED_MODEL} ({task_type}, dim={config.EMBED_DIM})\n"
-            f"  input     : {keys[missing[0]].preview()}\n"
+            f"  input     : {sample.preview()}\n"
             "Chạy lại không có --offline (cần GEMINI_API_KEY) để sinh entry này."
         )
 
-    for start in range(0, len(missing), config.EMBED_BATCH_SIZE):
-        batch = missing[start : start + config.EMBED_BATCH_SIZE]
-        batch_texts = [texts[i] for i in batch]
+    unique = list(pending.values())
+    for start in range(0, len(unique), config.EMBED_BATCH_SIZE):
+        batch = unique[start : start + config.EMBED_BATCH_SIZE]
+        batch_texts = [texts[group[0]] for group in batch]
 
         def call(batch_texts: list[str] = batch_texts) -> list[list[float]]:
             from google.genai import types
@@ -348,8 +382,9 @@ def embed_texts(texts: Sequence[str], *, task_type: str, offline: bool) -> np.nd
             raise RuntimeError(
                 f"Gemini trả {len(batch_vectors)} vector cho {len(batch)} text"
             )
-        for index, vector in zip(batch, batch_vectors):
-            vectors[index] = vector
-            cached_call(keys[index], lambda v=vector: v, offline=False)
+        for group, vector in zip(batch, batch_vectors):
+            cached_call(keys[group[0]], lambda v=vector: v, offline=False)
+            for index in group:
+                vectors[index] = vector
 
     return _l2_normalize(np.asarray(vectors, dtype=np.float32))
