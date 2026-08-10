@@ -14,7 +14,3 @@ raw/
 *.doc
 *.docx
 *.pdf
-
-# Notebook lưu dưới dạng jupytext percent (notebooks/*.py), không commit .ipynb:
-# nhị phân, chứa output, không diff được.
-*.ipynb
