@@ -19,7 +19,8 @@ from pathlib import Path
 from typing import Sequence
 
 from src import config
-from src.ingest import Article, Clause, Document, load_corpus
+from src.ingest import Article, Clause, DocMeta, Document, load_corpus
+from src.intervals import interval_union
 
 SENTENCE_END_RE = re.compile(r"[.!?]+[\"'”’)\]]*\s+")
 ABBREVIATIONS = frozenset(
@@ -85,9 +86,17 @@ class Chunk:
 
     @property
     def indexed_text(self) -> str:
-        """Text đem đi đánh chỉ mục: gắn nhãn trích dẫn để chunk mang ngữ cảnh
-        Điều/Khoản, nếu không thì một khoản tách rời gần như vô nghĩa."""
-        return f"{self.citation_label}\n{self.text}"
+        """Text đem đi đánh chỉ mục.
+
+        Gắn cả nhãn trích dẫn lẫn tiêu đề Điều vào đầu. Tiêu đề Điều ("Thời hạn
+        lưu trữ và huỷ dữ liệu") là tín hiệu truy xuất mạnh nhất của văn bản
+        QPPL, nhưng nó nằm ngoài mọi khoản nên chỉ chunk đầu của Điều mới có nó
+        trong `text`; các chunk còn lại sẽ mất tín hiệu đó nếu không gắn ở đây.
+        """
+        header = self.citation_label
+        if self.article_title:
+            header = f"{header} — {self.article_title}"
+        return f"{header}\n{self.text}"
 
 
 def _is_false_boundary(text: str, position: int) -> bool:
@@ -222,14 +231,36 @@ def _clause_range(group: Sequence[Clause]) -> str:
     return f"{group[0].clause_no}-{group[-1].clause_no}"
 
 
+def _header_prefix_start(article: Article) -> int:
+    """Điểm lùi về của chunk đầu tiên trong một Điều.
+
+    Lùi tới đầu dòng "Điều N."; nếu Điều đó mở đầu một Chương thì lùi tiếp tới
+    đầu khối "Chương X" để tiêu đề chương cũng nằm trong chunk.
+    """
+    if article.chapter_header_start is not None:
+        return article.chapter_header_start
+    return article.header_start
+
+
 def chunk_article(document: Document, article: Article) -> list[Chunk]:
     body = document.body
     meta = document.meta
     chunks: list[Chunk] = []
+    prefix_start = _header_prefix_start(article)
 
     has_numbered = any(c.clause_no > 0 for c in article.clauses)
+    groups = _group_clauses(body, article.clauses)
 
-    for group in _group_clauses(body, article.clauses):
+    if not groups:
+        line_end = body.find("\n", article.header_start)
+        return [
+            _make_chunk(
+                meta, article, body, prefix_start,
+                len(body) if line_end == -1 else line_end, "0", 0, False,
+            )
+        ]
+
+    for group_index, group in enumerate(groups):
         members = group.clauses
         start, end = members[0].char_start, members[-1].char_end
         clause_range = _clause_range(members)
@@ -240,32 +271,80 @@ def chunk_article(document: Document, article: Article) -> list[Chunk]:
             parts = [(start, end)]
 
         for part_index, (part_start, part_end) in enumerate(parts):
-            text = body[part_start:part_end]
+            if group_index == 0 and part_index == 0:
+                part_start = prefix_start
             chunks.append(
-                Chunk(
-                    chunk_id=f"{meta.doc_id}#a{article.article_no}#c{clause_range}#p{part_index}",
-                    doc_id=meta.doc_id,
-                    doc_title=meta.title,
-                    doc_type=meta.doc_type,
-                    status=meta.status,
-                    effective_from=meta.effective_from,
-                    effective_to=meta.effective_to,
-                    chapter=article.chapter,
-                    article_no=article.article_no,
-                    article_title=article.article_title,
-                    clause_range=clause_range,
-                    text=text,
-                    char_start=part_start,
-                    char_end=part_end,
-                    n_tokens=estimate_tokens(text),
-                    is_lead_in=is_lead_in,
+                _make_chunk(
+                    meta, article, body, part_start, part_end,
+                    clause_range, part_index, is_lead_in,
                 )
             )
     return chunks
 
 
+def _make_chunk(
+    meta: DocMeta,
+    article: Article,
+    body: str,
+    char_start: int,
+    char_end: int,
+    clause_range: str,
+    part_index: int,
+    is_lead_in: bool,
+) -> Chunk:
+    text = body[char_start:char_end]
+    return Chunk(
+        chunk_id=f"{meta.doc_id}#a{article.article_no}#c{clause_range}#p{part_index}",
+        doc_id=meta.doc_id,
+        doc_title=meta.title,
+        doc_type=meta.doc_type,
+        status=meta.status,
+        effective_from=meta.effective_from,
+        effective_to=meta.effective_to,
+        chapter=article.chapter,
+        article_no=article.article_no,
+        article_title=article.article_title,
+        clause_range=clause_range,
+        text=text,
+        char_start=char_start,
+        char_end=char_end,
+        n_tokens=estimate_tokens(text),
+        is_lead_in=is_lead_in,
+    )
+
+
+def verify_coverage(document: Document, chunks: Sequence[Chunk]) -> None:
+    """Hợp các chunk phải phủ toàn bộ body, phần chừa ra chỉ được là khoảng trắng.
+
+    Dùng raise chứ không assert vì `python -O` bỏ assert, và một lỗ thủng ở đây
+    hỏng âm thầm: mọi gold_span chạm vùng không được phủ sẽ có Cov@k tụt dưới
+    ngưỡng vĩnh viễn, cho Recall@k = 0 ở mọi arm mà không có dấu hiệu báo lỗi.
+    """
+    covered = interval_union(
+        [(c.char_start, c.char_end) for c in chunks if c.doc_id == document.meta.doc_id]
+    )
+    holes: list[tuple[int, int]] = []
+    cursor = 0
+    for start, end in covered:
+        if cursor < start:
+            holes.append((cursor, start))
+        cursor = max(cursor, end)
+    if cursor < len(document.body):
+        holes.append((cursor, len(document.body)))
+
+    for start, end in holes:
+        fragment = document.body[start:end]
+        if fragment.strip():
+            raise ValueError(
+                f"lỗ thủng coverage: doc_id={document.meta.doc_id} [{start}, {end}) "
+                f"không thuộc chunk nào: {fragment.strip()[:80]!r}"
+            )
+
+
 def chunk_document(document: Document) -> list[Chunk]:
-    return [c for article in document.articles for c in chunk_article(document, article)]
+    chunks = [c for article in document.articles for c in chunk_article(document, article)]
+    verify_coverage(document, chunks)
+    return chunks
 
 
 def chunk_corpus(documents: Sequence[Document]) -> list[Chunk]:

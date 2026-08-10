@@ -55,6 +55,11 @@ EMBED_DIM: Final[int] = 768
 chuẩn hoá L2 lại sau khi cắt vì chỉ vector 3072 chiều mới được chuẩn hoá sẵn."""
 
 EMBED_BATCH_SIZE: Final[int] = 32
+
+EMBED_TASK_DOCUMENT: Final[str] = "RETRIEVAL_DOCUMENT"
+EMBED_TASK_QUERY: Final[str] = "RETRIEVAL_QUERY"
+"""Embedding bất đối xứng: chunk và câu hỏi được nhúng bằng hai task_type khác
+nhau, nên cùng một chuỗi ở hai vai trò cho hai vector — và hai cache key khác nhau."""
 JUDGE_TEMPERATURE: Final[float] = 0.0
 JUDGE_MAX_TOKENS: Final[int] = 2048
 
