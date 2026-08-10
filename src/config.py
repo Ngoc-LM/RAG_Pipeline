@@ -43,6 +43,21 @@ THETA_COVERAGE: Final[float] = 0.8
 bước evaluate, khai báo sẵn ở đây cho tập trung."""
 
 # --- LLM -----------------------------------------------------------------
+EMBED_MODEL: Final[str] = "gemini-embedding-001"
+GEN_MODEL: Final[str] = "gemini-2.5-flash"
+RERANK_MODEL: Final[str] = "gemini-2.5-flash-lite"
+JUDGE_MODEL: Final[str] = "llama-3.3-70b-versatile"
+"""Judge khác họ model với bộ sinh: dùng Gemini chấm output của Gemini thì có
+thiên lệch tự ưu ái."""
+
+EMBED_DIM: Final[int] = 768
+"""Cắt Matryoshka từ 3072 để cache commit vào repo nhỏ đi ~4 lần. Bắt buộc
+chuẩn hoá L2 lại sau khi cắt vì chỉ vector 3072 chiều mới được chuẩn hoá sẵn."""
+
+EMBED_BATCH_SIZE: Final[int] = 32
+JUDGE_TEMPERATURE: Final[float] = 0.0
+JUDGE_MAX_TOKENS: Final[int] = 2048
+
 PROMPT_VERSION: Final[int] = 1
 """Tăng tay mỗi khi sửa bất kỳ template prompt nào.
 
@@ -50,3 +65,9 @@ Cache key băm payload có cấu trúc chứ không băm chuỗi prompt đã ren
 template đổi mà payload không đổi sẽ không tự bị phát hiện. Đây là cái chốt
 thủ công để vô hiệu hoá entry cũ thay vì phải xoá thư mục cache.
 """
+
+# --- Backoff -------------------------------------------------------------
+RETRY_MAX_ATTEMPTS: Final[int] = 6
+RETRY_BASE_SECONDS: Final[float] = 2.0
+RETRY_MAX_SLEEP_SECONDS: Final[float] = 60.0
+RETRY_JITTER: Final[float] = 0.25

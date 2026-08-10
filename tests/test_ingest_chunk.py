@@ -165,10 +165,20 @@ def test_khong_co_frontmatter_thi_raise():
 def test_citation_label_format(docs, chunks):
     labels = {c.chunk_id: c.citation_label for c in chunks}
     title = "Quy chế quản lý kho dữ liệu thử nghiệm số 99/2099/QC-GL"
+    thong_tu = "Thông tư 88/2088/TT-GL hướng dẫn báo cáo kho dữ liệu thử nghiệm"
 
     assert labels["qc_99_2099#a4#c1#p0"] == f"Điều 4 Khoản 1 {title}"
     assert labels["qc_99_2099#a5#c1-4#p0"] == f"Điều 5 Khoản 1-4 {title}"
     assert labels["qc_99_2099#a1#c0#p0"] == f"Điều 1 {title}"
+    assert labels["tt_88_2088#a3#c0#p0"] == f"Điều 3 (đoạn mở đầu) {thong_tu}"
+
+
+def test_lead_in_chi_ap_dung_khi_dieu_co_khoan_danh_so(chunks):
+    """Điều không chia khoản vẫn dùng nhãn nguyên Điều, không phải (đoạn mở đầu)."""
+    by_id = {c.chunk_id: c for c in chunks}
+    assert by_id["tt_88_2088#a3#c0#p0"].is_lead_in is True
+    assert by_id["tt_88_2088#a5#c0#p0"].is_lead_in is False
+    assert "(đoạn mở đầu)" not in by_id["tt_88_2088#a5#c0#p0"].citation_label
 
 
 # --- cắt khoản dài --------------------------------------------------------
@@ -244,3 +254,57 @@ def test_chunk_id_duy_nhat(chunks):
 def test_n_tokens_khop_uoc_luong(chunks: list[Chunk]):
     for chunk in chunks:
         assert chunk.n_tokens == max(1, round(len(chunk.text) / config.CHARS_PER_TOKEN))
+
+
+def test_indexed_text_khong_dung_cho_offset(chunks):
+    """Offset đo trên `text`, không phải `indexed_text`.
+
+    indexed_text gắn thêm nhãn trích dẫn vào đầu để đánh chỉ mục. Nếu ở bước sau
+    có chỗ nào lỡ đo độ dài trên nó, coverage sẽ tính dư đúng bằng độ dài nhãn
+    và mọi Cov@k đều sai lệch một cách âm thầm.
+    """
+    for chunk in chunks:
+        assert chunk.char_end - chunk.char_start == len(chunk.text)
+        assert chunk.char_end - chunk.char_start != len(chunk.indexed_text)
+
+
+def test_khong_bao_gio_vua_gop_vua_cat(docs, chunks):
+    """Mỗi chunk hoặc là part của đúng một khoản, hoặc là hợp các khoản nguyên vẹn."""
+    for chunk in chunks:
+        document = next(d for d in docs if d.meta.doc_id == chunk.doc_id)
+        art = next(a for a in document.articles if a.article_no == chunk.article_no)
+        touching = [
+            c
+            for c in art.clauses
+            if min(chunk.char_end, c.char_end) - max(chunk.char_start, c.char_start) > 0
+        ]
+        assert touching, f"{chunk.chunk_id} không chạm khoản nào"
+
+        if len(touching) == 1:
+            clause = touching[0]
+            assert clause.char_start <= chunk.char_start
+            assert chunk.char_end <= clause.char_end
+            assert chunk.clause_range == str(clause.clause_no)
+            continue
+
+        assert chunk.char_start == touching[0].char_start
+        assert chunk.char_end == touching[-1].char_end
+        for clause in touching:
+            assert chunk.char_start <= clause.char_start and clause.char_end <= chunk.char_end, (
+                f"{chunk.chunk_id} cắt ngang khoản {clause.clause_no} trong khi đang gộp"
+            )
+
+
+def test_khoan_bi_cat_khong_bao_gio_bi_gop(docs):
+    """Khoản dài của Điều 4 bị cắt -> khoản 2 liền kề phải đứng riêng."""
+    document, art = article(docs, "qc_99_2099", 4)
+    ranges = {c.clause_range for c in chunk_document(document) if c.article_no == 4}
+    assert ranges == {"1", "2"}
+    assert not any("-" in r for r in ranges)
+
+
+def test_doan_mo_dau_khong_gop_voi_khoan_danh_so(docs):
+    """Gộp lead-in vào khoản 1 sẽ tạo clause_range '0-1', một nhãn vô nghĩa."""
+    document, _ = article(docs, "tt_88_2088", 3)
+    ranges = [c.clause_range for c in chunk_document(document) if c.article_no == 3]
+    assert ranges == ["0", "1-4"]

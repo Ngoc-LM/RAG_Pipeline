@@ -41,6 +41,22 @@ def estimate_tokens(text: str) -> int:
     return max(1, round(len(text) / config.CHARS_PER_TOKEN))
 
 
+def citation_label(
+    doc_title: str, article_no: int, clause_range: str, is_lead_in: bool
+) -> str:
+    """Nhãn trích dẫn hiển thị cho người đọc.
+
+    Đoạn mở đầu của một Điều có chia khoản phải được gọi tên riêng: nếu ghi
+    "Điều 9 <title>" thì trông như đang trích dẫn cả Điều, trong khi thực tế chỉ
+    trích phần chapeau. "Điều 9 <title>" chỉ dùng khi Điều thật sự không chia khoản.
+    """
+    if is_lead_in:
+        return f"Điều {article_no} (đoạn mở đầu) {doc_title}"
+    if clause_range == "0":
+        return f"Điều {article_no} {doc_title}"
+    return f"Điều {article_no} Khoản {clause_range} {doc_title}"
+
+
 @dataclass(frozen=True)
 class Chunk:
     chunk_id: str
@@ -58,13 +74,14 @@ class Chunk:
     char_start: int
     char_end: int
     n_tokens: int
+    is_lead_in: bool = False
 
     @property
     def citation_label(self) -> str:
         """Chuỗi hiển thị trong câu trả lời cuối cùng, không phải chunk_id."""
-        if self.clause_range == "0":
-            return f"Điều {self.article_no} {self.doc_title}"
-        return f"Điều {self.article_no} Khoản {self.clause_range} {self.doc_title}"
+        return citation_label(
+            self.doc_title, self.article_no, self.clause_range, self.is_lead_in
+        )
 
     @property
     def indexed_text(self) -> str:
@@ -139,23 +156,63 @@ def _pack_with_overlap(body: str, spans: Sequence[tuple[int, int]]) -> list[tupl
     return parts
 
 
-def _group_clauses(body: str, clauses: Sequence[Clause]) -> list[list[Clause]]:
-    """Gộp khoản ngắn với khoản liền kề, chỉ trong phạm vi một Điều."""
-    groups: list[list[Clause]] = []
+@dataclass(frozen=True)
+class _Group:
+    clauses: list[Clause]
+    must_split: bool
+
+
+def _span_tokens(body: str, group: Sequence[Clause]) -> int:
+    return estimate_tokens(body[group[0].char_start : group[-1].char_end])
+
+
+def _group_clauses(body: str, clauses: Sequence[Clause]) -> list[_Group]:
+    """Tách hai pha để quy tắc cắt và quy tắc gộp không thể hợp thành nhau.
+
+    Pha 1 đánh dấu mọi khoản vượt trần: chúng sẽ bị cắt thành part và không bao
+    giờ tham gia gộp. Pha 2 chỉ gộp các khoản chưa bị cắt, chỉ khi tổng vẫn nằm
+    dưới trần, và không bao giờ gộp xuyên qua một khoản đã bị cắt.
+
+    Nhờ vậy mỗi chunk hoặc là một part của đúng một khoản, hoặc là hợp của các
+    khoản nguyên vẹn — không bao giờ vừa gộp vừa cắt. Đánh đổi: khoản ngắn nằm
+    cạnh một khoản dài sẽ đứng riêng dưới sàn gộp.
+    """
+    marked = [(c, estimate_tokens(c.text) > config.CHUNK_MAX_TOKENS) for c in clauses]
+    groups: list[_Group] = []
     current: list[Clause] = []
 
-    for clause in clauses:
-        current.append(clause)
-        span_tokens = estimate_tokens(body[current[0].char_start : current[-1].char_end])
-        if span_tokens >= config.CHUNK_MIN_TOKENS:
-            groups.append(current)
+    for clause, must_split in marked:
+        # Đoạn mở đầu (clause_no 0) đứng riêng: gộp nó vào khoản 1 sẽ tạo ra
+        # clause_range "0-1", một nhãn trích dẫn vô nghĩa.
+        if must_split or clause.clause_no == 0:
+            if current:
+                groups.append(_Group(current, False))
+                current = []
+            groups.append(_Group([clause], must_split))
+            continue
+
+        if current and _span_tokens(body, current + [clause]) > config.CHUNK_MAX_TOKENS:
+            groups.append(_Group(current, False))
+            current = [clause]
+        else:
+            current = current + [clause]
+
+        if _span_tokens(body, current) >= config.CHUNK_MIN_TOKENS:
+            groups.append(_Group(current, False))
             current = []
 
     if current:
-        if groups:
-            groups[-1].extend(current)
+        previous = groups[-1] if groups else None
+        mergeable = (
+            previous is not None
+            and not previous.must_split
+            and previous.clauses[0].clause_no != 0
+            and _span_tokens(body, previous.clauses + current) <= config.CHUNK_MAX_TOKENS
+        )
+        if mergeable and previous is not None:
+            groups[-1] = _Group(previous.clauses + current, False)
         else:
-            groups.append(current)
+            groups.append(_Group(current, False))
     return groups
 
 
@@ -170,13 +227,17 @@ def chunk_article(document: Document, article: Article) -> list[Chunk]:
     meta = document.meta
     chunks: list[Chunk] = []
 
+    has_numbered = any(c.clause_no > 0 for c in article.clauses)
+
     for group in _group_clauses(body, article.clauses):
-        start, end = group[0].char_start, group[-1].char_end
-        clause_range = _clause_range(group)
-        if estimate_tokens(body[start:end]) <= config.CHUNK_MAX_TOKENS:
-            parts = [(start, end)]
-        else:
+        members = group.clauses
+        start, end = members[0].char_start, members[-1].char_end
+        clause_range = _clause_range(members)
+        is_lead_in = members[0].clause_no == 0 and has_numbered
+        if group.must_split:
             parts = _pack_with_overlap(body, split_sentences(body[start:end], start))
+        else:
+            parts = [(start, end)]
 
         for part_index, (part_start, part_end) in enumerate(parts):
             text = body[part_start:part_end]
@@ -197,6 +258,7 @@ def chunk_article(document: Document, article: Article) -> list[Chunk]:
                     char_start=part_start,
                     char_end=part_end,
                     n_tokens=estimate_tokens(text),
+                    is_lead_in=is_lead_in,
                 )
             )
     return chunks

@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-import config
+from src import config
 from src.llm import CacheMiss, CallKey, cached_call
 
 

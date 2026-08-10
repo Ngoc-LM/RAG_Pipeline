@@ -20,7 +20,7 @@ from typing import Any, Callable, Final, Sequence
 
 import numpy as np
 
-import config
+from src import config
 
 TASK_DIRS: Final[tuple[str, ...]] = ("embed", "generate", "rerank", "judge")
 _RETRYABLE_MARKERS: Final[tuple[str, ...]] = (

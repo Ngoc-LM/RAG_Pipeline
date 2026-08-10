@@ -23,6 +23,7 @@ Chương II
 NỘI DUNG VÀ TRÁCH NHIỆM
 
 Điều 3. Nội dung báo cáo định kỳ
+Báo cáo định kỳ của mỗi bộ phận phải phản ánh đầy đủ tình hình sử dụng kho dữ liệu trong kỳ và gồm các nội dung sau đây.
 1. Số lượng tập dữ liệu đang lưu trữ, phân theo mức bảo vệ.
 2. Số lượt truy cập dữ liệu nhạy cảm trong kỳ, kèm danh sách người truy cập.
 3. Danh mục tập dữ liệu đã huỷ trong kỳ và số hiệu biên bản huỷ tương ứng.
