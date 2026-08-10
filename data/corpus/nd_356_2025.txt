@@ -1,6 +1,6 @@
 ---
 doc_id: nd_356_2025
-title: "Nghị định 356/2025/NĐ-CP quy định chi tiết Luật Bảo vệ dữ liệu cá nhân"
+title: "Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân"
 doc_type: nghi_dinh
 issued_date: "2025-12-31"
 effective_from: "2026-01-01"
