@@ -7,3 +7,14 @@ __pycache__/
 # outputs/ là dẫn xuất, trừ cache — cache mới là thứ làm --offline tái hiện được
 outputs/*
 !outputs/cache/
+
+# File nguồn của bước chuẩn bị corpus: nhị phân, nặng, và tái tạo được từ nguồn
+# gốc. Chỉ commit data/corpus/*.txt là kết quả đã chuẩn hoá.
+raw/
+*.doc
+*.docx
+*.pdf
+
+# Notebook lưu dưới dạng jupytext percent (notebooks/*.py), không commit .ipynb:
+# nhị phân, chứa output, không diff được.
+*.ipynb
