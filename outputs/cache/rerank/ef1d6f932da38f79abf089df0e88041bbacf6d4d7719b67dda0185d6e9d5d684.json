@@ -1,0 +1,52 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "rerank",
+    "input": {
+      "question": "Hai công ty sáp nhập, bên tôi tiếp nhận toàn bộ danh sách khách của bên kia. Có phải ký kết văn bản riêng cho việc bàn giao đó không, và trong đó cần ghi những gì?",
+      "candidates": [
+        "nd_13_2023#a16#c3-5#p0",
+        "luat_91_2025#a17#c1-3#p0",
+        "nd_13_2023#a25#c1-2#p0",
+        "nd_356_2025#a7#c2-3#p0",
+        "nd_356_2025#a7#c1#p0",
+        "nd_13_2023#a25#c3-4#p0",
+        "nd_356_2025#a12#c1-2#p0",
+        "luat_91_2025#a28#c1-2#p0",
+        "luat_91_2025#a29#c4-6#p0",
+        "luat_91_2025#a26#c1-4#p0",
+        "nd_356_2025#a7#c4-6#p0",
+        "nd_356_2025#a13#c1-2#p0",
+        "luat_attt_86_2015#a10#c3#p0",
+        "luat_91_2025#a39#c1-2#p0",
+        "nd_13_2023#a13#c3-4#p0",
+        "nd_13_2023#a22#c1-2#p0",
+        "luat_91_2025#a15#c1-2#p0",
+        "nd_13_2023#a2#c4#p0",
+        "nd_356_2025#a6#c2-4#p0",
+        "luat_91_2025#a20#c2-3#p0",
+        "nd_13_2023#a21#c1-3#p0",
+        "nd_356_2025#a9#c3#p0",
+        "nd_356_2025#a8#c1#p0",
+        "luat_91_2025#a2#c6-8#p0",
+        "nd_356_2025#a17#c2-3#p0",
+        "luat_91_2025#a9#c1-2#p0",
+        "nd_356_2025#a4#c1-2#p0",
+        "luat_attt_86_2015#a3#c1-3#p0",
+        "nd_13_2023#a25#c5-6#p0",
+        "luat_attt_86_2015#a10#c1-2#p0"
+      ],
+      "candidates_digest": "431f501e3466000f909080c3fb2a0a170b768f6d7205b81e5ca2c60095a4b7f1"
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json"
+    },
+    "prompt_version": 1
+  },
+  "response": "{\"scores\": [{\"id\": 1, \"score\": 0}, {\"id\": 2, \"score\": 2}, {\"id\": 3, \"score\": 0}, {\"id\": 4, \"score\": 2}, {\"id\": 5, \"score\": 3}, {\"id\": 6, \"score\": 0}, {\"id\": 7, \"score\": 1}, {\"id\": 8, \"score\": 1}, {\"id\": 9, \"score\": 1}, {\"id\": 10, \"score\": 1}, {\"id\": 11, \"score\": 1}, {\"id\": 12, \"score\": 1}, {\"id\": 13, \"score\": 0}, {\"id\": 14, \"score\": 1}, {\"id\": 15, \"score\": 0}, {\"id\": 16, \"score\": 0}, {\"id\": 17, \"score\": 1}, {\"id\": 18, \"score\": 0}, {\"id\": 19, \"score\": 1}, {\"id\": 20, \"score\": 0}, {\"id\": 21, \"score\": 0}, {\"id\": 22, \"score\": 1}, {\"id\": 23, \"score\": 1}, {\"id\": 24, \"score\": 2}, {\"id\": 25, \"score\": 0}, {\"id\": 26, \"score\": 1}, {\"id\": 27, \"score\": 0}, {\"id\": 28, \"score\": 0}, {\"id\": 29, \"score\": 0}, {\"id\": 30, \"score\": 0}]}",
+  "created_at": "2026-08-11T05:46:17.583169+00:00"
+}

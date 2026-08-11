@@ -1,0 +1,52 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "rerank",
+    "input": {
+      "question": "Bên tôi làm dịch vụ tiếp thị, muốn dùng danh sách khách do một đối tác chuyển sang để chạy quảng cáo. Có được phép không?",
+      "candidates": [
+        "luat_91_2025#a28#c1-2#p0",
+        "nd_13_2023#a21#c1-3#p0",
+        "luat_91_2025#a28#c3-4#p0",
+        "luat_91_2025#a28#c5-7#p0",
+        "luat_91_2025#a28#c8#p0",
+        "luat_91_2025#a11#c1-3#p0",
+        "nd_13_2023#a9#c7-8#p0",
+        "luat_91_2025#a29#c4-6#p0",
+        "nd_356_2025#a7#c2-3#p0",
+        "nd_13_2023#a22#c1-2#p0",
+        "luat_91_2025#a15#c1-2#p0",
+        "luat_91_2025#a17#c1-3#p0",
+        "nd_13_2023#a2#c4#p0",
+        "luat_91_2025#a7#c1-7#p0",
+        "luat_91_2025#a29#c1-3#p0",
+        "luat_attt_86_2015#a10#c1-2#p0",
+        "luat_91_2025#a16#c1-2#p0",
+        "nd_356_2025#a9#c1-2#p0",
+        "luat_91_2025#a26#c1-4#p0",
+        "luat_attt_86_2015#a7#c4-6#p0",
+        "luat_attt_86_2015#a5#c1-4#p0",
+        "luat_91_2025#a2#c6-8#p0",
+        "nd_356_2025#a4#c1-2#p0",
+        "nd_13_2023#a25#c1-2#p0",
+        "luat_91_2025#a19#c1#p0",
+        "nd_356_2025#a7#c4-6#p0",
+        "nd_356_2025#a17#c2-3#p0",
+        "luat_91_2025#a20#c1#p0",
+        "nd_356_2025#a15#c1-2#p0",
+        "nd_13_2023#a3#c1-4#p0"
+      ],
+      "candidates_digest": "9377ff7eb3af1737d76e9c3278150cb13eab2e2d81b40b0837d1ca3e2c934af6"
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json"
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"scores\": [\n    {\"id\": 1, \"score\": 3},\n    {\"id\": 2, \"score\": 0},\n    {\"id\": 3, \"score\": 3},\n    {\"id\": 4, \"score\": 3},\n    {\"id\": 5, \"score\": 3},\n    {\"id\": 6, \"score\": 2},\n    {\"id\": 7, \"score\": 0},\n    {\"id\": 8, \"score\": 1},\n    {\"id\": 9, \"score\": 2},\n    {\"id\": 10, \"score\": 0},\n    {\"id\": 11, \"score\": 2},\n    {\"id\": 12, \"score\": 2},\n    {\"id\": 13, \"score\": 0},\n    {\"id\": 14, \"score\": 2},\n    {\"id\": 15, \"score\": 1},\n    {\"id\": 16, \"score\": 2},\n    {\"id\": 17, \"score\": 2},\n    {\"id\": 18, \"score\": 2},\n    {\"id\": 19, \"score\": 1},\n    {\"id\": 20, \"score\": 2},\n    {\"id\": 21, \"score\": 0},\n    {\"id\": 22, \"score\": 2},\n    {\"id\": 23, \"score\": 1},\n    {\"id\": 24, \"score\": 0},\n    {\"id\": 25, \"score\": 2},\n    {\"id\": 26, \"score\": 1},\n    {\"id\": 27, \"score\": 0},\n    {\"id\": 28, \"score\": 0},\n    {\"id\": 29, \"score\": 0},\n    {\"id\": 30, \"score\": 0}\n  ]\n}",
+  "created_at": "2026-08-11T05:46:28.973025+00:00"
+}

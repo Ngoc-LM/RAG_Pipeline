@@ -103,8 +103,21 @@ nhìn thấy 30 ứng viên), nên cả bốn arm cùng cắt ở 30 để so đ
 
 # --- LLM -----------------------------------------------------------------
 EMBED_MODEL: Final[str] = "gemini-embedding-001"
-GEN_MODEL: Final[str] = "gemini-2.5-flash"
-RERANK_MODEL: Final[str] = "gemini-2.5-flash-lite"
+
+GEN_MODEL: Final[str] = "gemini-3.5-flash"
+RERANK_MODEL: Final[str] = "gemini-3.1-flash-lite"
+"""Thiết kế ban đầu chọn gemini-2.5-flash và gemini-2.5-flash-lite.
+
+Cả hai nay trả 404 "no longer available to new users" với API key tạo mới, nên
+buộc phải thay bằng model kế nhiệm cùng tầng: flash cho bộ sinh, flash-lite cho
+reranker. Giữ nguyên vai trò và nguyên tắc phân tầng chi phí, chỉ đổi số hiệu.
+
+Không dùng gemini-3.6-flash vì nó từ chối thinking_budget = 0, tức không tắt được
+phần suy nghĩ — mất cả tính tất định lẫn quyền kiểm soát quota. Không dùng các
+bí danh `-latest` vì chúng trôi theo thời gian, mà cache key băm tên model: bí
+danh đổi ngầm sẽ làm cache trỏ sai model mà không có dấu hiệu nào.
+"""
+
 JUDGE_MODEL: Final[str] = "llama-3.3-70b-versatile"
 """Judge khác họ model với bộ sinh: dùng Gemini chấm output của Gemini thì có
 thiên lệch tự ưu ái."""
