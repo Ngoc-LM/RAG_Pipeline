@@ -1,0 +1,51 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Khách muốn xem lại và sửa thông tin của họ đang nằm ở chỗ bên tôi. Bên tôi phải trả lời và làm xong trong bao lâu?",
+      "claims": [
+        "Khi nhận được yêu cầu xem, chỉnh sửa hoặc yêu cầu chỉnh sửa dữ liệu cá nhân theo đúng thủ tục của chủ thể dữ liệu cá nhân, bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân phải phản hồi trong thời hạn 02 ngày làm việc.",
+        "Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân phải cung cấp đầy đủ thông tin cho chủ thể dữ liệu cá nhân về thủ tục và thực hiện yêu cầu trong thời hạn 10 ngày.",
+        "Trường hợp cần yêu cầu bên xử lý dữ liệu cá nhân, bên thứ ba chỉnh sửa dữ liệu cá nhân của chủ thể dữ liệu cá nhân thì thực hiện trong thời hạn 15 ngày.",
+        "Tùy theo tính chất, mức độ phức tạp của yêu cầu, trường hợp cần gia hạn thời gian xử lý thì được kéo dài thêm tối đa 01 lần gia hạn trong thời hạn không quá 10 ngày.",
+        "Khi gia hạn, bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân phải thông báo cho chủ thể dữ liệu cá nhân lý do cần gia hạn và chịu trách nhiệm chứng minh việc gia hạn là cần thiết, hợp lý."
+      ],
+      "citations": [
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "context": [
+        "nd_356_2025#a5#c3#p0",
+        "luat_91_2025#a13#c1-3#p0",
+        "luat_91_2025#a4#c4-5#p0",
+        "luat_91_2025#a4#c1#p0",
+        "nd_356_2025#a5#c1-2#p0",
+        "nd_356_2025#a5#c5#p0",
+        "nd_356_2025#a5#c4#p0",
+        "luat_91_2025#a27#c2-3#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với quy định về thời hạn phản hồi 02 ngày làm việc tại Điều 5 Khoản 3 Nghị định 356/2025/NĐ-CP.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với quy định về việc cung cấp thông tin thủ tục và thực hiện trong thời hạn 10 ngày tại Điều 5 Khoản 3 Nghị định 356/2025/NĐ-CP.\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp hoàn toàn với quy định về thời hạn 15 ngày khi yêu cầu bên thứ ba/bên xử lý chỉnh sửa dữ liệu tại Điều 5 Khoản 3 Nghị định 356/2025/NĐ-CP.\"\n    },\n    {\n      \"claim_id\": 4,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với quy định về điều kiện và thời hạn gia hạn tối đa 01 lần không quá 10 ngày tại Điều 5 Khoản 3 Nghị định 356/2025/NĐ-CP.\"\n    },\n    {\n      \"claim_id\": 5,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với quy định về nghĩa vụ thông báo lý do và chứng minh việc gia hạn là cần thiết, hợp lý tại Điều 5 Khoản 3 Nghị định 356/2025/NĐ-CP.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:17:52.809740+00:00"
+}

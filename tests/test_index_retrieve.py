@@ -19,6 +19,7 @@ from src.index import build_index, write_manifest
 from src.ingest import load_corpus
 from src.llm import CacheMiss, CallKey, _embed_key
 from src.retrieve import (
+    RERANK_SCHEMA,
     Retrieved,
     _parse_rerank,
     rank_by_score,
@@ -95,6 +96,7 @@ def seed_rerank(question: str, chunks, scores: list[dict]) -> None:
             "max_output_tokens": config.RERANK_MAX_TOKENS,
             "thinking_budget": config.RERANK_THINKING_BUDGET,
             "response_mime_type": "application/json",
+            "response_schema": RERANK_SCHEMA,
         },
     )
     write_cache(key, json.dumps({"scores": scores}, ensure_ascii=False))

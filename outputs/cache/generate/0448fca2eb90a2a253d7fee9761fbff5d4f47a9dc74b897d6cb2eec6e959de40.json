@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Khách đòi rút lại sự cho phép, nhưng bên tôi đang giữ dữ liệu đó để phục vụ yêu cầu của cơ quan nhà nước. Bên tôi có buộc phải dừng trong thời hạn quy định không?",
+      "context": [
+        "luat_91_2025#a14#c2-3#p0",
+        "nd_356_2025#a5#c1-2#p0",
+        "luat_91_2025#a14#c1#p0",
+        "luat_91_2025#a19#c1#p0",
+        "nd_356_2025#a5#c4#p0",
+        "luat_91_2025#a14#c4-5#p0",
+        "luat_91_2025#a10#c3-4#p0",
+        "luat_91_2025#a10#c1-2#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Việc thực hiện yêu cầu rút lại sự đồng ý cho phép xử lý dữ liệu cá nhân không áp dụng đối với trường hợp xử lý dữ liệu cá nhân không cần sự đồng ý của chủ thể dữ liệu cá nhân theo quy định tại Điều 19 Luật Bảo vệ dữ liệu cá nhân.\",\n      \"citations\": [\n        2\n      ]\n    },\n    {\n      \"text\": \"Việc xử lý dữ liệu cá nhân phục vụ hoạt động của cơ quan nhà nước, hoạt động quản lý nhà nước theo quy định của pháp luật là trường hợp không cần sự đồng ý của chủ thể dữ liệu cá nhân.\",\n      \"citations\": [\n        4\n      ]\n    },\n    {\n      \"text\": \"Do đó, bên bạn không buộc phải dừng xử lý dữ liệu trong thời hạn quy định đối với yêu cầu rút lại sự đồng ý trong trường hợp dữ liệu đó đang được xử lý để phục vụ yêu cầu của cơ quan nhà nước.\",\n      \"citations\": [\n        2,\n        4\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:33:37.015303+00:00"
+}

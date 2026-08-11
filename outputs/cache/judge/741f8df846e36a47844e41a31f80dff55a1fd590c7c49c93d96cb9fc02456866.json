@@ -1,0 +1,43 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Sau khi bắt đầu đẩy hồ sơ khách sang máy chủ đặt ở nước khác, bên tôi có bao nhiêu ngày để nộp giấy tờ cho cơ quan quản lý?",
+      "claims": [
+        "Hoạt động chuyển dữ liệu cá nhân đang lưu trữ tại Việt Nam đến hệ thống lưu trữ dữ liệu đặt ngoài lãnh thổ Việt Nam được xác định là một trường hợp chuyển dữ liệu cá nhân xuyên biên giới.",
+        "Khi thực hiện chuyển dữ liệu cá nhân xuyên biên giới, cơ quan, tổ chức, cá nhân phải lập hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới.",
+        "Bên chuyển dữ liệu có thời gian là 60 ngày kể từ ngày đầu tiên chuyển dữ liệu cá nhân xuyên biên giới để gửi 01 bản chính hồ sơ này cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân, trừ một số trường hợp ngoại lệ theo quy định."
+      ],
+      "citations": [
+        [
+          3
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "context": [
+        "luat_91_2025#a20#c2-3#p0",
+        "nd_356_2025#a17#c1#p0",
+        "luat_91_2025#a20#c1#p0",
+        "luat_91_2025#a39#c1-2#p0",
+        "luat_91_2025#a21#c1-2#p0",
+        "luat_91_2025#a22#c1-4#p0",
+        "luat_91_2025#a20#c6-7#p0",
+        "luat_91_2025#a21#c5-7#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [3] tại Điều 20 Khoản 1 điểm a xác định rõ việc chuyển dữ liệu cá nhân đang lưu trữ tại Việt Nam đến hệ thống lưu trữ dữ liệu đặt ngoài lãnh thổ Việt Nam là một trường hợp chuyển dữ liệu cá nhân xuyên biên giới.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] tại Điều 20 Khoản 2 quy định cơ quan, tổ chức, cá nhân chuyển dữ liệu cá nhân xuyên biên giới phải lập hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới.\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] tại Điều 20 Khoản 2 quy định rõ thời hạn gửi 01 bản chính hồ sơ cho cơ quan chuyên trách là trong vòng 60 ngày kể từ ngày đầu tiên chuyển dữ liệu và có ghi chú trừ trường hợp quy định tại khoản 6.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:03:02.541575+00:00"
+}

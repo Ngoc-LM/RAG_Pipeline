@@ -104,13 +104,20 @@ nhìn thấy 30 ứng viên), nên cả bốn arm cùng cắt ở 30 để so đ
 # --- LLM -----------------------------------------------------------------
 EMBED_MODEL: Final[str] = "gemini-embedding-001"
 
-GEN_MODEL: Final[str] = "gemini-3.5-flash"
+GEN_MODEL: Final[str] = "gemini-3.1-flash-lite"
 RERANK_MODEL: Final[str] = "gemini-3.1-flash-lite"
-"""Thiết kế ban đầu chọn gemini-2.5-flash và gemini-2.5-flash-lite.
+"""Thiết kế ban đầu: `gemini-2.5-flash` sinh câu trả lời, `gemini-2.5-flash-lite`
+rerank — tầng mạnh cho việc khó, tầng rẻ cho việc gọi nhiều.
 
-Cả hai nay trả 404 "no longer available to new users" với API key tạo mới, nên
-buộc phải thay bằng model kế nhiệm cùng tầng: flash cho bộ sinh, flash-lite cho
-reranker. Giữ nguyên vai trò và nguyên tắc phân tầng chi phí, chỉ đổi số hiệu.
+Hai lần buộc phải đổi, cả hai đều do ràng buộc bên ngoài chứ không do thiết kế:
+
+1. Cả hai model 2.5 trả 404 "no longer available to new users" với API key tạo
+   mới, nên chuyển sang thế hệ 3.
+2. Free tier của `gemini-3.5-flash` chỉ cho 20 request/NGÀY — không đủ cho 20 câu
+   hỏi nhân số lượt sinh lại. Nên bộ sinh cũng chạy `flash-lite`.
+
+Hệ quả: phân tầng chi phí hiện xẹp xuống, hai vai dùng chung một model. Đây là
+thứ ĐẦU TIÊN nên đảo lại nếu có tài khoản trả phí — chỉ cần sửa GEN_MODEL.
 
 Không dùng gemini-3.6-flash vì nó từ chối thinking_budget = 0, tức không tắt được
 phần suy nghĩ — mất cả tính tất định lẫn quyền kiểm soát quota. Không dùng các
@@ -118,9 +125,27 @@ bí danh `-latest` vì chúng trôi theo thời gian, mà cache key băm tên mo
 danh đổi ngầm sẽ làm cache trỏ sai model mà không có dấu hiệu nào.
 """
 
-JUDGE_MODEL: Final[str] = "llama-3.3-70b-versatile"
-"""Judge khác họ model với bộ sinh: dùng Gemini chấm output của Gemini thì có
-thiên lệch tự ưu ái."""
+JUDGE_PROVIDER: Final[str] = "google"
+JUDGE_MODEL: Final[str] = "gemma-4-31b-it"
+"""Judge phải KHÁC HỌ MODEL với bộ sinh: dùng Gemini chấm output của Gemini thì
+có thiên lệch tự ưu ái.
+
+Lựa chọn đầu tiên là `llama-3.3-70b-versatile` trên Groq — khác cả nhà cung cấp
+lẫn họ model. Môi trường phát triển chặn `api.groq.com` ở tầng mạng, nên mặc định
+chuyển sang Gemma: khác họ model và khác công thức huấn luyện so với Gemini, dù
+cùng nhà cung cấp. Yếu hơn phương án Groq đúng ở điểm "cùng vendor", và đây là
+đánh đổi có ý thức chứ không phải nhầm lẫn.
+
+Quay lại Groq là sửa hai dòng:
+    JUDGE_PROVIDER = "groq"
+    JUDGE_MODEL = "llama-3.3-70b-versatile"
+
+Gemma không hỗ trợ response_mime_type = "application/json" (trả rỗng), nên nó
+được gọi ở chế độ text thường và `_parse_verdicts` bóc khối JSON ra khỏi fence.
+
+Cố ý CHỈ có một hằng JUDGE_MODEL: giữ thêm một hằng "tên model Groq" nằm chờ sẽ
+tạo ra hai nguồn sự thật, mà cái không được dùng thì không ai phát hiện khi nó sai.
+"""
 
 EMBED_DIM: Final[int] = 768
 """Cắt Matryoshka từ 3072 để cache commit vào repo nhỏ đi ~4 lần. Bắt buộc
@@ -133,7 +158,15 @@ EMBED_TASK_QUERY: Final[str] = "RETRIEVAL_QUERY"
 """Embedding bất đối xứng: chunk và câu hỏi được nhúng bằng hai task_type khác
 nhau, nên cùng một chuỗi ở hai vai trò cho hai vector — và hai cache key khác nhau."""
 JUDGE_TEMPERATURE: Final[float] = 0.0
-JUDGE_MAX_TOKENS: Final[int] = 2048
+
+JUDGE_MAX_TOKENS: Final[int] = 8192
+"""Rộng gấp bốn các trần khác vì Gemma KHÔNG cho tắt thinking.
+
+`thinking_budget = 0` bị Gemma từ chối bằng 400, và token suy nghĩ tiêu chung
+ngân sách với token trả lời. Ở 2048, câu hỏi khó (judge phải cân nhắc mệnh đề có
+bỏ sót ngoại lệ hay không) đốt sạch ngân sách vào suy luận rồi trả về RỖNG với
+`finish_reason = MAX_TOKENS`. Ở 8192 thì dừng bình thường.
+"""
 
 GEN_TEMPERATURE: Final[float] = 0.0
 GEN_MAX_TOKENS: Final[int] = 4096

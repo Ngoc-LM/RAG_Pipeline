@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Nộp bộ giấy tờ đánh giá cho cơ quan quản lý có phải trả khoản tiền nào không, và bao nhiêu?",
+      "context": [
+        "luat_91_2025#a21#c1-2#p0",
+        "luat_91_2025#a21#c5-7#p0",
+        "luat_91_2025#a22#c1-4#p0",
+        "luat_91_2025#a20#c2-3#p0",
+        "luat_91_2025#a19#c2#p0",
+        "luat_91_2025#a21#c3-4#p0",
+        "nd_13_2023#a25#c1-2#p0",
+        "nd_13_2023#a25#c5-6#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": true,\n  \"reason\": \"Các trích đoạn được cung cấp không chứa thông tin về việc có phải trả khoản tiền nào hay không khi nộp bộ giấy tờ đánh giá cho cơ quan quản lý.\"\n  ,\"claims\": []\n}",
+  "created_at": "2026-08-11T06:37:51.475009+00:00"
+}

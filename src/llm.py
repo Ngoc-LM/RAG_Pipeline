@@ -31,6 +31,32 @@ class CacheMiss(RuntimeError):
     """Chạy --offline nhưng lời gọi này chưa có trong cache."""
 
 
+class TruncatedResponse(RuntimeError):
+    """Model chạm trần token trước khi nói xong."""
+
+
+def check_finish(response: Any, *, model: str, max_tokens: int) -> str:
+    """Lấy text và phân biệt 'chạm trần' với 'rỗng vì lý do khác'.
+
+    Gộp hai ca này vào một thông điệp là tự làm khó mình: model có thinking đốt
+    hết ngân sách vào suy luận rồi trả rỗng trông y hệt model bị chặn nội dung,
+    trong khi cách sửa hoàn toàn khác nhau (nới trần so với đổi prompt).
+    """
+    text = getattr(response, "text", None)
+    candidates = getattr(response, "candidates", None) or []
+    reason = str(getattr(candidates[0], "finish_reason", "")) if candidates else ""
+
+    if "MAX_TOKENS" in reason:
+        raise TruncatedResponse(
+            f"{model} chạm trần {max_tokens} token trước khi trả lời xong "
+            f"(text nhận được: {len(text or '')} ký tự). "
+            "Nới trần tương ứng trong src/config.py."
+        )
+    if not text:
+        raise RuntimeError(f"{model} trả về rỗng (finish_reason={reason or 'không rõ'})")
+    return text
+
+
 class MissingAPIKey(RuntimeError):
     """Cần gọi API thật nhưng biến môi trường key chưa được set."""
 
@@ -231,8 +257,15 @@ def gemini_generate(
     max_tokens: int,
     thinking_budget: int,
     offline: bool,
+    response_schema: dict[str, Any] | None = None,
 ) -> str:
-    """Sinh text bằng Gemini, có cache. `input_obj` mới là thứ đi vào cache key."""
+    """Sinh text bằng Gemini, có cache. `input_obj` mới là thứ đi vào cache key.
+
+    `response_schema` là bắt buộc trên thực tế chứ không phải tuỳ chọn làm đẹp:
+    chỉ đặt `response_mime_type="application/json"` thì model vẫn trả về JSON
+    thiếu dấu đóng ngoặc mà `finish_reason` vẫn báo STOP — đã gặp thật, tất định
+    ở temperature 0. Schema ràng buộc cấu trúc ở tầng giải mã nên chặn hẳn lỗi đó.
+    """
     key = CallKey(
         task=task,
         provider="google",
@@ -243,6 +276,7 @@ def gemini_generate(
             "max_output_tokens": max_tokens,
             "thinking_budget": thinking_budget,
             "response_mime_type": "application/json",
+            "response_schema": response_schema,
         },
     )
 
@@ -256,15 +290,61 @@ def gemini_generate(
                 temperature=temperature,
                 max_output_tokens=max_tokens,
                 response_mime_type="application/json",
+                response_schema=response_schema,
                 thinking_config=types.ThinkingConfig(thinking_budget=thinking_budget),
             ),
         )
-        text = response.text
-        if not text:
-            raise RuntimeError(f"Gemini trả về rỗng (finish={response.candidates})")
-        return text
+        return check_finish(response, model=model, max_tokens=max_tokens)
 
     return cached_call(key, call, offline)
+
+
+def gemma_generate(*, task: str, input_obj: Any, prompt: str, offline: bool) -> str:
+    """Gọi Gemma qua Gemini API ở chế độ TEXT THƯỜNG, có cache.
+
+    Không đặt `response_mime_type` và không gửi `thinking_config`: Gemma trả chuỗi
+    rỗng khi bật JSON mode. Người gọi chịu trách nhiệm bóc khối JSON ra khỏi fence.
+    """
+    key = CallKey(
+        task=task,
+        provider="google",
+        model=config.JUDGE_MODEL,
+        input=input_obj,
+        params={
+            "temperature": config.JUDGE_TEMPERATURE,
+            "max_output_tokens": config.JUDGE_MAX_TOKENS,
+        },
+    )
+
+    def call() -> str:
+        from google.genai import types
+
+        response = gemini_client().models.generate_content(
+            model=config.JUDGE_MODEL,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=config.JUDGE_TEMPERATURE,
+                max_output_tokens=config.JUDGE_MAX_TOKENS,
+            ),
+        )
+        return check_finish(
+            response, model=config.JUDGE_MODEL, max_tokens=config.JUDGE_MAX_TOKENS
+        )
+
+    return cached_call(key, call, offline)
+
+
+def judge_generate(*, task: str, input_obj: Any, prompt: str, offline: bool) -> str:
+    """Điều hướng LLM judge theo `config.JUDGE_PROVIDER`.
+
+    Hai nhà cung cấp có hình dạng params khác nhau nên cache key cũng khác nhau —
+    đổi provider tự động vô hiệu hoá cache cũ, đúng như mong muốn.
+    """
+    if config.JUDGE_PROVIDER == "groq":
+        return groq_generate(task=task, input_obj=input_obj, prompt=prompt, offline=offline)
+    if config.JUDGE_PROVIDER == "google":
+        return gemma_generate(task=task, input_obj=input_obj, prompt=prompt, offline=offline)
+    raise ValueError(f"JUDGE_PROVIDER không hợp lệ: {config.JUDGE_PROVIDER!r}")
 
 
 def groq_generate(*, task: str, input_obj: Any, prompt: str, offline: bool) -> str:

@@ -1,0 +1,51 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Bên tôi làm dịch vụ tiếp thị, muốn dùng danh sách khách do một đối tác chuyển sang để chạy quảng cáo. Có được phép không?",
+      "claims": [
+        "Tổ chức kinh doanh dịch vụ quảng cáo được phép sử dụng dữ liệu cá nhân của khách hàng do bên kiểm soát dữ liệu cá nhân chuyển giao theo thỏa thuận để kinh doanh dịch vụ quảng cáo.",
+        "Việc xử lý dữ liệu cá nhân của khách hàng để kinh doanh dịch vụ quảng cáo phải được sự đồng ý của khách hàng.",
+        "Khách hàng phải được biết rõ nội dung, phương thức, hình thức, tần suất giới thiệu sản phẩm và được cung cấp phương thức để từ chối nhận thông tin quảng cáo.",
+        "Việc sử dụng dữ liệu cá nhân để quảng cáo phải tuân thủ các quy định của pháp luật về phòng, chống tin nhắn rác, thư điện tử rác, cuộc gọi rác và pháp luật về quảng cáo.",
+        "Tổ chức kinh doanh dịch vụ quảng cáo có trách nhiệm chứng minh việc sử dụng dữ liệu cá nhân của khách hàng là tuân thủ quy định pháp luật."
+      ],
+      "citations": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          2
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ]
+      ],
+      "context": [
+        "luat_91_2025#a28#c1-2#p0",
+        "luat_91_2025#a28#c3-4#p0",
+        "luat_91_2025#a28#c5-7#p0",
+        "luat_91_2025#a28#c8#p0",
+        "luat_91_2025#a11#c1-3#p0",
+        "nd_356_2025#a7#c2-3#p0",
+        "luat_91_2025#a15#c1-2#p0",
+        "luat_91_2025#a17#c1-3#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với Khoản 1 Điều 28 tại trích đoạn [1].\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với phần đầu Khoản 3 Điều 28 tại trích đoạn [2].\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với các điều kiện đi kèm trong Khoản 3 Điều 28 tại trích đoạn [2].\"\n    },\n    {\n      \"claim_id\": 4,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với Khoản 4 Điều 28 tại trích đoạn [2].\"\n    },\n    {\n      \"claim_id\": 5,\n      \"supported\": true,\n      \"reason\": \"Nội dung mệnh đề khớp với Khoản 7 Điều 28 tại trích đoạn [3], quy định về trách nhiệm chứng minh việc sử dụng dữ liệu và tuân thủ quy định pháp luật.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:39:58.187428+00:00"
+}

@@ -1,0 +1,78 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "rerank",
+    "input": {
+      "question": "Khách muốn xem lại và sửa thông tin của họ đang nằm ở chỗ bên tôi. Bên tôi phải trả lời và làm xong trong bao lâu?",
+      "candidates": [
+        "nd_356_2025#a5#c3#p0",
+        "nd_13_2023#a15#c1#p0",
+        "luat_91_2025#a4#c1#p0",
+        "nd_356_2025#a5#c1-2#p0",
+        "nd_356_2025#a5#c5#p0",
+        "nd_356_2025#a5#c4#p0",
+        "luat_91_2025#a13#c1-3#p0",
+        "nd_13_2023#a15#c2-3#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "nd_13_2023#a9#c1-3#p0",
+        "luat_91_2025#a10#c1-2#p0",
+        "nd_356_2025#a8#c2#p0",
+        "luat_91_2025#a10#c3-4#p0",
+        "luat_attt_86_2015#a7#c1-3#p0",
+        "nd_13_2023#a25#c1-2#p0",
+        "nd_13_2023#a2#c14#p0",
+        "nd_356_2025#a9#c1-2#p0",
+        "nd_13_2023#a12#c1-4#p0",
+        "luat_91_2025#a4#c4-5#p0",
+        "nd_13_2023#a9#c7-8#p0",
+        "nd_13_2023#a13#c3-4#p0",
+        "luat_91_2025#a16#c3-5#p0",
+        "nd_13_2023#a2#c4#p0",
+        "nd_13_2023#a3#c5-8#p0",
+        "nd_13_2023#a16#c3-5#p0",
+        "nd_356_2025#a3#c1-11#p0",
+        "nd_13_2023#a2#c3#p0",
+        "luat_91_2025#a21#c1-2#p0",
+        "nd_13_2023#a25#c5-6#p0",
+        "luat_91_2025#a3#c1-3#p0"
+      ],
+      "candidates_digest": "57a95562ec068d179a06615475a5e8447206aa11bcd542ba25eb2c4d5d53a823"
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "scores": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "score": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "score"
+              ]
+            }
+          }
+        },
+        "required": [
+          "scores"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"scores\": [\n    {\"id\": 1, \"score\": 3},\n    {\"id\": 2, \"score\": 0},\n    {\"id\": 3, \"score\": 1},\n    {\"id\": 4, \"score\": 1},\n    {\"id\": 5, \"score\": 1},\n    {\"id\": 6, \"score\": 1},\n    {\"id\": 7, \"score\": 2},\n    {\"id\": 8, \"score\": 0},\n    {\"id\": 9, \"score\": 1},\n    {\"id\": 10, \"score\": 0},\n    {\"id\": 11, \"score\": 1},\n    {\"id\": 12, \"score\": 1},\n    {\"id\": 13, \"score\": 1},\n    {\"id\": 14, \"score\": 0},\n    {\"id\": 15, \"score\": 0},\n    {\"id\": 16, \"score\": 0},\n    {\"id\": 17, \"score\": 1},\n    {\"id\": 18, \"score\": 0},\n    {\"id\": 19, \"score\": 2},\n    {\"id\": 20, \"score\": 0},\n    {\"id\": 21, \"score\": 0},\n    {\"id\": 22, \"score\": 1},\n    {\"id\": 23, \"score\": 0},\n    {\"id\": 24, \"score\": 0},\n    {\"id\": 25, \"score\": 0},\n    {\"id\": 26, \"score\": 0},\n    {\"id\": 27, \"score\": 0},\n    {\"id\": 28, \"score\": 0},\n    {\"id\": 29, \"score\": 0},\n    {\"id\": 30, \"score\": 1}\n  ]\n}",
+  "created_at": "2026-08-11T06:07:26.940981+00:00"
+}

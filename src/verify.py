@@ -3,7 +3,7 @@
 - Check A — cú pháp, MIỄN PHÍ. Mọi trích dẫn phải trỏ tới một trích đoạn thực sự
   có trong prompt, và mọi mệnh đề phải có ít nhất một trích dẫn. Fail thì sinh
   lại ngay, không tốn một lời gọi judge nào.
-- Check B — ngữ nghĩa, ĐÚNG MỘT lời gọi Groq cho toàn bộ mệnh đề.
+- Check B — ngữ nghĩa, ĐÚNG MỘT lời gọi LLM judge cho toàn bộ mệnh đề.
 
 Module này cố ý chỉ nhận kiểu dữ liệu nguyên thuỷ (chuỗi, số, Chunk) chứ không
 import gì từ `src.generate`. Nhờ vậy hướng phụ thuộc là generate -> verify, không
@@ -13,12 +13,13 @@ có vòng, và hai tầng kiểm chứng test được độc lập với bộ s
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any, Sequence
 
 from src import config
 from src.chunk import Chunk
-from src.llm import groq_generate
+from src.llm import judge_generate
 
 
 @dataclass(frozen=True)
@@ -123,9 +124,29 @@ def _render_claims(texts: Sequence[str], citations: Sequence[Sequence[int]]) -> 
     )
 
 
+FENCE_RE = re.compile(r"```(?:json)?\s*(.*?)```", re.DOTALL)
+
+
+def _extract_json(raw: str) -> str:
+    """Bóc khối JSON ra khỏi văn bản tự do.
+
+    Judge chạy ở chế độ JSON mode thì trả JSON trần và hàm này không đụng gì. Gemma
+    không có JSON mode nên gói kết quả trong ```json … ```; bóc fence ở tầng parse
+    giữ cho tầng gọi API không phải biết model nào cần xử lý đặc biệt.
+    """
+    stripped = raw.strip()
+    if stripped.startswith("{") or stripped.startswith("["):
+        return stripped
+    fenced = FENCE_RE.search(raw)
+    if fenced:
+        return fenced.group(1).strip()
+    brace = re.search(r"(\{.*\})", raw, re.DOTALL)
+    return brace.group(1) if brace else stripped
+
+
 def _parse_verdicts(raw: str, n_claims: int) -> dict[int, ClaimVerdict]:
     try:
-        parsed = json.loads(raw)
+        parsed = json.loads(_extract_json(raw))
     except json.JSONDecodeError as exc:
         raise ValueError(f"Judge trả về JSON hỏng: {raw[:200]!r}") from exc
 
@@ -173,7 +194,7 @@ def check_grounding(
         claims=_render_claims(claim_texts, citations_per_claim),
         n=len(claim_texts),
     )
-    raw = groq_generate(
+    raw = judge_generate(
         task="judge",
         input_obj={
             "question": question,

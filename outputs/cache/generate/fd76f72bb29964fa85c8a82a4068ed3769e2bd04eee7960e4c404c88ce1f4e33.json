@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Doanh nghiệp phải giữ hóa đơn điện tử trong bao nhiêu năm trước khi được huỷ?",
+      "context": [
+        "nd_13_2023#a16#c3-5#p0",
+        "luat_91_2025#a38#c1-4#p0",
+        "nd_13_2023#a12#c1-4#p0",
+        "luat_attt_86_2015#a10#c3#p0",
+        "luat_91_2025#a28#c8#p0",
+        "nd_356_2025#a12#c3-4#p0",
+        "nd_356_2025#a11#c1-2#p0",
+        "luat_91_2025#a9#c3-5#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": true,\n  \"reason\": \"Các trích đoạn được cung cấp không chứa thông tin về thời hạn lưu trữ hóa đơn điện tử trước khi được hủy.\"\n  ,\"claims\": []\n}",
+  "created_at": "2026-08-11T06:37:49.160854+00:00"
+}

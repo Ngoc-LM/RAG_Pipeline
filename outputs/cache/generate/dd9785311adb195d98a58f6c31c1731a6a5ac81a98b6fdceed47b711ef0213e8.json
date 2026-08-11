@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Dữ liệu khách hàng được phép giữ tối đa bao nhiêu tháng trước khi buộc phải xoá?",
+      "context": [
+        "luat_91_2025#a28#c3-4#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "luat_91_2025#a29#c1-3#p0",
+        "luat_91_2025#a28#c1-2#p0",
+        "nd_356_2025#a5#c4#p0",
+        "luat_91_2025#a28#c5-7#p0",
+        "nd_356_2025#a5#c1-2#p0",
+        "luat_91_2025#a8#c3-4#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": true,\n  \"reason\": \"Các trích đoạn được cung cấp không quy định về thời hạn tối đa được phép lưu trữ dữ liệu khách hàng trước khi buộc phải xóa.\"\n  ,\"claims\": []\n}",
+  "created_at": "2026-08-11T06:37:50.649526+00:00"
+}

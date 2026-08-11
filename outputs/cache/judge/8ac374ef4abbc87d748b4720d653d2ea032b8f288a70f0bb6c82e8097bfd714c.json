@@ -1,0 +1,43 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Công ty tôi vừa xác định có một vụ rò rỉ dữ liệu nghiêm trọng ảnh hưởng tới tài sản của khách. Phải gửi thông báo tới đâu và trong bao lâu?",
+      "claims": [
+        "Khi phát hiện vi phạm quy định về bảo vệ dữ liệu cá nhân có thể gây tổn hại đến tài sản của chủ thể dữ liệu, bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên thứ ba phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân.",
+        "Thời hạn thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân là chậm nhất 72 giờ kể từ khi phát hiện hành vi vi phạm.",
+        "Nếu là dữ liệu nhạy cảm trong lĩnh vực tài chính, ngân hàng, hoạt động thông tin tín dụng, tổ chức hoặc cá nhân thu thập dữ liệu phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu."
+      ],
+      "citations": [
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "context": [
+        "luat_91_2025#a23#c1#p0",
+        "nd_356_2025#a8#c3#p0",
+        "luat_91_2025#a27#c1#p0",
+        "luat_91_2025#a23#c4-5#p0",
+        "luat_91_2025#a23#c2-3#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "luat_attt_86_2015#a10#c3#p0",
+        "luat_91_2025#a29#c1-3#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Mệnh đề khớp hoàn toàn với nội dung tại Điều 23 Khoản 1 trích đoạn [1] về đối tượng thông báo, điều kiện (gây tổn hại đến tài sản) và cơ quan tiếp nhận thông báo.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Mệnh đề khớp hoàn toàn với thời hạn thông báo được quy định tại Điều 23 Khoản 1 trích đoạn [1].\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Mệnh đề khớp hoàn toàn với nội dung tại Điều 8 Khoản 3 trích đoạn [2] về loại dữ liệu, lĩnh vực, đối tượng có trách nhiệm thông báo, đối tượng nhận thông báo và thời hạn.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:34:55.116012+00:00"
+}

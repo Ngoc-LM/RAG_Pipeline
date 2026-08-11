@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Sau khi bắt đầu đẩy hồ sơ khách sang máy chủ đặt ở nước khác, bên tôi có bao nhiêu ngày để nộp giấy tờ cho cơ quan quản lý?",
+      "context": [
+        "luat_91_2025#a20#c2-3#p0",
+        "nd_356_2025#a17#c1#p0",
+        "luat_91_2025#a20#c1#p0",
+        "luat_91_2025#a39#c1-2#p0",
+        "luat_91_2025#a21#c1-2#p0",
+        "luat_91_2025#a22#c1-4#p0",
+        "luat_91_2025#a20#c6-7#p0",
+        "luat_91_2025#a21#c5-7#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Cơ quan, tổ chức, cá nhân chuyển dữ liệu cá nhân xuyên biên giới phải lập hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Hồ sơ này phải được gửi cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân trong thời gian 60 ngày kể từ ngày đầu tiên chuyển dữ liệu cá nhân xuyên biên giới.\",\n      \"citations\": [\n        1\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:24:33.170736+00:00"
+}

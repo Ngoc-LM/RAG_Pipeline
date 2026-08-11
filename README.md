@@ -85,18 +85,55 @@ python -m tools.annotate --help
 | Vai trò | Model | Ghi chú |
 |---|---|---|
 | Embedding | `gemini-embedding-001` | 768 chiều, cắt Matryoshka + chuẩn hoá L2 |
-| Sinh câu trả lời | `gemini-3.5-flash` | |
+| Sinh câu trả lời | `gemini-3.1-flash-lite` | JSON có `response_schema` |
 | Rerank | `gemini-3.1-flash-lite` | listwise, một lời gọi cho cả danh sách |
-| LLM judge | `llama-3.3-70b-versatile` trên Groq | |
+| LLM judge | `gemma-4-31b-it` | khác họ model với bộ sinh |
 
 Judge cố ý **khác họ model** với bộ sinh: dùng chính Gemini để chấm câu trả lời
 của Gemini thì sẽ có thiên lệch tự ưu ái.
 
-Thiết kế ban đầu chọn `gemini-2.5-flash` và `gemini-2.5-flash-lite`. Cả hai nay
-trả `404 no longer available to new users` với API key tạo mới, nên phải thay bằng
-model kế nhiệm cùng tầng. Không dùng bí danh `-latest` vì chúng trôi theo thời gian
-mà cache key băm tên model — bí danh đổi ngầm sẽ làm cache trỏ sai model mà không
-có dấu hiệu nào.
+### Ba lần buộc phải đổi model, và vì sao
+
+Thiết kế ban đầu là `gemini-2.5-flash` sinh, `gemini-2.5-flash-lite` rerank,
+`llama-3.3-70b-versatile` trên Groq làm judge. Cả ba đều phải đổi vì ràng buộc
+bên ngoài, không phải vì thiết kế sai:
+
+1. **Cả hai model 2.5 trả `404 no longer available to new users`** với API key tạo
+   mới → chuyển sang thế hệ 3.
+2. **`api.groq.com` bị network policy của môi trường phát triển chặn** → judge
+   chuyển sang Gemma. Gemma khác họ model và khác công thức huấn luyện so với
+   Gemini, nhưng **cùng nhà cung cấp** — yếu hơn phương án Groq đúng ở điểm đó.
+   Quay lại Groq chỉ cần sửa hai dòng trong `src/config.py`.
+3. **`gemini-3.5-flash` free tier chỉ cho 20 request/NGÀY**, không đủ cho 20 câu
+   hỏi nhân số lượt sinh lại → bộ sinh cũng dùng `flash-lite`. Phân tầng chi phí
+   (tầng mạnh cho việc khó, tầng rẻ cho việc gọi nhiều) vì vậy hiện đang xẹp
+   xuống; đây là thứ đầu tiên nên đảo lại nếu có tài khoản trả phí.
+
+Không dùng bí danh `-latest` vì chúng trôi theo thời gian mà cache key băm tên
+model — bí danh đổi ngầm sẽ làm cache trỏ sai model mà không có dấu hiệu nào.
+Không dùng `gemini-3.6-flash` vì nó từ chối `thinking_budget = 0`.
+
+### Bốn lỗi chỉ lộ ra khi chạy thật
+
+Không test nào bắt được những lỗi này, vì chúng nằm ở hành vi của nhà cung cấp:
+
+- **`response_mime_type="application/json"` KHÔNG đủ để có JSON hợp lệ.** Model
+  trả JSON thiếu dấu `}` đóng trong khi `finish_reason` vẫn báo `STOP`, tất định
+  ở `temperature = 0`. Phải khai báo `response_schema` mới ràng buộc được cấu
+  trúc ở tầng giải mã.
+- **Gemma không cho tắt thinking** (`thinking_budget = 0` → 400), và token suy
+  nghĩ tiêu chung ngân sách với token trả lời. Ở `max_output_tokens = 2048` nó
+  đốt sạch ngân sách vào suy luận rồi trả **rỗng** với `finish_reason = MAX_TOKENS`.
+  Vì vậy `JUDGE_MAX_TOKENS = 8192`.
+- **Hạn ngạch theo NGÀY thì backoff không cứu được.** `RETRY_MAX_ATTEMPTS = 6` xử
+  lý tốt 429 do vượt RPM, nhưng vô dụng với `GenerateRequestsPerDayPerProjectPerModel`.
+- **404 không được thử lại.** `RETRYABLE_STATUS` không chứa 404, nên khi gặp model
+  đã bị khoá thì pipeline dừng ngay thay vì lùi sáu lần vô ích — phân loại lỗi
+  theo status code thay vì theo chuỗi trong message đã trả công đúng chỗ này.
+
+`check_finish()` trong `src/llm.py` tách riêng "chạm trần token" khỏi "rỗng vì lý
+do khác": gộp hai ca này vào một thông điệp là tự làm khó mình, vì cách sửa hoàn
+toàn khác nhau (nới trần so với đổi prompt).
 
 ## Cấu trúc
 

@@ -17,6 +17,7 @@ import pytest
 from src import config
 from src.chunk import Chunk
 from src.generate import (
+    GENERATE_SCHEMA,
     Attempt,
     Claim,
     Draft,
@@ -30,6 +31,7 @@ from src.ingest import load_corpus
 from src.llm import CacheMiss, CallKey
 from src.retrieve import Retrieved
 from src.verify import (
+    _extract_json,
     CheckA,
     CheckB,
     ClaimVerdict,
@@ -87,6 +89,7 @@ def generate_key(question: str, chunks, attempt: int, feedback: str) -> CallKey:
             "max_output_tokens": config.GEN_MAX_TOKENS,
             "thinking_budget": config.GEN_THINKING_BUDGET,
             "response_mime_type": "application/json",
+            "response_schema": GENERATE_SCHEMA,
         },
     )
 
@@ -138,11 +141,35 @@ def test_parse_verdicts_json_hong_thi_raise():
         _parse_verdicts("không phải json", 1)
 
 
+def test_parse_verdicts_boc_duoc_fence_markdown():
+    """Gemma không có JSON mode nên gói kết quả trong ```json … ```."""
+    raw = '```json\n{"verdicts": [{"claim_id": 1, "supported": true}]}\n```'
+    assert _parse_verdicts(raw, 1)[1].supported is True
+
+
+def test_parse_verdicts_boc_duoc_fence_khong_ghi_json():
+    raw = '```\n{"verdicts": [{"claim_id": 1, "supported": false}]}\n```'
+    assert _parse_verdicts(raw, 1)[1].supported is False
+
+
+def test_parse_verdicts_boc_duoc_json_lan_trong_van_xuoi():
+    raw = 'Đây là kết quả:\n{"verdicts": [{"claim_id": 1, "supported": true}]}\nHết.'
+    assert _parse_verdicts(raw, 1)[1].supported is True
+
+
+def test_extract_json_khong_dung_vao_json_tran():
+    """JSON mode trả JSON trần thì bước bóc fence phải là no-op."""
+    raw = '{"verdicts": []}'
+    assert _extract_json(raw) == raw
+
+
 # --- Check B: chấm điểm ---------------------------------------------------
 def judge_key(question, claim_texts, citations, chunks) -> CallKey:
+    """Dựng lại cache key của judge theo đúng JUDGE_PROVIDER đang cấu hình."""
+    groq = config.JUDGE_PROVIDER == "groq"
     return CallKey(
         task="judge",
-        provider="groq",
+        provider="groq" if groq else "google",
         model=config.JUDGE_MODEL,
         input={
             "question": question,
@@ -154,6 +181,11 @@ def judge_key(question, claim_texts, citations, chunks) -> CallKey:
             "temperature": config.JUDGE_TEMPERATURE,
             "max_tokens": config.JUDGE_MAX_TOKENS,
             "response_format": "json_object",
+        }
+        if groq
+        else {
+            "temperature": config.JUDGE_TEMPERATURE,
+            "max_output_tokens": config.JUDGE_MAX_TOKENS,
         },
     )
 

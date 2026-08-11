@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Khách gửi yêu cầu xoá sạch thông tin của họ. Bên tôi phải hoàn tất trong bao lâu?",
+      "context": [
+        "nd_356_2025#a5#c4#p0",
+        "luat_91_2025#a4#c4-5#p0",
+        "luat_91_2025#a14#c1#p0",
+        "luat_91_2025#a4#c1#p0",
+        "nd_356_2025#a5#c3#p0",
+        "luat_91_2025#a10#c1-2#p0",
+        "nd_356_2025#a5#c5#p0",
+        "luat_91_2025#a28#c5-7#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Khi nhận được yêu cầu xóa dữ liệu cá nhân, bên kiểm soát dữ liệu cá nhân phải phản hồi trong thời hạn 02 ngày làm việc.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Bên kiểm soát dữ liệu cá nhân phải thực hiện yêu cầu xóa dữ liệu trong thời hạn 20 ngày.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Trường hợp cần yêu cầu bên xử lý dữ liệu cá nhân hoặc bên thứ ba xóa dữ liệu, thời hạn thực hiện là 30 ngày.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Nếu yêu cầu phức tạp, thời gian xử lý có thể được gia hạn tối đa 01 lần với thời hạn không quá 20 ngày.\",\n      \"citations\": [\n        1\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:34:56.334987+00:00"
+}
