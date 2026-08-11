@@ -181,23 +181,41 @@ MAX_GENERATE_ATTEMPTS: Final[int] = 2
 
 ABSTAIN_TEXT: Final[str] = "Không đủ căn cứ trong tài liệu."
 
-TAU_RETRIEVE: Final[float] = 0.5
+TAU_RETRIEVE: Final[float] = 0.0
 """Ngưỡng gác TRƯỚC generate, so với điểm rerank cao nhất (đã chuẩn hoá [0, 1]).
 
-Bắt câu hỏi nằm ngoài phạm vi corpus và chặn trước khi tốn một lượt sinh nào.
-Chỉ áp dụng được cho arm có rerank: điểm BM25 và cosine không cùng thang nên
+Ý định: bắt câu hỏi nằm ngoài phạm vi corpus và chặn trước khi tốn lượt sinh nào.
+Chỉ áp dụng được cho arm có rerank — điểm BM25 và cosine không cùng thang nên
 không có ngưỡng chung nào đúng cho cả bốn arm.
+
+GIÁ TRỊ 0.0 LÀ MỘT KẾT QUẢ RỖNG, KHÔNG PHẢI MỘT PHÁT HIỆN. Quét lưới trên gold
+set cho ra bốn hàng giống hệt nhau: mọi giá trị TAU_RETRIEVE đều cho cùng F1,
+cùng faithfulness, cùng số câu bị từ chối. Lý do là cả 4 câu unanswerable bị chặn
+HAI LẦN độc lập — điểm rerank của chúng lần lượt là 0.0, 0.0, 0.33, 0.0, mà bản
+thân bộ sinh cũng tự abstain đúng cả 4 câu. Cửa gác chưa bao giờ là mắt xích
+quyết định, nên dữ liệu không nói được gì về nó.
+
+Không có bằng chứng cho một giá trị khác 0 thì lấy 0. Hai điều cần biết trước khi
+tin con số này: (a) nó dựa trên đúng 4 câu unanswerable; (b) cửa gác còn một lý do
+mà metric này không đo được — nó tiết kiệm một lượt sinh cho mỗi câu truy xuất
+hỏng, và trên free tier có hạn ngạch theo ngày thì đó không phải lợi ích nhỏ.
+Hiệu chuẩn lại khi gold set có nhiều câu unanswerable hơn.
 """
 
-TAU_GROUND: Final[float] = 0.8
+TAU_GROUND: Final[float] = 1.0
 """Ngưỡng gác SAU generate, so với support_ratio từ LLM judge.
 
 Tách khỏi TAU_RETRIEVE vì hai ngưỡng bắt hai loại lỗi khác nhau: ngưỡng trước
 bắt "corpus không có câu trả lời", ngưỡng sau bắt "chunk trông hợp lý nhưng model
 bịa thêm chi tiết". Gộp một ngưỡng thì không thể chỉnh riêng từng loại lỗi.
 
-Cả hai giá trị ở đây là điểm khởi đầu; src/calibrate.py sẽ quét lưới trên gold
-set để tối ưu F1 giữa abstain đúng và abstain nhầm.
+Khác TAU_RETRIEVE, ngưỡng này CÓ bằng chứng: tác dụng đơn điệu trên toàn lưới,
+faithfulness sau verify đi 0.9597 -> 0.9806 -> 1.0000 khi siết 0.5 -> 0.75 -> 1.0,
+và không gây một lần từ chối nhầm nào.
+
+Giá phải trả cho 1.0 là 3 lượt sinh lại thay vì 0. Nếu quota là ràng buộc chặt
+hơn groundedness thì 0.75 cho 0.9806 với chỉ 1 lượt sinh lại — cả hai con số nằm
+trong outputs/eval/calibration.json để chọn lại có căn cứ.
 """
 
 CALIBRATE_TAU_RETRIEVE_GRID: Final[tuple[float, ...]] = (0.0, 0.34, 0.67, 1.0)

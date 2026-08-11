@@ -57,6 +57,33 @@ Ba điều đáng nói, kể cả điều bất lợi:
 
 Chi tiết `r*` từng span từng câu nằm trong `outputs/eval/retrieval.json`.
 
+### Chất lượng câu trả lời (cả 20 câu, arm `hybrid_rerank`)
+
+```
+Quyết định abstain (lớp dương = đáng lẽ phải abstain)
+  abstain đúng   : 4        từ chối nhầm : 0
+  bỏ sót abstain : 0        trả lời đúng : 16
+  P = 1.000   R = 1.000   F1 = 1.000
+
+Groundedness
+  support_ratio  : 0.9597 trước verify  ->  1.0000 sau verify
+  sinh lại       : 3        Check A hỏng : 0
+```
+
+Cột "trước / sau verify" là chỗ đọc được tầng kiểm chứng đáng giá bao nhiêu. Ba
+câu bị judge bác một phần, và cả ba đều được lượt sinh lại cứu:
+
+| qid | loại | support_ratio lượt 1 → lượt 2 |
+|---|---|---|
+| `q07` | factoid | 0.667 → **1.000** |
+| `q09` | multi-hop | 0.889 → **1.000** |
+| `q16` | distractor | 0.800 → **1.000** |
+
+Không câu nào phải abstain sau khi sinh lại, tức cơ chế "chèn danh sách mệnh đề
+bị bác vào prompt lượt hai" hoạt động đúng ý đồ chứ không chỉ đốt thêm quota.
+
+Năm câu trả lời đầy đủ kèm trích dẫn: **[`outputs/demo_answers.md`](outputs/demo_answers.md)**.
+
 ## Các lệnh khác
 
 ```bash
@@ -604,9 +631,9 @@ cosine nằm trong `[-1, 1]`, nên cùng một con số ngưỡng mang ý nghĩa
 arm — thà không gác còn hơn gác bằng một đại lượng không so sánh được. Ba arm còn
 lại đi thẳng vào generate và chỉ chịu ngưỡng sau.
 
-Giá trị hiện tại (`TAU_RETRIEVE = 0.5`, `TAU_GROUND = 0.8`) là điểm khởi đầu;
-`src/calibrate.py` quét lưới trên gold set để tối ưu F1 giữa abstain đúng và
-abstain nhầm.
+Giá trị hiện tại (`TAU_RETRIEVE = 0.0`, `TAU_GROUND = 1.0`) đến từ `run.py
+calibrate` chạy thật, không phải đặt tay — xem phần quét lưới ngay dưới đây, kể
+cả phần kết quả rỗng của `TAU_RETRIEVE`.
 
 ### Quét lưới ngưỡng
 
@@ -642,16 +669,40 @@ nguyên `0..RERANK_MAX_SCORE` chuẩn hoá về `[0, 1]`, nên nó chỉ nhận 
 các giá trị đó — thêm điểm lưới nữa chỉ tạo ra các dòng trùng nhau và làm bảng
 trông như đã dò kỹ hơn thực tế.
 
-Chọn điểm: F1 cao nhất; hoà thì ưu tiên ít `missed_abstain` hơn (phá hoà về phía
-an toàn), hoà tiếp thì lấy ngưỡng **thấp** hơn để không siết chặt hơn mức dữ liệu
-biện minh được.
+Chọn điểm theo bốn tiêu chí, đúng thứ tự đó: F1 cao nhất → ít `missed_abstain`
+hơn (phá hoà về phía an toàn) → **faithfulness cao hơn** → ngưỡng thấp hơn.
+
+### Lưới phẳng: kết quả thật, và nó buộc phải sửa tiêu chí chọn
+
+Chạy thật trên gold set cho một kết quả không lường trước: **cả 28 điểm lưới đều
+F1 = 1.000**. Vùng bằng phẳng phủ kín lưới.
+
+Đó chính là lúc việc in cả vùng bằng phẳng trả công. Nếu chỉ in argmax thì bảng
+sẽ trông như "đã tìm được ngưỡng tối ưu", trong khi sự thật là **mục tiêu chính
+không phân biệt được điểm nào với điểm nào**. Tách hai ngưỡng ra thì thấy chúng
+khác hẳn nhau:
+
+| | kết luận từ lưới |
+|---|---|
+| `TAU_RETRIEVE` | **kết quả rỗng.** Bốn hàng giống hệt nhau. Cả 4 câu unanswerable bị chặn hai lần độc lập — điểm rerank của chúng là 0.0/0.0/0.33/0.0, *và* bộ sinh cũng tự abstain đúng cả 4. Cửa gác chưa bao giờ là mắt xích quyết định. |
+| `TAU_GROUND` | **có tác dụng đo được.** Faithfulness đi 0.9597 → 0.9806 → 1.0000 khi siết 0.5 → 0.75 → 1.0, đơn điệu trên toàn lưới, và không gây một lần từ chối nhầm nào. Giá phải trả: 0 → 1 → 3 lượt sinh lại. |
+
+Tiêu chí chọn ban đầu chỉ tối ưu F1 abstain. Vì F1 hoà khắp lưới, nó rơi thẳng
+xuống tiêu chí cuối là "ngưỡng thấp nhất" — và chọn đúng ô có faithfulness **tệ
+nhất** (0.9597 thay vì 1.0000). Đó là một lỗi thật của tiêu chí, chỉ lộ ra khi có
+dữ liệu thật, nên `best_point` được bổ sung faithfulness làm tiêu chí phá hoà thứ
+ba. Bài học: **lưới phẳng ở mục tiêu chính không có nghĩa mọi điểm tương đương.**
+
+Kết quả: `TAU_RETRIEVE = 0.0`, `TAU_GROUND = 1.0`. Giá trị `TAU_RETRIEVE = 0.0`
+được ghi rõ trong `src/config.py` là *kết quả rỗng, không phải phát hiện* — không
+có bằng chứng cho giá trị nào khác 0, và cửa gác vẫn còn một lý do mà metric này
+không đo được (nó tiết kiệm một lượt sinh cho mỗi câu truy xuất hỏng, đáng kể khi
+free tier có hạn ngạch theo ngày).
 
 **Cảnh báo cỡ mẫu, in ra ngay trong báo cáo.** Gold set chỉ có 4 câu
 `unanswerable`, nên recall của lớp abstain nhảy theo bước 0.25 và F1 có khoảng tin
-cậy rất rộng. Vì vậy `calibrate` in **cả vùng bằng phẳng** (mọi điểm đạt đúng F1
-cao nhất, đánh dấu `~`) chứ không chỉ in argmax: hình dạng vùng đó mới là thứ biện
-minh cho lựa chọn ngưỡng. Một argmax nằm chơ vơ giữa vùng trũng là dấu hiệu overfit
-lên 4 điểm dữ liệu, không phải một ngưỡng tốt.
+cậy rất rộng. Một lưới phẳng hoàn toàn với n = 4 nói về cỡ mẫu nhiều hơn là về
+ngưỡng.
 
 ## Cache và chế độ offline
 
@@ -832,14 +883,13 @@ Theo thứ tự giá trị trên chi phí:
 
 ## Trạng thái chạy thật
 
-| tầng | trạng thái | ghi chú |
-|---|---|---|
-| Chunk, index, 4 arm truy xuất, `evaluate` | ✅ **đã chạy thật** | cache đã commit, dựng lại được bằng `--offline` |
-| `answer`, `calibrate` | ⚠️ **chưa chạy** | Check B gọi Groq, mà `api.groq.com` bị network policy của môi trường phát triển chặn (403 CONNECT) |
+**Toàn bộ pipeline đã chạy thật đầu-cuối.** Mọi con số trong README này đến từ
+lời gọi API thật, và cache của cả bốn loại lời gọi (`embed`, `rerank`, `generate`,
+`judge`) đã được commit trong `outputs/cache/`.
 
-Đây là hạn chế của **môi trường**, không phải của mã: `GROQ_API_KEY` đã có, đường
-mạng thì không. Trên máy có truy cập `api.groq.com`, `python run.py answer` và
-`python run.py calibrate` chạy được ngay với cache Gemini đã commit sẵn.
+Hệ quả: `python run.py all --arm all --offline` dựng lại được **mọi bảng** trong
+tài liệu này mà không cần một API key nào. Chỉ cần key khi hỏi một câu **mới**
+chưa có trong cache.
 
 Không có nhánh nào coi "không gọi được judge" là "đã chấm và đạt": Check B lỗi
 kết nối thì `with_backoff` thử lại rồi raise, `check_b` giữ nguyên `None`, và
