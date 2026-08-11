@@ -25,8 +25,10 @@ chạy được và có test; phần chưa có là thiết kế đã chốt như
 | Index (BM25 + embedding) | `src/index.py` | ✅ |
 | Retrieve (4 arm, RRF + rerank) | `src/retrieve.py` | ✅ |
 | Evaluate truy xuất bằng coverage | `src/evaluate.py` | ✅ |
-| Generate + verify hai tầng | — | ⬜ chưa dựng |
+| Sinh câu trả lời có trích dẫn | `src/generate.py` | ✅ |
+| Kiểm chứng hai tầng | `src/verify.py` | ✅ |
 | Calibrate hai ngưỡng abstain | — | ⬜ chưa dựng |
+| CLI đầu-cuối | — | ⬜ chưa dựng |
 
 Lệnh chạy được đầu-cuối hôm nay:
 
@@ -35,6 +37,7 @@ python -m src.chunk  --corpus data/corpus                    # thống kê chunk
 python -m src.index  --corpus data/corpus                    # dựng chỉ mục + ghi manifest
 python -m src.retrieve --corpus data/corpus --arm bm25 --qid q16
 python -m src.evaluate --corpus data/corpus --arms bm25    # bảng truy xuất
+python -m src.generate --corpus data/corpus --qid q01      # cần GEMINI_API_KEY
 python -m tools.annotate --help
 python -m pytest
 ```
@@ -440,39 +443,73 @@ Bù bằng **bigram âm tiết liền kề** (`bảo_hiểm`, `xã_hội`) thay 
 
 ## Sinh câu trả lời và kiểm chứng
 
-> Thiết kế đã chốt; chưa dựng lại.
+Bộ sinh trả về **từng mệnh đề kèm đúng tập citation của riêng mệnh đề đó**, không
+trả một khối text rồi tách claim ở bước sau — tách câu tiếng Việt bằng heuristic
+sẽ vỡ ở "Điều 1.", "khoản 2.", "0,5%", mà claim tách sai thì mọi con số
+groundedness đều sai theo, một cách âm thầm.
 
-Bộ sinh trả về **từng câu kèm đúng tập citation của riêng câu đó**, không trả một
-khối text rồi tách claim ở bước sau — tách câu tiếng Việt bằng heuristic sẽ vỡ ở
-"Điều 1.", "khoản 2.", "0,5%", mà claim tách sai thì mọi con số groundedness đều
-sai theo.
+Trích dẫn dùng **số hiệu `[1]`..`[n]`** trỏ vào danh sách trích đoạn trong prompt,
+không dùng `chunk_id`. Output ngắn hơn, model ít bịa hơn, và Check A trở thành một
+phép so sánh khoảng số chính xác thay vì một phép khớp chuỗi.
 
 Hai tầng kiểm chứng, chi phí khác hẳn nhau:
 
-- **Check A — cú pháp, miễn phí.** Mọi citation phải trỏ tới chunk thực sự có
+- **Check A — cú pháp, miễn phí.** Mọi citation phải trỏ tới trích đoạn thực sự có
   trong prompt, và mọi claim phải có ít nhất một citation. Fail thì sinh lại ngay,
-  không tốn một lời gọi judge nào.
+  **không tốn một lời gọi judge nào** — `check_b` để `None` chứ không phải 0.0, để
+  "chưa chấm" không bị đọc nhầm thành "chấm và trượt".
 - **Check B — ngữ nghĩa, đúng một lời gọi Groq.** Toàn bộ claim đi trong một
   request; judge trả `[{claim_id, supported, reason}]`. `support_ratio` = số claim
   được hỗ trợ / tổng số claim. Claim mà judge không nhắc tới bị tính là **không**
   được hỗ trợ — im lặng không phải bằng chứng ủng hộ, và cách tính này không
   thưởng cho judge trả thiếu.
 
-Sinh lại tối đa một lần, và prompt lượt hai **bắt buộc khác** lượt một: ở
-`temperature=0`, prompt y hệt sẽ cho output y hệt. Lượt hai chèn danh sách claim
-đã bị bác kèm yêu cầu sửa hoặc bỏ. Vẫn fail thì trả `"Không đủ căn cứ trong tài liệu."`
+Judge được dặn rõ là đang đo **tính có căn cứ, không đo tính đúng**: một mệnh đề
+đúng trên thực tế nhưng nói nhiều hơn trích đoạn được viện dẫn vẫn phải bị bác.
+Không tách bạch chỗ này thì judge sẽ chấm bằng kiến thức nền của chính nó và
+`support_ratio` mất hết ý nghĩa.
 
-Báo cáo faithfulness **trước** và **sau** tầng verify, để đọc được tầng này thực sự
-thêm bao nhiêu giá trị chứ không chỉ thêm bao nhiêu chi phí.
+Bộ parse của generate **cố ý không lọc trước** mệnh đề thiếu citation hay citation
+ngoài phạm vi. Đó đúng là việc của Check A; lọc sớm sẽ giấu mất lỗi mà tầng kiểm
+chứng sinh ra để bắt và làm mọi con số về Check A đẹp một cách giả tạo.
+
+### Sinh lại: prompt và cache key đều phải khác
+
+Sinh lại tối đa một lần, và lượt hai **bắt buộc khác** lượt một ở hai chỗ:
+
+1. **Prompt** — chèn danh sách claim đã bị bác kèm lý do và yêu cầu sửa hoặc bỏ
+   hẳn. Ở `temperature = 0`, prompt y hệt cho output y hệt.
+2. **Cache key** — `attempt` và `feedback` nằm trong `input_obj`. Thiếu hai trường
+   này thì lượt sinh lại chỉ đọc lại đúng câu trả lời vừa bị bác, và vòng lặp
+   "sinh lại" trở thành một vòng lặp tốn quota để nhận lại y nguyên.
+
+`test_generate_verify.py::test_luot_sinh_lai_dung_cache_key_khac` canh điểm 2 bằng
+cách gieo cache **chỉ cho lượt 1**: nếu lượt 2 dùng chung key thì nó sẽ đọc lại
+được và không raise, nên `CacheMiss` ở đó chính là bằng chứng hai lượt là hai lời
+gọi khác nhau.
+
+Vẫn fail sau hai lượt thì trả `"Không đủ căn cứ trong tài liệu."`, kèm
+`abstain_stage` ghi rõ chết ở đâu: `retrieve`, `model`, `check_a` hay `check_b`.
+
+`support_ratio_first` và `support_ratio_final` được báo cáo tách nhau, để đọc được
+tầng verify thực sự thêm bao nhiêu giá trị chứ không chỉ thêm bao nhiêu chi phí.
 
 ### Hai ngưỡng abstain
 
-Tách đôi vì chúng bắt hai loại lỗi khác nhau: một ngưỡng gác **trước** generate
+Tách đôi vì chúng bắt hai loại lỗi khác nhau: `TAU_RETRIEVE` gác **trước** generate
 (so với điểm rerank cao nhất) bắt câu hỏi ngoài phạm vi corpus và chặn trước khi
-tốn lượt sinh nào; một ngưỡng gác **sau** generate (so với `support_ratio`) bắt
-trường hợp chunk trông hợp lý nhưng model bịa thêm chi tiết. Cả hai sẽ được quét
-lưới trên gold set để tối ưu F1 giữa abstain đúng và abstain nhầm, và sẽ vào
-`src/config.py` khi tầng đó được dựng.
+tốn lượt sinh nào; `TAU_GROUND` gác **sau** generate (so với `support_ratio`) bắt
+trường hợp trích đoạn trông hợp lý nhưng model bịa thêm chi tiết. Gộp một ngưỡng
+thì không thể chỉnh riêng từng loại lỗi.
+
+Ngưỡng trước **chỉ áp dụng cho arm có rerank**. Điểm BM25 không chặn trên còn
+cosine nằm trong `[-1, 1]`, nên cùng một con số ngưỡng mang ý nghĩa khác nhau ở mỗi
+arm — thà không gác còn hơn gác bằng một đại lượng không so sánh được. Ba arm còn
+lại đi thẳng vào generate và chỉ chịu ngưỡng sau.
+
+Giá trị hiện tại (`TAU_RETRIEVE = 0.5`, `TAU_GROUND = 0.8`) là điểm khởi đầu;
+`src/calibrate.py` sẽ quét lưới trên gold set để tối ưu F1 giữa abstain đúng và
+abstain nhầm.
 
 ## Cache và chế độ offline
 
@@ -546,9 +583,16 @@ Không test nào chạm mạng. Đáng chú ý:
 - `test_evaluate.py::test_coverage_chunk_chong_lan_khong_vuot_qua_1` — cộng độ dài
   text sẽ ra 1.4, hợp khoảng ra đúng 1.0.
 
-Phía dense và rerank được kiểm bằng cách **gieo sẵn cache** rồi chạy đúng đường dữ
-liệu thật, chứ không monkeypatch hàm gọi API. Nhờ vậy test bao luôn cả hình dạng
-cache key — thứ mà một stub sẽ bỏ lọt.
+- `test_generate_verify.py::test_luot_sinh_lai_dung_cache_key_khac` — gieo cache
+  chỉ cho lượt 1; `CacheMiss` ở lượt 2 là bằng chứng hai lượt là hai lời gọi khác.
+- `test_generate_verify.py::test_check_a_fail_thi_khong_goi_judge` — tầng rẻ chặn
+  trước tầng đắt.
+- `test_generate_verify.py::test_diem_rerank_duoi_nguong_thi_abstain_truoc_khi_sinh`
+  — cache rỗng + offline mà không raise, tức là không tốn lượt sinh nào.
+
+Phía dense, rerank, generate và judge được kiểm bằng cách **gieo sẵn cache** rồi
+chạy đúng đường dữ liệu thật, chứ không monkeypatch hàm gọi API. Nhờ vậy test bao
+luôn cả hình dạng cache key — thứ mà một stub sẽ bỏ lọt.
 
 `tests/fixtures/corpus/` chứa hai văn bản **giả lập** (Quy chế 99/2099 và Thông tư
 88/2088 hư cấu, một `active` một `expired`) để chạy được toàn bộ pipeline mà không

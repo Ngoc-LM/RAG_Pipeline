@@ -122,6 +122,38 @@ nhau, nên cùng một chuỗi ở hai vai trò cho hai vector — và hai cache
 JUDGE_TEMPERATURE: Final[float] = 0.0
 JUDGE_MAX_TOKENS: Final[int] = 2048
 
+GEN_TEMPERATURE: Final[float] = 0.0
+GEN_MAX_TOKENS: Final[int] = 4096
+GEN_THINKING_BUDGET: Final[int] = 0
+"""Tắt thinking cho bộ sinh: free tier tính quota theo cả token suy nghĩ, mà
+nhiệm vụ ở đây là trích xuất có ràng buộc chứ không phải suy luận nhiều bước.
+Bật lên là một tham số đáng thử nếu quota cho phép."""
+
+# --- Sinh và kiểm chứng --------------------------------------------------
+MAX_GENERATE_ATTEMPTS: Final[int] = 2
+"""Sinh lại tối đa một lần. Lượt hai bắt buộc dùng prompt KHÁC lượt một."""
+
+ABSTAIN_TEXT: Final[str] = "Không đủ căn cứ trong tài liệu."
+
+TAU_RETRIEVE: Final[float] = 0.5
+"""Ngưỡng gác TRƯỚC generate, so với điểm rerank cao nhất (đã chuẩn hoá [0, 1]).
+
+Bắt câu hỏi nằm ngoài phạm vi corpus và chặn trước khi tốn một lượt sinh nào.
+Chỉ áp dụng được cho arm có rerank: điểm BM25 và cosine không cùng thang nên
+không có ngưỡng chung nào đúng cho cả bốn arm.
+"""
+
+TAU_GROUND: Final[float] = 0.8
+"""Ngưỡng gác SAU generate, so với support_ratio từ LLM judge.
+
+Tách khỏi TAU_RETRIEVE vì hai ngưỡng bắt hai loại lỗi khác nhau: ngưỡng trước
+bắt "corpus không có câu trả lời", ngưỡng sau bắt "chunk trông hợp lý nhưng model
+bịa thêm chi tiết". Gộp một ngưỡng thì không thể chỉnh riêng từng loại lỗi.
+
+Cả hai giá trị ở đây là điểm khởi đầu; src/calibrate.py sẽ quét lưới trên gold
+set để tối ưu F1 giữa abstain đúng và abstain nhầm.
+"""
+
 PROMPT_VERSION: Final[int] = 1
 """Tăng tay mỗi khi sửa bất kỳ template prompt nào.
 
