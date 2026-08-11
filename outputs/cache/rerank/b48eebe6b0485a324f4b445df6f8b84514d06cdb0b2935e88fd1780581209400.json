@@ -1,0 +1,52 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "rerank",
+    "input": {
+      "question": "So với nghĩa vụ chung khi để lộ dữ liệu, một ngân hàng còn phải làm thêm điều gì?",
+      "candidates": [
+        "nd_356_2025#a8#c3#p0",
+        "luat_91_2025#a27#c1#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "nd_356_2025#a8#c1#p0",
+        "nd_356_2025#a8#c2#p0",
+        "luat_91_2025#a4#c2-3#p0",
+        "luat_91_2025#a4#c4-5#p0",
+        "nd_13_2023#a10#c1-5#p0",
+        "nd_13_2023#a25#c7-8#p0",
+        "luat_91_2025#a16#c1-2#p0",
+        "nd_356_2025#a7#c2-3#p0",
+        "nd_356_2025#a4#c1-2#p0",
+        "luat_91_2025#a23#c1#p0",
+        "luat_91_2025#a23#c4-5#p0",
+        "nd_13_2023#a2#c4#p0",
+        "nd_13_2023#a23#c1-2#p0",
+        "nd_13_2023#a23#c3#p0",
+        "luat_91_2025#a1#c1-2#p0",
+        "luat_91_2025#a23#c2-3#p0",
+        "luat_91_2025#a7#c1-7#p0",
+        "nd_13_2023#a23#c4-5#p0",
+        "nd_13_2023#a3#c5-8#p0",
+        "nd_13_2023#a9#c7-8#p0",
+        "luat_91_2025#a4#c1#p0",
+        "nd_356_2025#a15#c3-4#p0",
+        "luat_91_2025#a29#c0#p0",
+        "luat_91_2025#a29#c1-3#p0",
+        "nd_13_2023#a9#c1-3#p0",
+        "nd_13_2023#a21#c1-3#p0",
+        "nd_13_2023#a25#c3-4#p0"
+      ],
+      "candidates_digest": "0dab5bf50a50fc50ae89b501c0b88e0dfeb89a59c579bed9bfc11d5cc2e578f1"
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json"
+    },
+    "prompt_version": 1
+  },
+  "response": "{\"scores\": [{\"id\": 1, \"score\": 3}, {\"id\": 2, \"score\": 3}, {\"id\": 3, \"score\": 1}, {\"id\": 4, \"score\": 1}, {\"id\": 5, \"score\": 1}, {\"id\": 6, \"score\": 0}, {\"id\": 7, \"score\": 0}, {\"id\": 8, \"score\": 0}, {\"id\": 9, \"score\": 0}, {\"id\": 10, \"score\": 0}, {\"id\": 11, \"score\": 1}, {\"id\": 12, \"score\": 1}, {\"id\": 13, \"score\": 1}, {\"id\": 14, \"score\": 1}, {\"id\": 15, \"score\": 0}, {\"id\": 16, \"score\": 0}, {\"id\": 17, \"score\": 0}, {\"id\": 18, \"score\": 0}, {\"id\": 19, \"score\": 1}, {\"id\": 20, \"score\": 0}, {\"id\": 21, \"score\": 0}, {\"id\": 22, \"score\": 0}, {\"id\": 23, \"score\": 0}, {\"id\": 24, \"score\": 0}, {\"id\": 25, \"score\": 0}, {\"id\": 26, \"score\": 0}, {\"id\": 27, \"score\": 0}, {\"id\": 28, \"score\": 0}, {\"id\": 29, \"score\": 0}, {\"id\": 30, \"score\": 0}]}",
+  "created_at": "2026-08-11T05:46:18.964003+00:00"
+}

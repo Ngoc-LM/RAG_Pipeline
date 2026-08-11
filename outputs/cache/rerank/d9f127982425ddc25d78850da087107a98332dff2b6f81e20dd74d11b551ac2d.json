@@ -1,0 +1,52 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "rerank",
+    "input": {
+      "question": "Hai đạo luật đang còn hiệu lực dùng hai cách gọi khác nhau cho thông tin về một con người. Cách hiểu của mỗi đạo luật khác nhau ra sao?",
+      "candidates": [
+        "nd_13_2023#a2#c1-2#p0",
+        "luat_91_2025#a2#c1-2#p0",
+        "nd_13_2023#a2#c3#p0",
+        "luat_attt_86_2015#a3#c13-15#p0",
+        "nd_356_2025#a3#c1-11#p0",
+        "luat_91_2025#a2#c9-12#p0",
+        "luat_91_2025#a39#c1-2#p0",
+        "nd_13_2023#a2#c11-13#p0",
+        "luat_91_2025#a24#c1-2#p0",
+        "luat_91_2025#a9#c1-2#p0",
+        "nd_13_2023#a2#c4#p0",
+        "luat_attt_86_2015#a3#c16-20#p0",
+        "luat_91_2025#a29#c4-6#p0",
+        "luat_91_2025#a2#c6-8#p0",
+        "nd_356_2025#a9#c1-2#p0",
+        "luat_91_2025#a2#c0#p0",
+        "luat_91_2025#a2#c3-5#p0",
+        "luat_91_2025#a38#c1-4#p0",
+        "luat_91_2025#a1#c1-2#p0",
+        "luat_91_2025#a11#c1-3#p0",
+        "nd_13_2023#a2#c5-7#p0",
+        "nd_356_2025#a9#c3#p0",
+        "luat_attt_86_2015#a6#c1-2#p0",
+        "nd_356_2025#a2#c1-3#p0",
+        "luat_91_2025#a12#c1-3#p0",
+        "nd_356_2025#a10#c1-2#p0",
+        "luat_91_2025#a9#c3-5#p0",
+        "nd_13_2023#a2#c8-10#p0",
+        "luat_91_2025#a3#c4-6#p0",
+        "nd_13_2023#a2#c0#p0"
+      ],
+      "candidates_digest": "bbfcb84c0dcb29c23f40a014bbefc488055a044d56fa05c5e03411ac648fe11f"
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json"
+    },
+    "prompt_version": 1
+  },
+  "response": "{\"scores\": [{\"id\": 1, \"score\": 0}, {\"id\": 2, \"score\": 3}, {\"id\": 3, \"score\": 0}, {\"id\": 4, \"score\": 2}, {\"id\": 5, \"score\": 0}, {\"id\": 6, \"score\": 0}, {\"id\": 7, \"score\": 0}, {\"id\": 8, \"score\": 0}, {\"id\": 9, \"score\": 0}, {\"id\": 10, \"score\": 0}, {\"id\": 11, \"score\": 0}, {\"id\": 12, \"score\": 3}, {\"id\": 13, \"score\": 0}, {\"id\": 14, \"score\": 0}, {\"id\": 15, \"score\": 0}, {\"id\": 16, \"score\": 0}, {\"id\": 17, \"score\": 3}, {\"id\": 18, \"score\": 0}, {\"id\": 19, \"score\": 0}, {\"id\": 20, \"score\": 0}, {\"id\": 21, \"score\": 0}, {\"id\": 22, \"score\": 0}, {\"id\": 23, \"score\": 0}, {\"id\": 24, \"score\": 0}, {\"id\": 25, \"score\": 0}, {\"id\": 26, \"score\": 0}, {\"id\": 27, \"score\": 0}, {\"id\": 28, \"score\": 0}, {\"id\": 29, \"score\": 0}, {\"id\": 30, \"score\": 0}]}",
+  "created_at": "2026-08-11T05:46:22.753290+00:00"
+}
