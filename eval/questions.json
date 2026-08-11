@@ -1,0 +1,283 @@
+[
+  {
+    "qid": "q01",
+    "question": "Công ty bị phát hiện bán danh sách khách hàng ra ngoài thì trần tiền phạt được xác định dựa trên cái gì?",
+    "type": "factoid_1hop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 7409,
+        "char_end": 7786
+      }
+    ],
+    "gold_answer": "Trần phạt tiền được tính theo khoản thu có được từ hành vi vi phạm: tối đa 10 lần khoản thu đó. Nếu không có khoản thu, hoặc mức tính theo khoản thu còn thấp hơn mức phạt tiền tối đa tại khoản 5 Điều 8, thì áp dụng mức phạt tiền tối đa tại khoản 5 Điều 8."
+  },
+  {
+    "qid": "q02",
+    "question": "Sau khi bắt đầu đẩy hồ sơ khách sang máy chủ đặt ở nước khác, bên tôi có bao nhiêu ngày để nộp giấy tờ cho cơ quan quản lý?",
+    "type": "factoid_1hop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 21364,
+        "char_end": 21755
+      }
+    ],
+    "gold_answer": "60 ngày kể từ ngày đầu tiên chuyển dữ liệu cá nhân xuyên biên giới; nộp 01 bản chính hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân, trừ trường hợp quy định tại khoản 6 Điều 22."
+  },
+  {
+    "qid": "q03",
+    "question": "Bộ giấy tờ đánh giá đã nộp cho cơ quan quản lý thì bao lâu phải rà soát lại một lần?",
+    "type": "factoid_1hop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 24853,
+        "char_end": 25088
+      }
+    ],
+    "gold_answer": "Cập nhật định kỳ 06 tháng khi có sự thay đổi, và phải cập nhật ngay trong các trường hợp quy định tại khoản 2 Điều 22."
+  },
+  {
+    "qid": "q04",
+    "question": "Muốn đăng ảnh và chuyện riêng của một đứa trẻ 10 tuổi lên mạng thì cần ai gật đầu?",
+    "type": "factoid_1hop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 28181,
+        "char_end": 28666
+      }
+    ],
+    "gold_answer": "Trẻ 10 tuổi là trẻ em từ đủ 07 tuổi trở lên, nên việc công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân của trẻ phải có sự đồng ý của cả trẻ em đó và người đại diện theo pháp luật."
+  },
+  {
+    "qid": "q05",
+    "question": "Khách muốn xem lại và sửa thông tin của họ đang nằm ở chỗ bên tôi. Bên tôi phải trả lời và làm xong trong bao lâu?",
+    "type": "factoid_1hop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "nd_356_2025",
+        "char_start": 4938,
+        "char_end": 5814
+      }
+    ],
+    "gold_answer": "Phản hồi trong thời hạn 02 ngày làm việc và thực hiện trong thời hạn 10 ngày. Nếu phải yêu cầu bên xử lý dữ liệu cá nhân hoặc bên thứ ba chỉnh sửa thì thực hiện trong thời hạn 15 ngày. Được gia hạn tối đa 01 lần, không quá 10 ngày, và phải thông báo lý do cho chủ thể dữ liệu."
+  },
+  {
+    "qid": "q06",
+    "question": "Người được công ty giao phụ trách mảng này cần bằng cấp gì và bao nhiêu năm đi làm?",
+    "type": "factoid_1hop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "nd_356_2025",
+        "char_start": 21702,
+        "char_end": 22189
+      }
+    ],
+    "gold_answer": "Trình độ cao đẳng trở lên; ít nhất 02 năm kinh nghiệm công tác kể từ khi tốt nghiệp trong một trong các lĩnh vực pháp chế, công nghệ thông tin, an ninh mạng, an ninh dữ liệu, quản trị rủi ro, kiểm soát tuân thủ, quản lý nhân sự, tổ chức cán bộ; và đã được đào tạo, bồi dưỡng kiến thức pháp luật, kỹ năng chuyên môn về bảo vệ dữ liệu cá nhân."
+  },
+  {
+    "qid": "q07",
+    "question": "Bên tôi cung cấp dịch vụ thư điện tử cho khách. Có bắt buộc phải cài hệ thống chặn mã độc không?",
+    "type": "factoid_1hop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_attt_86_2015",
+        "char_start": 9850,
+        "char_end": 10102
+      }
+    ],
+    "gold_answer": "Có. Doanh nghiệp cung cấp dịch vụ thư điện tử, truyền đưa, lưu trữ thông tin phải có hệ thống lọc phần mềm độc hại trong quá trình gửi, nhận, lưu trữ thông tin trên hệ thống của mình, và phải báo cáo cơ quan nhà nước có thẩm quyền theo quy định."
+  },
+  {
+    "qid": "q08",
+    "question": "Bộ nào được giao lo việc bảo mật cho hạ tầng phân giải địa chỉ web cấp quốc gia?",
+    "type": "factoid_1hop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_attt_86_2015",
+        "char_start": 11271,
+        "char_end": 11407
+      }
+    ],
+    "gold_answer": "Bộ Thông tin và Truyền thông chịu trách nhiệm bảo đảm an toàn thông tin mạng cho hệ thống máy chủ tên miền quốc gia Việt Nam."
+  },
+  {
+    "qid": "q09",
+    "question": "Hai công ty sáp nhập, bên tôi tiếp nhận toàn bộ danh sách khách của bên kia. Có phải ký kết văn bản riêng cho việc bàn giao đó không, và trong đó cần ghi những gì?",
+    "type": "multihop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 17788,
+        "char_end": 18804
+      },
+      {
+        "doc_id": "nd_356_2025",
+        "char_start": 8781,
+        "char_end": 9618
+      }
+    ],
+    "gold_answer": "Có. Chuyển giao dữ liệu cá nhân do sáp nhập thuộc điểm c khoản 1 Điều 17 Luật Bảo vệ dữ liệu cá nhân, nên các bên phải xác lập thỏa thuận chuyển giao với bên nhận, nêu rõ: mục đích chuyển giao; đối tượng chủ thể dữ liệu và loại dữ liệu được chuyển giao; thời hạn xử lý và yêu cầu xóa, hủy dữ liệu sau khi hoàn thành mục đích; cơ sở pháp lý; trách nhiệm bảo vệ dữ liệu trong quá trình chuyển giao, xử lý; trách nhiệm thực hiện các quyền của chủ thể dữ liệu; trách nhiệm phối hợp, tuân thủ khi phát hiện vi phạm."
+  },
+  {
+    "qid": "q10",
+    "question": "So với nghĩa vụ chung khi để lộ dữ liệu, một ngân hàng còn phải làm thêm điều gì?",
+    "type": "multihop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 25936,
+        "char_end": 26535
+      },
+      {
+        "doc_id": "nd_356_2025",
+        "char_start": 12915,
+        "char_end": 13358
+      }
+    ],
+    "gold_answer": "Nghĩa vụ chung khi phát hiện vi phạm là thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân chậm nhất 72 giờ kể từ khi phát hiện. Với lĩnh vực tài chính, ngân hàng, hoạt động thông tin tín dụng, khi lộ, mất dữ liệu nhạy cảm thì tổ chức trực tiếp thu thập còn phải thông báo cho chính chủ thể dữ liệu cá nhân, cũng trong thời hạn không quá 72 giờ, với nội dung tối thiểu theo khoản 1 Điều 28 Nghị định 356/2025/NĐ-CP."
+  },
+  {
+    "qid": "q11",
+    "question": "Lịch sử giao dịch của khách tại ngân hàng được xếp vào nhóm dữ liệu nào, và việc xếp nhóm đó kéo theo nghĩa vụ gì cho ngân hàng?",
+    "type": "multihop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "nd_356_2025",
+        "char_start": 1849,
+        "char_end": 3195
+      },
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 32320,
+        "char_end": 33171
+      }
+    ],
+    "gold_answer": "Lịch sử giao dịch tài chính của khách hàng tại tổ chức tín dụng thuộc nhóm dữ liệu cá nhân nhạy cảm (điểm k khoản 1 Điều 4 Nghị định 356/2025/NĐ-CP). Kéo theo, tổ chức hoạt động trong lĩnh vực tài chính, ngân hàng, thông tin tín dụng phải: thực hiện đầy đủ quy định về bảo vệ dữ liệu cá nhân nhạy cảm và các tiêu chuẩn an toàn, bảo mật; không dùng thông tin tín dụng để chấm điểm, xếp hạng, đánh giá mức độ tín nhiệm tín dụng khi chưa có sự đồng ý của chủ thể; chỉ thu thập dữ liệu cần thiết từ nguồn hợp pháp; và thông báo cho chủ thể dữ liệu khi lộ, mất thông tin tài khoản ngân hàng, tài chính, tín dụng."
+  },
+  {
+    "qid": "q12",
+    "question": "Hai đạo luật đang còn hiệu lực dùng hai cách gọi khác nhau cho thông tin về một con người. Cách hiểu của mỗi đạo luật khác nhau ra sao?",
+    "type": "multihop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_attt_86_2015",
+        "char_start": 2973,
+        "char_end": 3061
+      },
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 675,
+        "char_end": 916
+      }
+    ],
+    "gold_answer": "Luật An toàn thông tin mạng 2015 dùng khái niệm \"thông tin cá nhân\": thông tin gắn với việc xác định danh tính của một người cụ thể. Luật Bảo vệ dữ liệu cá nhân 2025 dùng khái niệm \"dữ liệu cá nhân\", rộng hơn: dữ liệu số hoặc thông tin dưới dạng khác xác định hoặc giúp xác định một con người cụ thể, gồm dữ liệu cá nhân cơ bản và dữ liệu cá nhân nhạy cảm; dữ liệu sau khi khử nhận dạng thì không còn là dữ liệu cá nhân."
+  },
+  {
+    "qid": "q13",
+    "question": "Khách đòi rút lại sự cho phép, nhưng bên tôi đang giữ dữ liệu đó để phục vụ yêu cầu của cơ quan nhà nước. Bên tôi có buộc phải dừng trong thời hạn quy định không?",
+    "type": "multihop",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "nd_356_2025",
+        "char_start": 3860,
+        "char_end": 4937
+      },
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 19112,
+        "char_end": 20142
+      }
+    ],
+    "gold_answer": "Không. Thời hạn phản hồi 02 ngày làm việc và thực hiện trong 15 ngày (20 ngày nếu phải yêu cầu bên xử lý hoặc bên thứ ba) chỉ áp dụng cho việc xử lý dữ liệu dựa trên sự đồng ý. Xử lý dữ liệu cá nhân để phục vụ hoạt động của cơ quan nhà nước, hoạt động quản lý nhà nước thuộc điểm c khoản 1 Điều 19 Luật Bảo vệ dữ liệu cá nhân — trường hợp không cần sự đồng ý — nên được loại trừ khỏi thời hạn ngừng xử lý nói trên."
+  },
+  {
+    "qid": "q14",
+    "question": "Công ty tôi vừa xác định có một vụ rò rỉ dữ liệu nghiêm trọng ảnh hưởng tới tài sản của khách. Phải gửi thông báo tới đâu và trong bao lâu?",
+    "type": "distractor",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 25936,
+        "char_end": 26535
+      }
+    ],
+    "gold_answer": "Thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân, chậm nhất là 72 giờ kể từ khi phát hiện hành vi vi phạm. Nếu bên xử lý dữ liệu cá nhân là bên phát hiện thì phải thông báo kịp thời cho bên kiểm soát dữ liệu cá nhân hoặc bên kiểm soát và xử lý dữ liệu cá nhân."
+  },
+  {
+    "qid": "q15",
+    "question": "Khách gửi yêu cầu xoá sạch thông tin của họ. Bên tôi phải hoàn tất trong bao lâu?",
+    "type": "distractor",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "nd_356_2025",
+        "char_start": 5815,
+        "char_end": 6642
+      }
+    ],
+    "gold_answer": "Phản hồi trong thời hạn 02 ngày làm việc và thực hiện việc xóa trong thời hạn 20 ngày. Nếu cần yêu cầu bên xử lý dữ liệu cá nhân hoặc bên thứ ba xóa thì thực hiện trong thời hạn 30 ngày. Được gia hạn tối đa 01 lần, không quá 20 ngày, và phải thông báo lý do cho chủ thể dữ liệu."
+  },
+  {
+    "qid": "q16",
+    "question": "Bên tôi làm dịch vụ tiếp thị, muốn dùng danh sách khách do một đối tác chuyển sang để chạy quảng cáo. Có được phép không?",
+    "type": "distractor",
+    "answerable": true,
+    "gold_spans": [
+      {
+        "doc_id": "luat_91_2025",
+        "char_start": 33698,
+        "char_end": 34111
+      }
+    ],
+    "gold_answer": "Được, nhưng có điều kiện. Tổ chức, cá nhân kinh doanh dịch vụ quảng cáo chỉ được dùng dữ liệu cá nhân của khách hàng do bên kiểm soát dữ liệu cá nhân hoặc bên kiểm soát và xử lý dữ liệu cá nhân chuyển giao theo thỏa thuận, hoặc do chính mình thu thập qua hoạt động kinh doanh. Việc thu thập, sử dụng, chuyển giao phải bảo đảm các quyền của chủ thể dữ liệu cá nhân quy định tại Điều 4 của Luật."
+  },
+  {
+    "qid": "q17",
+    "question": "Doanh nghiệp phải giữ hóa đơn điện tử trong bao nhiêu năm trước khi được huỷ?",
+    "type": "unanswerable_oos",
+    "answerable": false,
+    "gold_spans": [],
+    "gold_answer": "Không đủ căn cứ trong tài liệu."
+  },
+  {
+    "qid": "q18",
+    "question": "Một năm người lao động được huy động làm thêm tối đa bao nhiêu giờ?",
+    "type": "unanswerable_oos",
+    "answerable": false,
+    "gold_spans": [],
+    "gold_answer": "Không đủ căn cứ trong tài liệu."
+  },
+  {
+    "qid": "q19",
+    "question": "Dữ liệu khách hàng được phép giữ tối đa bao nhiêu tháng trước khi buộc phải xoá?",
+    "type": "unanswerable_nearmiss",
+    "answerable": false,
+    "gold_spans": [],
+    "gold_answer": "Không đủ căn cứ trong tài liệu."
+  },
+  {
+    "qid": "q20",
+    "question": "Nộp bộ giấy tờ đánh giá cho cơ quan quản lý có phải trả khoản tiền nào không, và bao nhiêu?",
+    "type": "unanswerable_nearmiss",
+    "answerable": false,
+    "gold_spans": [],
+    "gold_answer": "Không đủ căn cứ trong tài liệu."
+  }
+]

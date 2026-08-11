@@ -21,6 +21,7 @@ chạy được và có test; phần chưa có là thiết kế đã chốt như
 | Tokenizer tiếng Việt cho BM25 | `src/tokenize_vi.py` | ✅ |
 | Cache + backoff cho API | `src/llm.py` | ✅ |
 | CLI gán nhãn gold_span | `tools/annotate.py` | ✅ |
+| Gold set 20 câu | `eval/questions.json` | ✅ |
 | Index (embed + BM25) | — | ⬜ chưa dựng |
 | Retrieve (RRF + rerank) | — | ⬜ chưa dựng |
 | Generate + verify hai tầng | — | ⬜ chưa dựng |
@@ -112,6 +113,7 @@ python -m tools.annotate --corpus data/corpus --grep "thời hạn phản hồi"
 python -m tools.annotate --corpus data/corpus --article luat_91_2025:9
 python -m tools.annotate --corpus data/corpus --grep "phản hồi" --emit q07
 python -m tools.annotate --corpus data/corpus --validate eval/questions.json
+python -m tools.annotate --corpus data/corpus --leakage eval/questions.json
 ```
 
 - `--grep` tìm chuỗi (không phân biệt hoa thường, thêm `--no-accent` để bỏ dấu ở
@@ -123,6 +125,9 @@ python -m tools.annotate --corpus data/corpus --validate eval/questions.json
 - `--validate` kiểm `0 <= char_start < char_end <= len(body)`, in 120 ký tự đầu của
   mỗi span để xác nhận bằng mắt, và báo lỗi nếu span không nằm trọn trong một Điều.
   Trả exit code khác 0 khi có lỗi, cắm vào CI được.
+- `--leakage` đo Jaccard trên unigram âm tiết giữa câu hỏi và text của `gold_span`,
+  gắn cờ câu vượt `LEAKAGE_JACCARD_MAX` và trả exit code khác 0. Câu multi-span đo
+  trên hợp text của các span; câu `unanswerable_*` không tính.
 
 ## Gold set
 
@@ -142,9 +147,57 @@ python -m tools.annotate --corpus data/corpus --validate eval/questions.json
 Câu `unanswerable_*` có `answerable: false` và `gold_spans: []`; chúng không tham
 gia metric truy xuất, chỉ dùng để đo chất lượng abstain.
 
-Kiểm tra rò rỉ từ vựng (câu hỏi copy nguyên văn đoạn nguồn sẽ làm BM25 thắng giả
-tạo và thổi phồng Recall của mọi arm) sẽ quay lại cùng tầng evaluate — nó phụ
-thuộc vào tokenizer trong `src/tokenize_vi.py`, vốn đã có và đã có test.
+20 câu, 21 gold span. Mọi offset đều lấy từ `tools/annotate.py` chạy thật trên
+`data/corpus/`, không đếm tay.
+
+| loại | số câu | dùng để đo |
+|---|---|---|
+| `factoid_1hop` | 8 | truy xuất một khoản duy nhất |
+| `multihop` | 5 | cột **strict**: cả hai span phải đạt ngưỡng coverage |
+| `distractor` | 3 | rerank có đọc `status` không |
+| `unanswerable_oos` | 2 | abstain khi chủ đề nằm ngoài corpus |
+| `unanswerable_nearmiss` | 2 | abstain khi corpus bàn đúng chủ đề nhưng không có con số |
+
+Bốn văn bản đóng bốn vai khác nhau, và tỉ lệ gold span bám theo tỉ lệ độ dài để
+Recall tổng không bị một văn bản chi phối:
+
+| văn bản | số từ | tỉ lệ corpus | gold span | tỉ lệ span |
+|---|---|---|---|---|
+| `luat_91_2025` | 9.307 | 52% | 11 | 52% |
+| `nd_356_2025` | 6.084 | 34% | 7 | 33% |
+| `luat_attt_86_2015` | 2.512 | 14% | 3 | 14% |
+| `nd_13_2023` (`expired`) | 6.985 | — | **0** | chỉ đóng vai mồi nhử |
+
+### Ba cặp mồi nhử
+
+`nd_13_2023` đã hết hiệu lực từ 01/01/2026, bị thay bằng `nd_356_2025`, và cố ý
+được giữ trong corpus vì nó bàn **đúng** những chủ đề mà hai văn bản còn hiệu lực
+bàn — chỉ khác đáp án. Ba câu `distractor` khai thác đúng chỗ đó:
+
+| qid | span đúng | mồi nhử | vì sao khó |
+|---|---|---|---|
+| `q14` | `luat_91` Điều 23 Khoản 1 | `nd_13` Điều 23 Khoản 1 | chỉ văn bản hết hiệu lực nêu đích danh "Bộ Công an (Cục A05)" và "Mẫu số 03" — trả lời sai thì lộ ngay ở phần trích dẫn |
+| `q15` | `nd_356` Điều 5 Khoản 4 | `nd_13` Điều 16 Khoản 5 | xoá dữ liệu trong **72 giờ** (cũ) so với **02 ngày làm việc + 20/30 ngày** (mới). Không có khe hở từ vựng nào giữa hai bên, nên câu này cô lập đúng một câu hỏi: retriever có phân biệt hiệu lực không |
+| `q16` | `luat_91` Điều 28 Khoản 1 | `nd_13` Điều 21 Khoản 1 | từ "tiếp thị" **chỉ** xuất hiện trong văn bản hết hiệu lực nên BM25 bị kéo về mồi nhử, và hai văn bản cho đáp án **ngược nhau** |
+
+Cặp mồi nhử không nằm trong `eval/questions.json`: schema đánh giá chỉ biết tới
+span đúng, còn "chunk nào là mồi nhử" là thông tin phân tích lỗi, không phải nhãn.
+
+### Chống rò rỉ từ vựng
+
+Câu hỏi chép lại từ vựng của chính khoản nguồn làm BM25 thắng một cách giả tạo và
+thổi phồng Recall của **mọi** arm cùng lúc — bảng ablation mất luôn khả năng phân
+biệt arm nào thực sự tốt hơn. Vì vậy câu hỏi được viết theo lời người dùng thật
+("bên tôi", "khách gửi yêu cầu", "đứa trẻ 10 tuổi") thay vì thuật ngữ của văn bản.
+
+`--leakage` trên bộ hiện tại: **0/16 câu vượt ngưỡng**, cao nhất 0.211. Ngưỡng đo
+trên unigram âm tiết chứ không phải bigram — bigram phạt hai lần cùng một chỗ trùng
+(vừa tính `bảo`, `hiểm` vừa tính `bảo_hiểm`) nên ngưỡng mất ý nghĩa.
+
+Một hệ quả đo được: khoản càng ngắn thì mẫu số Jaccard càng nhỏ và điểm càng dễ
+vọt. `q08` trỏ tới một khoản chỉ 136 ký tự và bản nháp đầu đạt 0.303; diễn đạt lại
+bằng từ đời thường ("hạ tầng phân giải địa chỉ web" thay cho "hệ thống máy chủ tên
+miền") kéo xuống 0.122 mà không đổi đáp án.
 
 ## Chia chunk: đơn vị là KHOẢN
 
