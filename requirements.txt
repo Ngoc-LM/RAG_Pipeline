@@ -1,5 +1,9 @@
 numpy==2.4.6
 rank-bm25==0.2.2
 google-genai==2.17.0
-groq==1.6.0
 pytest==9.1.1
+
+# Không dùng ở cấu hình mặc định (judge chạy Gemma qua Gemini API). Giữ lại để
+# đổi judge về Groq chỉ cần sửa hai dòng config, không phải cài thêm gói.
+# src/llm.py import groq theo kiểu nạp trễ nên thiếu gói này vẫn chạy được.
+groq==1.6.0

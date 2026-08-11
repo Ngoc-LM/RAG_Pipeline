@@ -19,7 +19,7 @@ dưới đây dựng lại được offline:
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python run.py eval --arm all --offline    # bảng truy xuất 4 arm
-.venv/bin/python -m pytest                          # 246 test, không chạm mạng
+.venv/bin/python -m pytest                          # 255 test, không chạm mạng
 ```
 
 ## Kết quả
@@ -186,14 +186,17 @@ toàn khác nhau (nới trần so với đổi prompt).
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-cp .env.example .env      # điền GEMINI_API_KEY và GROQ_API_KEY
+cp .env.example .env      # chỉ cần điền GEMINI_API_KEY
 ```
 
-`.env` nằm trong `.gitignore`. Không commit key.
+`.env` nằm trong `.gitignore`. Không commit key. `GROQ_API_KEY` **không cần** với
+cấu hình mặc định — judge chạy Gemma qua Gemini API; nó chỉ cần khi đổi judge về
+Groq (hai dòng trong `src/config.py`).
 
-**Không cần key** cho: toàn bộ `pytest`, `src.chunk`, `tools.annotate`, và mọi lệnh
-chạy với `--offline` — cache đã commit phủ đủ cả bốn arm truy xuất. Chỉ cần key khi
-muốn hỏi một câu **mới** chưa có trong cache.
+**Không cần key nào** cho: toàn bộ `pytest`, và **mọi lệnh chạy với `--offline`** —
+cache đã commit phủ cả bốn loại lời gọi (`embed`, `rerank`, `generate`, `judge`)
+cho toàn bộ 20 câu của gold set. Chỉ cần key khi hỏi một câu **mới** chưa có trong
+cache.
 
 ## Chuẩn bị corpus
 
@@ -582,7 +585,7 @@ Hai tầng kiểm chứng, chi phí khác hẳn nhau:
   trong prompt, và mọi claim phải có ít nhất một citation. Fail thì sinh lại ngay,
   **không tốn một lời gọi judge nào** — `check_b` để `None` chứ không phải 0.0, để
   "chưa chấm" không bị đọc nhầm thành "chấm và trượt".
-- **Check B — ngữ nghĩa, đúng một lời gọi Groq.** Toàn bộ claim đi trong một
+- **Check B — ngữ nghĩa, đúng một lời gọi LLM judge.** Toàn bộ claim đi trong một
   request; judge trả `[{claim_id, supported, reason}]`. `support_ratio` = số claim
   được hỗ trợ / tổng số claim. Claim mà judge không nhắc tới bị tính là **không**
   được hỗ trợ — im lặng không phải bằng chứng ủng hộ, và cách tính này không
