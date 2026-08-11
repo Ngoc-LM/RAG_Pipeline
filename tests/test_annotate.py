@@ -10,10 +10,12 @@ import pytest
 from src.ingest import load_corpus
 from tools.annotate import (
     article_span,
+    cmd_leakage,
     cmd_validate,
     excerpt,
     find_matches,
     fold,
+    jaccard_unigram,
     locate,
     short_label,
 )
@@ -173,3 +175,106 @@ def test_validate_in_preview_de_mat_thuong_xac_nhan(docs, tmp_path, capsys):
     output = capsys.readouterr().out
     assert "Điều 4 Khoản 1" in output
     assert clause.text[:40].replace("\n", " ") in output
+
+
+# --- rò rỉ từ vựng --------------------------------------------------------
+def write_gold(tmp_path: Path, questions: list[dict]) -> Path:
+    path = tmp_path / "gold.json"
+    path.write_text(json.dumps(questions, ensure_ascii=False), encoding="utf-8")
+    return path
+
+
+def clause_of(docs, doc_id: str, article_no: int, index: int = 0):
+    document = next(d for d in docs if d.meta.doc_id == doc_id)
+    art = next(a for a in document.articles if a.article_no == article_no)
+    return document, art.clauses[index]
+
+
+def test_jaccard_unigram_khong_dung_bigram():
+    """Trùng hoàn toàn -> 1.0; rời rạc hoàn toàn -> 0.0."""
+    assert jaccard_unigram("thời hạn lưu trữ", "thời hạn lưu trữ") == 1.0
+    assert jaccard_unigram("alpha beta", "gamma delta") == 0.0
+    assert jaccard_unigram("", "nội dung") == 0.0
+
+
+def test_jaccard_doi_xung_va_trong_khoang():
+    a, b = "dữ liệu cá nhân nhạy cảm", "dữ liệu cá nhân cơ bản"
+    assert jaccard_unigram(a, b) == jaccard_unigram(b, a)
+    assert 0.0 < jaccard_unigram(a, b) < 1.0
+
+
+def test_leakage_bat_duoc_cau_copy_tu_vung(docs, tmp_path, capsys):
+    """Câu hỏi chép gần nguyên văn khoản nguồn phải bị gắn cờ và exit != 0."""
+    document, clause = clause_of(docs, "qc_99_2099", 5, index=0)
+    question = clause.text.lstrip("1234567890. ")
+
+    path = write_gold(
+        tmp_path,
+        [
+            {
+                "qid": "leak01",
+                "question": question,
+                "answerable": True,
+                "gold_spans": [
+                    {
+                        "doc_id": "qc_99_2099",
+                        "char_start": clause.char_start,
+                        "char_end": clause.char_end,
+                    }
+                ],
+            }
+        ],
+    )
+    assert cmd_leakage(docs, path) == 1
+    output = capsys.readouterr().out
+    assert "RÒ RỈ" in output
+    assert "1/1 câu vượt ngưỡng" in output
+
+
+def test_leakage_cho_qua_cau_dien_dat_lai(docs, tmp_path, capsys):
+    """Câu hỏi diễn đạt theo lời người dùng thật thì không bị gắn cờ."""
+    document, clause = clause_of(docs, "qc_99_2099", 5, index=0)
+    path = write_gold(
+        tmp_path,
+        [
+            {
+                "qid": "ok01",
+                "question": "Bên tôi giữ được bao lâu trước khi buộc phải bỏ đi?",
+                "answerable": True,
+                "gold_spans": [
+                    {
+                        "doc_id": "qc_99_2099",
+                        "char_start": clause.char_start,
+                        "char_end": clause.char_end,
+                    }
+                ],
+            }
+        ],
+    )
+    assert cmd_leakage(docs, path) == 0
+    assert "0/1 câu vượt ngưỡng" in capsys.readouterr().out
+
+
+def test_leakage_bo_qua_cau_unanswerable(docs, tmp_path, capsys):
+    path = write_gold(
+        tmp_path,
+        [{"qid": "u01", "question": "Câu ngoài phạm vi?", "answerable": False, "gold_spans": []}],
+    )
+    assert cmd_leakage(docs, path) == 0
+    assert "0/0 câu vượt ngưỡng" in capsys.readouterr().out
+
+
+def test_leakage_span_hong_thi_bao_bo_qua(docs, tmp_path, capsys):
+    path = write_gold(
+        tmp_path,
+        [
+            {
+                "qid": "bad01",
+                "question": "Câu hỏi thử.",
+                "answerable": True,
+                "gold_spans": [{"doc_id": "qc_99_2099", "char_start": 0, "char_end": 10**7}],
+            }
+        ],
+    )
+    assert cmd_leakage(docs, path) == 0
+    assert "bỏ qua bad01" in capsys.readouterr().out

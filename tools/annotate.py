@@ -8,6 +8,7 @@ kèm offset từng khoản, và soi lại file gold set đã soạn để bắt 
     python -m tools.annotate --corpus data/corpus --article luat_91_2025:9
     python -m tools.annotate --corpus data/corpus --grep "phản hồi" --emit q07
     python -m tools.annotate --corpus data/corpus --validate eval/questions.json
+    python -m tools.annotate --corpus data/corpus --leakage eval/questions.json
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ from typing import Sequence
 from src import config
 from src.chunk import citation_label, estimate_tokens
 from src.ingest import Article, Clause, Document, load_corpus
+from src.tokenize_vi import syllables
 
 EXCERPT_WIDTH = 300
 VALIDATE_PREVIEW = 120
@@ -296,6 +298,72 @@ def cmd_validate(documents: Sequence[Document], path: Path) -> int:
     return 1 if errors else 0
 
 
+def jaccard_unigram(question: str, evidence: str) -> float:
+    """Jaccard trên TẬP unigram âm tiết, không dùng bigram.
+
+    Bigram phạt hai lần cùng một chỗ trùng (đã tính "bảo" và "hiểm" rồi lại tính
+    "bảo_hiểm"), làm ngưỡng mất ý nghĩa.
+    """
+    left, right = set(syllables(question)), set(syllables(evidence))
+    if not left or not right:
+        return 0.0
+    return len(left & right) / len(left | right)
+
+
+def cmd_leakage(documents: Sequence[Document], path: Path) -> int:
+    """Đo rò rỉ từ vựng giữa câu hỏi và đoạn văn nguồn của nó."""
+    if not path.is_file():
+        print(f"Không thấy file gold set: {path}", file=sys.stderr)
+        return 1
+
+    by_id = {d.meta.doc_id: d for d in documents}
+    questions = json.loads(path.read_text(encoding="utf-8"))
+    rows: list[tuple[str, float, str]] = []
+    skipped: list[str] = []
+
+    for question in questions:
+        qid = question.get("qid", "?")
+        if not question.get("answerable", True):
+            continue
+
+        pieces: list[str] = []
+        for span in question.get("gold_spans", []):
+            document = by_id.get(span.get("doc_id"))
+            start, end = span.get("char_start"), span.get("char_end")
+            if document is None or not isinstance(start, int) or not isinstance(end, int):
+                skipped.append(f"{qid}: gold_span sai định dạng hoặc doc_id lạ")
+                continue
+            if not 0 <= start < end <= len(document.body):
+                skipped.append(f"{qid}: [{start}, {end}) ngoài phạm vi {span.get('doc_id')}")
+                continue
+            pieces.append(document.body[start:end])
+
+        if not pieces:
+            skipped.append(f"{qid}: không lấy được text gold_span")
+            continue
+
+        # Câu nhiều span: đo trên HỢP text các span, vì câu hỏi được phép mượn
+        # từ vựng của bất kỳ span nào trong đó.
+        score = jaccard_unigram(question.get("question", ""), "\n".join(pieces))
+        flag = "⚠ RÒ RỈ" if score > config.LEAKAGE_JACCARD_MAX else ""
+        rows.append((qid, score, flag))
+
+    rows.sort(key=lambda row: -row[1])
+    print(f"{'qid':<10} {'jaccard':>8}  cờ")
+    print("-" * 32)
+    for qid, score, flag in rows:
+        print(f"{qid:<10} {score:>8.3f}  {flag}")
+
+    flagged = [row for row in rows if row[2]]
+    print(
+        f"\n{len(flagged)}/{len(rows)} câu vượt ngưỡng "
+        f"{config.LEAKAGE_JACCARD_MAX} (câu unanswerable không tính)"
+    )
+    for note in skipped:
+        print(f"  ! bỏ qua {note}")
+    return 1 if flagged else 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m tools.annotate", description="Hỗ trợ gán nhãn gold_span bằng tay"
@@ -308,12 +376,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--article", help="In nguyên một Điều, dạng doc_id:số_điều")
     parser.add_argument("--emit", metavar="QID", help="In JSON fragment cho các kết quả --grep")
     parser.add_argument("--validate", metavar="PATH", help="Soi lại gold set đã soạn")
+    parser.add_argument(
+        "--leakage", metavar="PATH", help="Đo rò rỉ từ vựng câu hỏi vs gold_span"
+    )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    if not any((args.grep, args.article, args.validate)):
+    if not any((args.grep, args.article, args.validate, args.leakage)):
         build_parser().print_help()
         return 1
 
@@ -325,6 +396,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         status |= cmd_article(documents, args.article)
     if args.validate:
         status |= cmd_validate(documents, Path(args.validate))
+    if args.leakage:
+        status |= cmd_leakage(documents, Path(args.leakage))
     return status
 
 

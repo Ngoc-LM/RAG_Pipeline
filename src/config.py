@@ -38,6 +38,16 @@ CHARS_PER_TOKEN: Final[float] = 3.5
 """Ước lượng số ký tự mỗi token cho tiếng Việt có dấu."""
 
 # --- Đánh giá ------------------------------------------------------------
+LEAKAGE_JACCARD_MAX: Final[float] = 0.3
+"""Ngưỡng Jaccard unigram âm tiết giữa câu hỏi và text gold_span.
+
+Câu hỏi copy lại từ vựng của chính khoản nguồn làm BM25 thắng một cách giả tạo
+và thổi phồng Recall của MỌI arm cùng lúc — bảng ablation mất luôn khả năng
+phân biệt arm nào thực sự tốt hơn. Đo trên unigram chứ không phải bigram: bigram
+sẽ phạt hai lần cùng một chỗ trùng (vừa tính "bảo", "hiểm" vừa tính "bảo_hiểm")
+nên ngưỡng mất ý nghĩa.
+"""
+
 THETA_COVERAGE: Final[float] = 0.8
 """Ngưỡng coverage để coi một gold_span là đã truy xuất đủ căn cứ. Dùng ở
 bước evaluate, khai báo sẵn ở đây cho tập trung."""
