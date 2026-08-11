@@ -24,8 +24,9 @@ chạy được và có test; phần chưa có là thiết kế đã chốt như
 | Gold set 20 câu | `eval/questions.json` | ✅ |
 | Index (BM25 + embedding) | `src/index.py` | ✅ |
 | Retrieve (4 arm, RRF + rerank) | `src/retrieve.py` | ✅ |
+| Evaluate truy xuất bằng coverage | `src/evaluate.py` | ✅ |
 | Generate + verify hai tầng | — | ⬜ chưa dựng |
-| Evaluate + calibrate | — | ⬜ chưa dựng |
+| Calibrate hai ngưỡng abstain | — | ⬜ chưa dựng |
 
 Lệnh chạy được đầu-cuối hôm nay:
 
@@ -33,6 +34,7 @@ Lệnh chạy được đầu-cuối hôm nay:
 python -m src.chunk  --corpus data/corpus                    # thống kê chunk
 python -m src.index  --corpus data/corpus                    # dựng chỉ mục + ghi manifest
 python -m src.retrieve --corpus data/corpus --arm bm25 --qid q16
+python -m src.evaluate --corpus data/corpus --arms bm25    # bảng truy xuất
 python -m tools.annotate --help
 python -m pytest
 ```
@@ -269,9 +271,6 @@ mở đầu cũng không bao giờ gộp với khoản 1 — gộp sẽ tạo ra
 
 ## Đo truy xuất bằng coverage, không bằng "chunk gold"
 
-> Thiết kế đã chốt; tầng evaluate chưa dựng lại. Phần số học khoảng đã có trong
-> `src/intervals.py` và có test cho các ca chồng lấn, lồng nhau, kề nhau, trùng lặp.
-
 Repo này **không** có khái niệm "chunk nào là chunk gold". Gán nhãn ở mức chunk
 buộc phải chọn một ngưỡng overlap, mà mọi ngưỡng như vậy đều thiên lệch theo kích
 thước chunk: lấy `overlap >= 0.5 · |span|` thì chunk nhỏ không bao giờ đạt; đổi sang
@@ -291,14 +290,55 @@ MRR ở đây đọc là "đến hạng thứ mấy thì retriever gom đủ că
 
 Phần giao tính trên **hợp các khoảng `[char_start, char_end)`** rồi mới cắt với
 span — không cộng độ dài text của từng chunk, vì chunk chồng lấn sẽ bị đếm hai lần
-và coverage vọt quá 1.
+và coverage vọt quá 1. Có test cho đúng ca đó: hai chunk `[0,70)` và `[30,100)`
+phủ span `[0,100)` cho `cov = 1.0`, trong khi cộng độ dài text sẽ ra 1.4.
+
+Hợp khoảng chỉ gom chunk **cùng `doc_id`** với span. Trục ký tự là trục riêng của
+từng văn bản, nên chunk `[0, 100)` của văn bản khác chồng lên span về mặt số học
+mà không phủ một chữ nào của nó.
+
+Tính chất then chốt — **bất biến với `chunk_size` theo đúng định nghĩa**: chia một
+chunk thành hai chunk kề nhau không đổi hợp, nên không đổi coverage. Đó là thứ mà
+nhãn "chunk gold" không thể có, và `test_evaluate.py::test_coverage_bat_bien_voi_chunk_size`
+canh đúng tính chất đó.
 
 Câu multi-hop báo cáo hai cột: **strict** (mọi `gold_span` đều đạt ngưỡng) và
-**any** (ít nhất một span đạt). Strict là cột chính.
+**any** (ít nhất một span đạt). Strict là cột chính, và `r*_strict` là hạng của
+span **chậm nhất** — hạng mà tại đó retriever đã gom đủ căn cứ cho cả câu.
 
 Không báo cáo nDCG: với relevance dạng coverage thì IDCG phải dựng từ một lời giải
 phủ tối ưu, và con số đó nói về bộ giải set-cover nhiều hơn là về retriever. Thay
 bằng `mean_cov@k`, vốn đã là metric có thứ bậc và không cần chuẩn hoá tuỳ tiện.
+`mean_cov` lấy trung bình **trong một câu trước** rồi mới trung bình qua các câu,
+để câu 2 span không mang trọng số gấp đôi câu 1 span.
+
+Bốn câu `unanswerable` không tham gia metric truy xuất — chúng đo chất lượng
+abstain, mà abstain thì thuộc tầng generate.
+
+### Baseline BM25 (arm duy nhất chạy được khi chưa có API key)
+
+```
+                    n       Rs@1       Rs@5       Rs@8      Rs@30      Ra@8       cov@8     MRR
+bm25               16      0.125      0.500      0.562      0.938     0.812       0.688   0.281
+factoid_1hop        8      0.250      0.750      0.750      1.000     0.750       0.750   0.416
+multihop            5      0.000      0.200      0.200      0.800     1.000       0.600   0.121
+distractor          3      0.000      0.333      0.667      1.000     0.667       0.667   0.186
+```
+
+Ba điều đọc được ngay, và cả ba đều là thứ tầng dense/rerank phải cải thiện:
+
+- **`Rs@30 = 0.938` là trần trên của `hybrid_rerank`.** Reranker chỉ nhìn thấy 30
+  ứng viên, nên span nằm ngoài top-30 thì nó không có cơ hội cứu.
+- **Multi-hop: `Ra@8 = 1.000` nhưng `Rs@8 = 0.200`.** BM25 gần như luôn tìm được
+  *một* trong hai span và gần như không bao giờ tìm đủ *cả hai*. Đúng hiện tượng
+  mà cột strict sinh ra để phơi bày — một bảng chỉ có cột "any" sẽ báo 100% và
+  giấu mất toàn bộ vấn đề.
+- **`Rs@1 = 0.125` trên tổng thể, và `0.000` cho cả multihop lẫn distractor.**
+  Hạng 1 của BM25 gần như không bao giờ đúng cho hai loại câu khó.
+
+`outputs/eval/retrieval.json` giữ `r*` của từng span từng câu, nên truy được ngay
+câu nào hỏng ở đâu. Ví dụ `q10` có `r*` từng span là `[None, 2]`: span thứ hai lên
+hạng 2, span thứ nhất không xuất hiện trong 30 ứng viên đầu.
 
 ## Bốn arm ablation
 
@@ -498,6 +538,13 @@ Không test nào chạm mạng. Đáng chú ý:
   1000 lần mà giữ nguyên thứ hạng thì kết quả hợp nhất không đổi.
 - `test_index_retrieve.py::test_arm_rerank_hoa_diem_thi_giu_thu_tu_rrf` — reranker
   chấm mọi ứng viên bằng nhau thì thứ tự ra đúng bằng thứ tự RRF.
+
+- `test_evaluate.py::test_coverage_bat_bien_voi_chunk_size` — chia một chunk thành
+  bốn chunk kề nhau không đổi coverage. Đây là lý do tồn tại của cả metric.
+- `test_evaluate.py::test_coverage_chi_tinh_chunk_cung_document` — chunk của văn
+  bản khác không được tính vào phần giao dù khoảng số học có chồng nhau.
+- `test_evaluate.py::test_coverage_chunk_chong_lan_khong_vuot_qua_1` — cộng độ dài
+  text sẽ ra 1.4, hợp khoảng ra đúng 1.0.
 
 Phía dense và rerank được kiểm bằng cách **gieo sẵn cache** rồi chạy đúng đường dữ
 liệu thật, chứ không monkeypatch hàm gọi API. Nhờ vậy test bao luôn cả hình dạng

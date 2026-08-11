@@ -10,6 +10,7 @@ CORPUS_DIR: Final[Path] = ROOT / "data" / "corpus"
 OUTPUTS_DIR: Final[Path] = ROOT / "outputs"
 CACHE_DIR: Final[Path] = OUTPUTS_DIR / "cache"
 INDEX_DIR: Final[Path] = OUTPUTS_DIR / "index"
+EVAL_DIR: Final[Path] = OUTPUTS_DIR / "eval"
 QUESTIONS_PATH: Final[Path] = ROOT / "eval" / "questions.json"
 
 # --- Chunk ---------------------------------------------------------------
@@ -85,8 +86,20 @@ nên ngưỡng mất ý nghĩa.
 """
 
 THETA_COVERAGE: Final[float] = 0.8
-"""Ngưỡng coverage để coi một gold_span là đã truy xuất đủ căn cứ. Dùng ở
-bước evaluate, khai báo sẵn ở đây cho tập trung."""
+"""Ngưỡng coverage để coi một gold_span là đã truy xuất đủ căn cứ.
+
+0.8 chứ không phải 1.0: chunk cuối cùng chạm vào span thường cắt ngang vài chữ ở
+mép, và đòi phủ tuyệt đối sẽ phạt một retriever thực chất đã lấy đủ căn cứ để
+trả lời. Cũng không hạ xuống 0.5, vì phủ nửa khoản trong văn bản QPPL rất dễ mất
+đúng vế điều kiện hoặc vế ngoại lệ — tức là mất phần quyết định nghĩa của quy phạm.
+"""
+
+EVAL_K_VALUES: Final[tuple[int, ...]] = (1, 3, 5, 8, 10, 20, 30)
+"""Các mốc k báo cáo. Trần 30 = RERANK_CANDIDATES.
+
+Báo cáo @k vượt quá RERANK_CANDIDATES là vô nghĩa với arm hybrid_rerank (nó chỉ
+nhìn thấy 30 ứng viên), nên cả bốn arm cùng cắt ở 30 để so được với nhau.
+"""
 
 # --- LLM -----------------------------------------------------------------
 EMBED_MODEL: Final[str] = "gemini-embedding-001"
