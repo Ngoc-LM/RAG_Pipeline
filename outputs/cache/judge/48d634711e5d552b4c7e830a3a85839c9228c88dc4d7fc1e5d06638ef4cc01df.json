@@ -1,0 +1,35 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Bộ nào được giao lo việc bảo mật cho hạ tầng phân giải địa chỉ web cấp quốc gia?",
+      "claims": [
+        "Bộ Thông tin và Truyền thông có trách nhiệm thực hiện bảo đảm an toàn thông tin mạng cho hệ thống máy chủ tên miền quốc gia Việt Nam."
+      ],
+      "citations": [
+        [
+          1
+        ]
+      ],
+      "context": [
+        "luat_attt_86_2015#a12#c1-3#p0",
+        "luat_attt_86_2015#a5#c1-4#p0",
+        "nd_356_2025#a1#c0#p0",
+        "nd_356_2025#a13#c3-6#p0",
+        "luat_attt_86_2015#a9#c1-2#p0",
+        "luat_attt_86_2015#a3#c16-20#p0",
+        "nd_356_2025#a12#c1-2#p0",
+        "nd_13_2023#a6#c0#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\"verdicts\": [{\"claim_id\": 1, \"supported\": true, \"reason\": \"Nội dung mệnh đề trùng khớp hoàn toàn với Khoản 3 Điều 12 trong trích đoạn [1].\"}]}\n```",
+  "created_at": "2026-08-11T06:18:43.604255+00:00"
+}

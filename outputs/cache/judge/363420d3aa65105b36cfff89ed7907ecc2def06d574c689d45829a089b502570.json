@@ -1,0 +1,39 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "So với nghĩa vụ chung khi để lộ dữ liệu, một ngân hàng còn phải làm thêm điều gì?",
+      "claims": [
+        "Trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm, ngân hàng có trách nhiệm thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân.",
+        "Nội dung thông báo về việc lộ, mất dữ liệu nhạy cảm phải đảm bảo tối thiểu các nội dung theo quy định của pháp luật."
+      ],
+      "citations": [
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "context": [
+        "nd_356_2025#a8#c3#p0",
+        "luat_91_2025#a27#c1#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "nd_356_2025#a8#c1#p0",
+        "nd_356_2025#a8#c2#p0",
+        "nd_356_2025#a4#c1-2#p0",
+        "luat_91_2025#a23#c1#p0",
+        "luat_91_2025#a23#c4-5#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định rõ trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm trong lĩnh vực tài chính, ngân hàng, tổ chức thu thập dữ liệu có trách nhiệm thông báo cho cơ quan chuyên trách và chủ thể dữ liệu.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] nêu rõ nội dung thông báo cần đảm bảo tối thiểu các nội dung quy định tại khoản 1 Điều 28 của Nghị định này.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:32:06.413063+00:00"
+}

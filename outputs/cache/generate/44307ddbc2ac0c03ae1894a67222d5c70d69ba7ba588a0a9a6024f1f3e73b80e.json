@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Bên tôi làm dịch vụ tiếp thị, muốn dùng danh sách khách do một đối tác chuyển sang để chạy quảng cáo. Có được phép không?",
+      "context": [
+        "luat_91_2025#a28#c1-2#p0",
+        "luat_91_2025#a28#c3-4#p0",
+        "luat_91_2025#a28#c5-7#p0",
+        "luat_91_2025#a28#c8#p0",
+        "luat_91_2025#a11#c1-3#p0",
+        "nd_356_2025#a7#c2-3#p0",
+        "luat_91_2025#a15#c1-2#p0",
+        "luat_91_2025#a17#c1-3#p0"
+      ],
+      "attempt": 2,
+      "feedback": "Lượt trước có mệnh đề không được trích đoạn hỗ trợ:\n- \"Tổ chức kinh doanh dịch vụ quảng cáo chỉ được sử dụng dữ liệu cá nhân của khách hàng được bên kiểm soát dữ liệu cá nhân chuyển giao theo thỏa thuận để kinh doanh dịch vụ quảng cáo.\" — Trích đoạn [1] nêu tổ chức kinh doanh dịch vụ quảng cáo được sử dụng dữ liệu từ hai nguồn: được chuyển giao theo thỏa thuận HOẶC thu thập qua hoạt động kinh doanh của mình. Mệnh đề dùng từ 'chỉ được' để giới hạn chỉ còn một nguồn là chuyển giao theo thỏa thuận, nên không chính xác so với trích đoạn.\nSửa hoặc BỎ HẲN những mệnh đề trên. Không thêm mệnh đề mới nếu không có căn cứ trong danh sách trích đoạn. Nếu sau khi bỏ thì không còn gì để trả lời, hãy trả về abstain."
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Tổ chức kinh doanh dịch vụ quảng cáo được phép sử dụng dữ liệu cá nhân của khách hàng do bên kiểm soát dữ liệu cá nhân chuyển giao theo thỏa thuận để kinh doanh dịch vụ quảng cáo.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Việc xử lý dữ liệu cá nhân của khách hàng để kinh doanh dịch vụ quảng cáo phải được sự đồng ý của khách hàng.\",\n      \"citations\": [\n        2\n      ]\n    },\n    {\n      \"text\": \"Khách hàng phải được biết rõ nội dung, phương thức, hình thức, tần suất giới thiệu sản phẩm và được cung cấp phương thức để từ chối nhận thông tin quảng cáo.\",\n      \"citations\": [\n        2\n      ]\n    },\n    {\n      \"text\": \"Việc sử dụng dữ liệu cá nhân để quảng cáo phải tuân thủ các quy định của pháp luật về phòng, chống tin nhắn rác, thư điện tử rác, cuộc gọi rác và pháp luật về quảng cáo.\",\n      \"citations\": [\n        2\n      ]\n    },\n    {\n      \"text\": \"Tổ chức kinh doanh dịch vụ quảng cáo có trách nhiệm chứng minh việc sử dụng dữ liệu cá nhân của khách hàng là tuân thủ quy định pháp luật.\",\n      \"citations\": [\n        3\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:38:49.991137+00:00"
+}

@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Hai công ty sáp nhập, bên tôi tiếp nhận toàn bộ danh sách khách của bên kia. Có phải ký kết văn bản riêng cho việc bàn giao đó không, và trong đó cần ghi những gì?",
+      "context": [
+        "nd_356_2025#a7#c1#p0",
+        "luat_91_2025#a17#c1-3#p0",
+        "nd_356_2025#a7#c2-3#p0",
+        "luat_91_2025#a2#c6-8#p0",
+        "nd_356_2025#a12#c1-2#p0",
+        "luat_91_2025#a28#c1-2#p0",
+        "luat_91_2025#a26#c1-4#p0",
+        "nd_356_2025#a7#c4-6#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Khi sáp nhập tổ chức, việc chuyển giao dữ liệu cá nhân để tiếp tục xử lý là một trường hợp được phép thực hiện.\",\n      \"citations\": [\n        2\n      ]\n    },\n    {\n      \"text\": \"Tổ chức chuyển giao dữ liệu cá nhân trong trường hợp sáp nhập phải xác lập thỏa thuận về việc chuyển giao dữ liệu cá nhân với bên nhận.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Thỏa thuận chuyển giao dữ liệu cá nhân phải nêu rõ mục đích chuyển giao.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Thỏa thuận phải nêu rõ đối tượng chủ thể dữ liệu và loại dữ liệu cá nhân được chuyển giao phù hợp với mục đích.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Thỏa thuận phải nêu rõ thời hạn xử lý dữ liệu và yêu cầu về xóa, hủy dữ liệu sau khi hoàn thành mục đích.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Thỏa thuận phải nêu rõ cơ sở pháp lý của việc chuyển giao.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Thỏa thuận phải nêu rõ trách nhiệm bảo vệ dữ liệu cá nhân trong quá trình chuyển giao, xử lý.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Thỏa thuận phải nêu rõ trách nhiệm thực hiện các quyền của chủ thể dữ liệu cá nhân.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Thỏa thuận phải nêu rõ trách nhiệm phối hợp và tuân thủ của các bên khi phát hiện vi phạm quy định bảo vệ dữ liệu cá nhân.\",\n      \"citations\": [\n        1\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:30:03.484231+00:00"
+}

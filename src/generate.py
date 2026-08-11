@@ -53,6 +53,27 @@ Trả về JSON đúng một trong hai dạng:
 {{"abstain": true, "reason": "..."}}"""
 
 
+GENERATE_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "abstain": {"type": "boolean"},
+        "reason": {"type": "string"},
+        "claims": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string"},
+                    "citations": {"type": "array", "items": {"type": "integer"}},
+                },
+                "required": ["text", "citations"],
+            },
+        },
+    },
+    "required": ["abstain", "claims"],
+}
+
+
 @dataclass(frozen=True)
 class Claim:
     text: str
@@ -152,6 +173,7 @@ def draft_answer(
         temperature=config.GEN_TEMPERATURE,
         max_tokens=config.GEN_MAX_TOKENS,
         thinking_budget=config.GEN_THINKING_BUDGET,
+        response_schema=GENERATE_SCHEMA,
         offline=offline,
     )
     return _parse_draft(raw)
@@ -272,9 +294,19 @@ def answer_question(
     feedback = ""
 
     for index in range(1, config.MAX_GENERATE_ATTEMPTS + 1):
-        draft = draft_answer(
-            question, chunks, attempt=index, feedback=feedback, offline=offline
-        )
+        try:
+            draft = draft_answer(
+                question, chunks, attempt=index, feedback=feedback, offline=offline
+            )
+        except ValueError as exc:
+            # Output không đọc được là một lượt sinh HỎNG, không phải lỗi lập
+            # trình: đưa vào đúng vòng sinh lại đã có sẵn thay vì làm chết cả
+            # lượt chạy 20 câu vì một câu.
+            broken = CheckA(False, (f"output không đọc được: {exc}",))
+            attempts.append(Attempt(index, Draft((), False, ""), broken, None))
+            feedback = retry_feedback(broken, None, ())
+            continue
+
         if draft.abstain:
             attempts.append(Attempt(index, draft, CheckA(True, ()), None))
             return _abstain(question, "model", attempts, top_score)

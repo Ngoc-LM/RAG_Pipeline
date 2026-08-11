@@ -1,0 +1,39 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Muốn đăng ảnh và chuyện riêng của một đứa trẻ 10 tuổi lên mạng thì cần ai gật đầu?",
+      "claims": [
+        "Việc xử lý dữ liệu cá nhân của trẻ em nhằm công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân của trẻ em từ đủ 07 tuổi trở lên phải có sự đồng ý của chính trẻ em đó.",
+        "Việc xử lý dữ liệu cá nhân của trẻ em từ đủ 07 tuổi trở lên nhằm công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân cũng cần có sự đồng ý của người đại diện theo pháp luật của trẻ em."
+      ],
+      "citations": [
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "context": [
+        "luat_91_2025#a24#c1-2#p0",
+        "luat_91_2025#a24#c3#p0",
+        "luat_91_2025#a10#c1-2#p0",
+        "nd_356_2025#a4#c1-2#p0",
+        "nd_356_2025#a3#c1-11#p0",
+        "luat_91_2025#a9#c1-2#p0",
+        "luat_91_2025#a16#c1-2#p0",
+        "luat_91_2025#a10#c3-4#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định rõ việc xử lý dữ liệu cá nhân của trẻ em từ đủ 07 tuổi trở lên để công bố, tiết lộ đời sống riêng tư, bí mật cá nhân phải có sự đồng ý của trẻ em.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định rõ việc xử lý dữ liệu cá nhân của trẻ em từ đủ 07 tuổi trở lên để công bố, tiết lộ đời sống riêng tư, bí mật cá nhân phải có sự đồng ý của người đại diện theo pháp luật.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:26:08.236162+00:00"
+}

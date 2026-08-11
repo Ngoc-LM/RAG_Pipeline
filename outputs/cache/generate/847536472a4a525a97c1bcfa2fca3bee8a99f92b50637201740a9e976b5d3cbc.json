@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Người được công ty giao phụ trách mảng này cần bằng cấp gì và bao nhiêu năm đi làm?",
+      "context": [
+        "nd_356_2025#a15#c1-2#p0",
+        "nd_356_2025#a13#c1-2#p0",
+        "nd_356_2025#a13#c3-6#p0",
+        "nd_356_2025#a15#c3-4#p0",
+        "nd_356_2025#a12#c3-4#p0",
+        "luat_attt_86_2015#a10#c3#p0",
+        "luat_91_2025#a25#c1#p0",
+        "luat_91_2025#a1#c1-2#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có trình độ cao đẳng trở lên.\",\n      \"citations\": [\n        2\n      ]\n    },\n    {\n      \"text\": \"Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có ít nhất 02 năm kinh nghiệm công tác kể từ thời điểm tốt nghiệp trong các lĩnh vực liên quan như pháp chế, công nghệ thông tin, an ninh mạng, an ninh dữ liệu, quản trị rủi ro, kiểm soát tuân thủ, quản lý nhân sự hoặc tổ chức cán bộ.\",\n      \"citations\": [\n        2\n      ]\n    },\n    {\n      \"text\": \"Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải đã được đào tạo, bồi dưỡng kiến thức pháp luật và kỹ năng chuyên môn về bảo vệ dữ liệu cá nhân.\",\n      \"citations\": [\n        2\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:28:07.678719+00:00"
+}

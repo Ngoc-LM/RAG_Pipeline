@@ -1,0 +1,64 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Hai công ty sáp nhập, bên tôi tiếp nhận toàn bộ danh sách khách của bên kia. Có phải ký kết văn bản riêng cho việc bàn giao đó không, và trong đó cần ghi những gì?",
+      "claims": [
+        "Tổ chức chuyển giao dữ liệu cá nhân trong trường hợp sáp nhập phải xác lập thỏa thuận về việc chuyển giao dữ liệu cá nhân với bên nhận.",
+        "Thỏa thuận chuyển giao dữ liệu cá nhân phải nêu rõ mục đích chuyển giao.",
+        "Thỏa thuận phải nêu rõ đối tượng chủ thể dữ liệu cá nhân và loại dữ liệu cá nhân được chuyển giao phù hợp với mục đích chuyển giao.",
+        "Thỏa thuận phải nêu rõ thời hạn xử lý dữ liệu cá nhân, yêu cầu về xóa, hủy dữ liệu cá nhân sau khi hoàn thành mục đích chuyển giao.",
+        "Thỏa thuận phải nêu rõ cơ sở pháp lý của việc chuyển giao dữ liệu cá nhân.",
+        "Thỏa thuận phải nêu rõ trách nhiệm bảo vệ dữ liệu cá nhân trong quá trình chuyển giao, xử lý dữ liệu cá nhân.",
+        "Thỏa thuận phải nêu rõ trách nhiệm thực hiện các quyền của chủ thể dữ liệu cá nhân.",
+        "Thỏa thuận phải nêu rõ trách nhiệm phối hợp và tuân thủ của các bên trong trường hợp phát hiện vi phạm quy định bảo vệ dữ liệu cá nhân."
+      ],
+      "citations": [
+        [
+          1,
+          2
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "context": [
+        "nd_356_2025#a7#c1#p0",
+        "luat_91_2025#a17#c1-3#p0",
+        "nd_356_2025#a7#c2-3#p0",
+        "luat_91_2025#a2#c6-8#p0",
+        "nd_356_2025#a12#c1-2#p0",
+        "luat_91_2025#a28#c1-2#p0",
+        "luat_91_2025#a26#c1-4#p0",
+        "nd_356_2025#a7#c4-6#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [2] xác định sáp nhập là một trường hợp chuyển giao dữ liệu cá nhân (điểm c khoản 1), và trích đoạn [1] quy định tổ chức chuyển giao theo điểm c khoản 1 Điều 17 phải xác lập thỏa thuận với bên nhận.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ mục đích chuyển giao dữ liệu cá nhân tại điểm a khoản 1.\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ đối tượng chủ thể và loại dữ liệu cá nhân được chuyển giao phù hợp với mục đích tại điểm b khoản 1.\"\n    },\n    {\n      \"claim_id\": 4,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ thời hạn xử lý và yêu cầu xóa, hủy dữ liệu sau khi hoàn thành mục đích tại điểm c khoản 1.\"\n    },\n    {\n      \"claim_id\": 5,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ cơ sở pháp lý của việc chuyển giao tại điểm d khoản 1.\"\n    },\n    {\n      \"claim_id\": 6,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ trách nhiệm bảo vệ dữ liệu cá nhân trong quá trình chuyển giao, xử lý tại điểm đ khoản 1.\"\n    },\n    {\n      \"claim_id\": 7,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ trách nhiệm thực hiện các quyền của chủ thể dữ liệu cá nhân tại điểm e khoản 1.\"\n    },\n    {\n      \"claim_id\": 8,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ trách nhiệm phối hợp và tuân thủ khi phát hiện vi phạm tại điểm g khoản 1.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:38:48.570561+00:00"
+}

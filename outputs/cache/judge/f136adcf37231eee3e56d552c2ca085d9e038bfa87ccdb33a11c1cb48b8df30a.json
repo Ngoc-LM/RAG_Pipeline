@@ -1,0 +1,44 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Sau khi bắt đầu đẩy hồ sơ khách sang máy chủ đặt ở nước khác, bên tôi có bao nhiêu ngày để nộp giấy tờ cho cơ quan quản lý?",
+      "claims": [
+        "Hoạt động lưu trữ dữ liệu cá nhân có sự chuyển giao dữ liệu cá nhân thu thập, lưu trữ tại Việt Nam đến hệ thống máy chủ đặt ngoài lãnh thổ Việt Nam là một trong các trường hợp chuyển dữ liệu cá nhân xuyên biên giới.",
+        "Cơ quan, tổ chức, cá nhân thực hiện chuyển dữ liệu cá nhân xuyên biên giới phải lập hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới.",
+        "Bên chuyển dữ liệu cá nhân xuyên biên giới phải gửi 01 bản chính hồ sơ đánh giá tác động cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân trong thời gian 60 ngày kể từ ngày đầu tiên chuyển dữ liệu cá nhân xuyên biên giới, trừ một số trường hợp ngoại lệ."
+      ],
+      "citations": [
+        [
+          2,
+          3
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "context": [
+        "luat_91_2025#a20#c2-3#p0",
+        "nd_356_2025#a17#c1#p0",
+        "luat_91_2025#a20#c1#p0",
+        "luat_91_2025#a39#c1-2#p0",
+        "luat_91_2025#a21#c1-2#p0",
+        "luat_91_2025#a22#c1-4#p0",
+        "luat_91_2025#a20#c6-7#p0",
+        "luat_91_2025#a21#c5-7#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [2] và [3] xác nhận trực tiếp hoạt động lưu trữ dữ liệu cá nhân chuyển giao đến máy chủ ngoài lãnh thổ Việt Nam là một trường hợp chuyển dữ liệu cá nhân xuyên biên giới.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": false,\n      \"reason\": \"Mệnh đề khẳng định mọi cơ quan, tổ chức, cá nhân chuyển dữ liệu xuyên biên giới đều phải lập hồ sơ, trong khi trích đoạn [1] có quy định ngoại lệ ('trừ trường hợp quy định tại khoản 6 Điều này').\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định đầy đủ về việc gửi 01 bản chính cho cơ quan chuyên trách trong vòng 60 ngày kể từ ngày đầu tiên chuyển dữ liệu và có ghi nhận các trường hợp ngoại lệ.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:15:24.749993+00:00"
+}

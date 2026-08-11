@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Bộ nào được giao lo việc bảo mật cho hạ tầng phân giải địa chỉ web cấp quốc gia?",
+      "context": [
+        "luat_attt_86_2015#a12#c1-3#p0",
+        "luat_attt_86_2015#a5#c1-4#p0",
+        "nd_356_2025#a1#c0#p0",
+        "nd_356_2025#a13#c3-6#p0",
+        "luat_attt_86_2015#a9#c1-2#p0",
+        "luat_attt_86_2015#a3#c16-20#p0",
+        "nd_356_2025#a12#c1-2#p0",
+        "nd_13_2023#a6#c0#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Bộ Thông tin và Truyền thông có trách nhiệm thực hiện bảo đảm an toàn thông tin mạng cho hệ thống máy chủ tên miền quốc gia Việt Nam.\",\n      \"citations\": [\n        1\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:30:01.913207+00:00"
+}

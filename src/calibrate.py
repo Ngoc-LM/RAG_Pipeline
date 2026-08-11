@@ -51,6 +51,11 @@ class GridPoint:
         """Trả lời một câu không có căn cứ — lỗi nguy hiểm hơn từ chối nhầm."""
         return int(self.abstain["missed_abstain"])
 
+    @property
+    def support_ratio_final(self) -> float:
+        """Faithfulness sau verify. None (không câu nào được trả lời) coi là 0."""
+        return float(self.faithfulness.get("support_ratio_final") or 0.0)
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "tau_retrieve": self.tau_retrieve,
@@ -87,18 +92,30 @@ def sweep(
 
 
 def best_point(points: Sequence[GridPoint]) -> GridPoint:
-    """F1 cao nhất; hoà thì ưu tiên ít `missed_abstain` hơn, rồi ngưỡng thấp hơn.
+    """Xếp theo bốn tiêu chí, theo đúng thứ tự ưu tiên đó.
 
-    Hai loại lỗi không đối xứng: trả lời một câu không có căn cứ trong corpus là
-    đúng dạng lỗi mà cả pipeline này sinh ra để chặn, còn từ chối nhầm chỉ gây
-    phiền. Nên khi F1 bằng nhau, phá hoà về phía an toàn. Mức phá hoà cuối cùng
-    là ngưỡng thấp hơn, để không siết chặt hơn mức dữ liệu biện minh được.
+    1. **F1 abstain** cao nhất — mục tiêu chính.
+    2. **Ít `missed_abstain`** hơn. Hai loại lỗi không đối xứng: trả lời một câu
+       không có căn cứ là đúng dạng lỗi cả pipeline này sinh ra để chặn, còn từ
+       chối nhầm chỉ gây phiền. Hoà thì phá về phía an toàn.
+    3. **Faithfulness sau verify** cao hơn. Tiêu chí này được thêm SAU khi chạy
+       thật: trên gold set hiện tại F1 hoà ở cả 28 điểm lưới, nên nếu chỉ có tiêu
+       chí 1-2 thì thuật toán rơi thẳng xuống tiêu chí "ngưỡng thấp nhất" và chọn
+       đúng ô có faithfulness TỆ nhất (0.9597 thay vì 1.0000). Một lưới phẳng ở
+       mục tiêu chính không có nghĩa là mọi điểm tương đương nhau.
+    4. **Ngưỡng thấp hơn**, để không siết chặt hơn mức dữ liệu biện minh được.
     """
     if not points:
         raise ValueError("Lưới rỗng")
     return min(
         points,
-        key=lambda p: (-p.f1, p.missed_abstain, p.tau_retrieve, p.tau_ground),
+        key=lambda p: (
+            -p.f1,
+            p.missed_abstain,
+            -p.support_ratio_final,
+            p.tau_retrieve,
+            p.tau_ground,
+        ),
     )
 
 

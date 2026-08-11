@@ -1,0 +1,43 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Bên tôi cung cấp dịch vụ thư điện tử cho khách. Có bắt buộc phải cài hệ thống chặn mã độc không?",
+      "claims": [
+        "Doanh nghiệp cung cấp dịch vụ thư điện tử bắt buộc phải có hệ thống lọc phần mềm độc hại trong quá trình gửi, nhận, lưu trữ thông tin trên hệ thống của mình.",
+        "Hệ thống lọc phần mềm độc hại này là tập hợp phần cứng, phần mềm được kết nối vào mạng để phát hiện, ngăn chặn, lọc và thống kê phần mềm độc hại.",
+        "Doanh nghiệp cung cấp dịch vụ thư điện tử cũng có trách nhiệm báo cáo cơ quan nhà nước có thẩm quyền theo quy định của pháp luật."
+      ],
+      "citations": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          1
+        ]
+      ],
+      "context": [
+        "luat_attt_86_2015#a11#c1-5#p0",
+        "luat_attt_86_2015#a3#c10-12#p0",
+        "luat_attt_86_2015#a7#c4-6#p0",
+        "luat_attt_86_2015#a12#c1-3#p0",
+        "luat_91_2025#a28#c3-4#p0",
+        "luat_attt_86_2015#a10#c3#p0",
+        "luat_attt_86_2015#a3#c13-15#p0",
+        "luat_attt_86_2015#a3#c16-20#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] Khoản 3 quy định rõ doanh nghiệp cung cấp dịch vụ thư điện tử phải có hệ thống lọc phần mềm độc hại trong quá trình gửi, nhận, lưu trữ thông tin.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [2] Khoản 12 định nghĩa chính xác hệ thống lọc phần mềm độc hại là tập hợp phần cứng, phần mềm được kết nối vào mạng để phát hiện, ngăn chặn, lọc và thống kê phần mềm độc hại.\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] Khoản 3 quy định doanh nghiệp cung cấp dịch vụ thư điện tử phải báo cáo cơ quan nhà nước có thẩm quyền theo quy định của pháp luật.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:18:29.318584+00:00"
+}

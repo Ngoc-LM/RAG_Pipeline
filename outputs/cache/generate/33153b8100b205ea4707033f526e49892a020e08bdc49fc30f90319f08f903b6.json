@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Muốn đăng ảnh và chuyện riêng của một đứa trẻ 10 tuổi lên mạng thì cần ai gật đầu?",
+      "context": [
+        "luat_91_2025#a24#c1-2#p0",
+        "luat_91_2025#a24#c3#p0",
+        "luat_91_2025#a10#c1-2#p0",
+        "nd_356_2025#a4#c1-2#p0",
+        "nd_356_2025#a3#c1-11#p0",
+        "luat_91_2025#a9#c1-2#p0",
+        "luat_91_2025#a16#c1-2#p0",
+        "luat_91_2025#a10#c3-4#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Việc xử lý dữ liệu cá nhân của trẻ em nhằm công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân của trẻ em từ đủ 07 tuổi trở lên phải có sự đồng ý của chính trẻ em đó.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Việc xử lý dữ liệu cá nhân của trẻ em từ đủ 07 tuổi trở lên nhằm công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân cũng cần có sự đồng ý của người đại diện theo pháp luật của trẻ em.\",\n      \"citations\": [\n        1\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:25:41.920549+00:00"
+}

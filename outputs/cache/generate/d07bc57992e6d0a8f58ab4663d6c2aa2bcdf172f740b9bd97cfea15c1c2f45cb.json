@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Hai đạo luật đang còn hiệu lực dùng hai cách gọi khác nhau cho thông tin về một con người. Cách hiểu của mỗi đạo luật khác nhau ra sao?",
+      "context": [
+        "luat_91_2025#a2#c1-2#p0",
+        "luat_attt_86_2015#a3#c13-15#p0",
+        "luat_attt_86_2015#a3#c16-20#p0",
+        "luat_91_2025#a2#c3-5#p0",
+        "nd_356_2025#a3#c1-11#p0",
+        "luat_91_2025#a2#c9-12#p0",
+        "luat_91_2025#a2#c6-8#p0",
+        "nd_13_2023#a2#c1-2#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 định nghĩa dữ liệu cá nhân là dữ liệu số hoặc thông tin dưới dạng khác xác định hoặc giúp xác định một con người cụ thể.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Luật An toàn thông tin mạng số 86/2015/QH13 định nghĩa thông tin cá nhân là thông tin gắn với việc xác định danh tính của một người cụ thể.\",\n      \"citations\": [\n        2\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:33:15.438143+00:00"
+}

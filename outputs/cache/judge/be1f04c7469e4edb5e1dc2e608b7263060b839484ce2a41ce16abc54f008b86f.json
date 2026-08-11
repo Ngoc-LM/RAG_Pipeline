@@ -1,0 +1,43 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Người được công ty giao phụ trách mảng này cần bằng cấp gì và bao nhiêu năm đi làm?",
+      "claims": [
+        "Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có trình độ cao đẳng trở lên.",
+        "Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có ít nhất 02 năm kinh nghiệm công tác kể từ thời điểm tốt nghiệp trong các lĩnh vực liên quan như pháp chế, công nghệ thông tin, an ninh mạng, an ninh dữ liệu, quản trị rủi ro, kiểm soát tuân thủ, quản lý nhân sự hoặc tổ chức cán bộ.",
+        "Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải đã được đào tạo, bồi dưỡng kiến thức pháp luật và kỹ năng chuyên môn về bảo vệ dữ liệu cá nhân."
+      ],
+      "citations": [
+        [
+          2
+        ],
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "context": [
+        "nd_356_2025#a15#c1-2#p0",
+        "nd_356_2025#a13#c1-2#p0",
+        "nd_356_2025#a13#c3-6#p0",
+        "nd_356_2025#a15#c3-4#p0",
+        "nd_356_2025#a12#c3-4#p0",
+        "luat_attt_86_2015#a10#c3#p0",
+        "luat_91_2025#a25#c1#p0",
+        "luat_91_2025#a1#c1-2#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [2] khoản 2a quy định rõ nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có trình độ cao đẳng trở lên.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [2] khoản 2b quy định rõ yêu cầu về ít nhất 02 năm kinh nghiệm công tác kể từ khi tốt nghiệp trong các lĩnh vực được liệt kê.\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [2] khoản 2c quy định rõ yêu cầu về việc đã được đào tạo, bồi dưỡng kiến thức pháp luật và kỹ năng chuyên môn về bảo vệ dữ liệu cá nhân.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:28:44.725044+00:00"
+}

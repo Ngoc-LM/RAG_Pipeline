@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Lịch sử giao dịch của khách tại ngân hàng được xếp vào nhóm dữ liệu nào, và việc xếp nhóm đó kéo theo nghĩa vụ gì cho ngân hàng?",
+      "context": [
+        "nd_356_2025#a4#c1-2#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "nd_356_2025#a8#c2#p0",
+        "nd_356_2025#a8#c1#p0",
+        "nd_356_2025#a8#c3#p0",
+        "nd_356_2025#a6#c2-4#p0",
+        "luat_91_2025#a27#c1#p0",
+        "luat_91_2025#a4#c2-3#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Lịch sử giao dịch của khách hàng tại các tổ chức tín dụng, chi nhánh ngân hàng nước ngoài được xếp vào nhóm dữ liệu cá nhân nhạy cảm.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Trong quá trình xử lý dữ liệu cá nhân nhạy cảm, ngân hàng phải thiết lập quy định phân quyền giới hạn truy cập, quy trình xử lý và các biện pháp bảo mật.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Ngân hàng có trách nhiệm áp dụng tiêu chuẩn, quy chuẩn kỹ thuật bảo vệ dữ liệu cá nhân, quy chuẩn kỹ thuật khử nhận dạng và ẩn danh dữ liệu cá nhân.\",\n      \"citations\": [\n        4\n      ]\n    },\n    {\n      \"text\": \"Ngân hàng phải thực hiện đánh giá tuân thủ các quy định về bảo vệ dữ liệu cá nhân định kỳ 01 năm/lần và ghi lại nhật ký toàn bộ hoạt động xử lý dữ liệu cá nhân.\",\n      \"citations\": [\n        4\n      ]\n    },\n    {\n      \"text\": \"Khi xin sự đồng ý của chủ thể dữ liệu, ngân hàng phải đảm bảo nêu rõ mục đích xử lý, nguồn thu thập, thời gian lưu trữ, cơ chế rút lại sự đồng ý và chính sách xóa, hủy dữ liệu.\",\n      \"citations\": [\n        3\n      ]\n    },\n    {\n      \"text\": \"Trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm, ngân hàng có trách nhiệm thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân.\",\n      \"citations\": [\n        5\n      ]\n    },\n    {\n      \"text\": \"Ngân hàng phải thực hiện đầy đủ quy định về bảo vệ dữ liệu cá nhân nhạy cảm và các tiêu chuẩn an toàn, bảo mật trong hoạt động tài chính, ngân hàng.\",\n      \"citations\": [\n        7\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:32:07.994029+00:00"
+}

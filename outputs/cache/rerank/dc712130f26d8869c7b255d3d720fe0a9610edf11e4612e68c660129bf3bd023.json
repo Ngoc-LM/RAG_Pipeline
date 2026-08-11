@@ -1,0 +1,52 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "rerank",
+    "input": {
+      "question": "Dữ liệu khách hàng được phép giữ tối đa bao nhiêu tháng trước khi buộc phải xoá?",
+      "candidates": [
+        "luat_91_2025#a28#c3-4#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "nd_13_2023#a21#c1-3#p0",
+        "luat_91_2025#a29#c1-3#p0",
+        "luat_91_2025#a28#c1-2#p0",
+        "nd_356_2025#a5#c4#p0",
+        "nd_13_2023#a3#c5-8#p0",
+        "luat_91_2025#a28#c5-7#p0",
+        "nd_356_2025#a5#c1-2#p0",
+        "nd_13_2023#a16#c6-7#p0",
+        "luat_91_2025#a8#c3-4#p0",
+        "nd_13_2023#a16#c3-5#p0",
+        "luat_91_2025#a8#c5-7#p0",
+        "nd_13_2023#a16#c1#p0",
+        "luat_91_2025#a14#c1#p0",
+        "nd_356_2025#a4#c1-2#p0",
+        "luat_91_2025#a25#c2#p0",
+        "nd_13_2023#a2#c4#p0",
+        "luat_91_2025#a3#c1-3#p0",
+        "luat_91_2025#a28#c8#p0",
+        "luat_91_2025#a11#c1-3#p0",
+        "nd_13_2023#a16#c2#p0",
+        "luat_91_2025#a9#c3-5#p0",
+        "luat_91_2025#a14#c2-3#p0",
+        "nd_356_2025#a9#c3#p0",
+        "luat_91_2025#a10#c3-4#p0",
+        "luat_91_2025#a14#c4-5#p0",
+        "nd_356_2025#a5#c5#p0",
+        "nd_356_2025#a5#c3#p0",
+        "luat_91_2025#a39#c1-2#p0"
+      ],
+      "candidates_digest": "4e2918e2b440313c04aaf499f1cfc3f9f8e6eeed8a02e0f15bbaca23316fdb1a"
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json"
+    },
+    "prompt_version": 1
+  },
+  "response": "{\"scores\": [{\"id\": 1, \"score\": 1}, {\"id\": 2, \"score\": 1}, {\"id\": 3, \"score\": 0}, {\"id\": 4, \"score\": 1}, {\"id\": 5, \"score\": 1}, {\"id\": 6, \"score\": 1}, {\"id\": 7, \"score\": 0}, {\"id\": 8, \"score\": 1}, {\"id\": 9, \"score\": 1}, {\"id\": 10, \"score\": 0}, {\"id\": 11, \"score\": 1}, {\"id\": 12, \"score\": 0}, {\"id\": 13, \"score\": 1}, {\"id\": 14, \"score\": 0}, {\"id\": 15, \"score\": 2}, {\"id\": 16, \"score\": 1}, {\"id\": 17, \"score\": 1}, {\"id\": 18, \"score\": 0}, {\"id\": 19, \"score\": 2}, {\"id\": 20, \"score\": 3}, {\"id\": 21, \"score\": 1}, {\"id\": 22, \"score\": 0}, {\"id\": 23, \"score\": 1}, {\"id\": 24, \"score\": 1}, {\"id\": 25, \"score\": 1}, {\"id\": 26, \"score\": 1}, {\"id\": 27, \"score\": 1}, {\"id\": 28, \"score\": 1}, {\"id\": 29, \"score\": 1}, {\"id\": 30, \"score\": 1}]}",
+  "created_at": "2026-08-11T06:01:25.939562+00:00"
+}

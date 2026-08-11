@@ -175,13 +175,28 @@ def test_sweep_phu_het_luoi(chunks, monkeypatch):
 
 
 # --- Chọn điểm ------------------------------------------------------------
-def grid_point(f1: float, missed: int, tau_r: float, tau_g: float) -> GridPoint:
+def grid_point(f1: float, missed: int, tau_r: float, tau_g: float,
+               support: float = 0.0) -> GridPoint:
     return GridPoint(
         tau_retrieve=tau_r, tau_ground=tau_g,
         abstain={"f1": f1, "missed_abstain": missed, "precision": 0.0, "recall": 0.0,
                  "wrong_abstain": 0, "true_abstain": 0, "true_answer": 0, "n": 0},
-        faithfulness={},
+        faithfulness={"support_ratio_final": support},
     )
+
+
+def test_best_point_hoa_f1_thi_uu_tien_faithfulness_cao_hon():
+    """Lưới phẳng ở F1 không có nghĩa mọi điểm tương đương — đã gặp thật."""
+    kem = grid_point(1.0, 0, 0.0, 0.0, support=0.9597)
+    tot = grid_point(1.0, 0, 0.0, 1.0, support=1.0)
+    assert best_point([kem, tot]) is tot
+
+
+def test_best_point_faithfulness_khong_lan_at_missed_abstain():
+    """An toàn vẫn đứng trên groundedness."""
+    risky = grid_point(1.0, 2, 0.0, 1.0, support=1.0)
+    safe = grid_point(1.0, 0, 0.0, 0.0, support=0.5)
+    assert best_point([risky, safe]) is safe
 
 
 def test_best_point_lay_f1_cao_nhat():
@@ -266,3 +281,54 @@ def test_cli_eval_chay_duoc_arm_bm25(tmp_path):
     ])
     assert code == 0
     assert (tmp_path / "eval" / "retrieval.json").is_file()
+
+
+# --- File demo 5 câu trả lời ----------------------------------------------
+def demo_report(types_present) -> dict:
+    return {
+        "arm": "hybrid_rerank",
+        "tau_retrieve": config.TAU_RETRIEVE,
+        "tau_ground": config.TAU_GROUND,
+        "questions": [
+            {
+                "qid": f"q{i:02d}",
+                "type": kind,
+                "answerable": not kind.startswith("unanswerable"),
+                "question": f"Câu hỏi {kind}?",
+                "answer": config.ABSTAIN_TEXT if kind.startswith("unanswerable") else "Trả lời. [1]",
+                "citations": [] if kind.startswith("unanswerable") else ["[1] Điều 1 Luật X"],
+                "abstained": kind.startswith("unanswerable"),
+                "abstain_stage": "check_b" if kind.startswith("unanswerable") else None,
+                "support_ratio_first": 1.0,
+                "support_ratio_final": 1.0,
+                "attempts": [{}],
+            }
+            for i, kind in enumerate(types_present, start=1)
+        ],
+    }
+
+
+def test_demo_chon_du_nam_hanh_vi():
+    from tools.demo_answers import SHOWCASE, pick
+
+    report = demo_report([kind for kind, _ in SHOWCASE])
+    assert [item["type"] for item in pick(report)] == [kind for kind, _ in SHOWCASE]
+
+
+def test_demo_bo_qua_loai_khong_co_trong_bao_cao():
+    from tools.demo_answers import pick
+
+    assert [i["type"] for i in pick(demo_report(["factoid_1hop", "multihop"]))] == [
+        "factoid_1hop",
+        "multihop",
+    ]
+
+
+def test_demo_render_co_trich_dan_va_quyet_dinh():
+    from tools.demo_answers import SHOWCASE, render
+
+    text = render(demo_report([kind for kind, _ in SHOWCASE]))
+    assert "[1] Điều 1 Luật X" in text
+    assert "TỪ CHỐI TRẢ LỜI" in text
+    assert "**Căn cứ.**" in text
+    assert config.ABSTAIN_TEXT in text

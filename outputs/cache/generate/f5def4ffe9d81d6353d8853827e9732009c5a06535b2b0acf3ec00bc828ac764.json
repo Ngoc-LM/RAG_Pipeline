@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Công ty bị phát hiện bán danh sách khách hàng ra ngoài thì trần tiền phạt được xác định dựa trên cái gì?",
+      "context": [
+        "luat_91_2025#a8#c3-4#p0",
+        "luat_91_2025#a8#c5-7#p0",
+        "luat_91_2025#a8#c1-2#p0",
+        "luat_91_2025#a28#c3-4#p0",
+        "nd_356_2025#a7#c4-6#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "luat_attt_86_2015#a8#c0#p0",
+        "luat_attt_86_2015#a7#c4-6#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Mức phạt tiền tối đa đối với hành vi mua, bán dữ liệu cá nhân là 10 lần khoản thu có được từ hành vi vi phạm.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Trường hợp không có khoản thu từ hành vi vi phạm hoặc mức phạt tính theo khoản thu thấp hơn mức phạt tiền tối đa quy định tại khoản 5 Điều 8 thì áp dụng mức phạt tiền theo quy định tại khoản 5 Điều 8.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Mức phạt tiền tối đa đối với các hành vi vi phạm khác trong lĩnh vực bảo vệ dữ liệu cá nhân là 03 tỷ đồng.\",\n      \"citations\": [\n        2\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:23:56.958244+00:00"
+}

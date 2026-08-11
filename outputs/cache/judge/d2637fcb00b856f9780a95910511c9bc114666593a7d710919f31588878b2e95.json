@@ -1,0 +1,39 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Bộ giấy tờ đánh giá đã nộp cho cơ quan quản lý thì bao lâu phải rà soát lại một lần?",
+      "claims": [
+        "Hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới được cập nhật định kỳ 06 tháng khi có sự thay đổi.",
+        "Các hồ sơ này cũng phải được cập nhật ngay khi có các trường hợp thay đổi theo quy định."
+      ],
+      "citations": [
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "context": [
+        "luat_91_2025#a22#c1-4#p0",
+        "luat_91_2025#a21#c1-2#p0",
+        "luat_91_2025#a21#c5-7#p0",
+        "luat_91_2025#a20#c2-3#p0",
+        "luat_91_2025#a39#c1-2#p0",
+        "luat_91_2025#a21#c3-4#p0",
+        "luat_91_2025#a19#c2#p0",
+        "nd_356_2025#a8#c2#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 8192
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] khoản 1 quy định rõ hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới được cập nhật định kỳ 06 tháng khi có sự thay đổi.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] khoản 1 và khoản 2 quy định việc cập nhật ngay trong các trường hợp thay đổi cụ thể.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:16:25.649128+00:00"
+}

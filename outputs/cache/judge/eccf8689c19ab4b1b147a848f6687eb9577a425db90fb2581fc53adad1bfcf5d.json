@@ -1,0 +1,44 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemma-4-31b-it",
+    "task": "judge",
+    "input": {
+      "question": "Công ty bị phát hiện bán danh sách khách hàng ra ngoài thì trần tiền phạt được xác định dựa trên cái gì?",
+      "claims": [
+        "Mức phạt tiền tối đa trong xử phạt vi phạm hành chính đối với hành vi mua, bán dữ liệu cá nhân là 10 lần khoản thu có được từ hành vi vi phạm.",
+        "Trong trường hợp không có khoản thu từ hành vi vi phạm hoặc mức phạt tính theo khoản thu này thấp hơn mức phạt tiền tối đa là 03 tỷ đồng thì áp dụng mức phạt tiền tối đa là 03 tỷ đồng.",
+        "Mức phạt tiền tối đa này được áp dụng đối với tổ chức."
+      ],
+      "citations": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "context": [
+        "luat_91_2025#a8#c3-4#p0",
+        "luat_91_2025#a8#c5-7#p0",
+        "luat_91_2025#a8#c1-2#p0",
+        "luat_91_2025#a28#c3-4#p0",
+        "nd_356_2025#a7#c4-6#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "luat_attt_86_2015#a8#c0#p0",
+        "luat_attt_86_2015#a7#c4-6#p0"
+      ]
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048
+    },
+    "prompt_version": 1
+  },
+  "response": "```json\n{\n  \"verdicts\": [\n    {\n      \"claim_id\": 1,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] quy định rõ mức phạt tiền tối đa đối với hành vi mua, bán dữ liệu cá nhân là 10 lần khoản thu có được từ hành vi vi phạm.\"\n    },\n    {\n      \"claim_id\": 2,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [1] nêu trường hợp không có khoản thu hoặc mức phạt theo khoản thu thấp hơn mức phạt tại khoản 5 thì áp dụng mức phạt tại khoản 5; và trích đoạn [2] xác định mức phạt tại khoản 5 là 03 tỷ đồng.\"\n    },\n    {\n      \"claim_id\": 3,\n      \"supported\": true,\n      \"reason\": \"Trích đoạn [2] quy định rõ mức phạt tiền tối đa tại các khoản 3, 4 và 5 Điều này được áp dụng đối với tổ chức.\"\n    }\n  ]\n}\n```",
+  "created_at": "2026-08-11T06:09:01.617055+00:00"
+}

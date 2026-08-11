@@ -82,6 +82,24 @@ def _order_fused(fused: dict[int, float], depth: int) -> list[int]:
 
 
 # --- Rerank listwise ------------------------------------------------------
+RERANK_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "scores": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "score": {"type": "integer"},
+                },
+                "required": ["id", "score"],
+            },
+        }
+    },
+    "required": ["scores"],
+}
+
 RERANK_INSTRUCTION = """Bạn đang chấm mức liên quan của các trích đoạn văn bản quy phạm pháp luật đối với một câu hỏi.
 
 Câu hỏi: {question}
@@ -181,6 +199,7 @@ def rerank(question: str, chunks: Sequence[Chunk], *, offline: bool) -> list[flo
         temperature=config.RERANK_TEMPERATURE,
         max_tokens=config.RERANK_MAX_TOKENS,
         thinking_budget=config.RERANK_THINKING_BUDGET,
+        response_schema=RERANK_SCHEMA,
         offline=offline,
     )
     scored = _parse_rerank(raw, len(chunks))

@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Công ty tôi vừa xác định có một vụ rò rỉ dữ liệu nghiêm trọng ảnh hưởng tới tài sản của khách. Phải gửi thông báo tới đâu và trong bao lâu?",
+      "context": [
+        "luat_91_2025#a23#c1#p0",
+        "nd_356_2025#a8#c3#p0",
+        "luat_91_2025#a27#c1#p0",
+        "luat_91_2025#a23#c4-5#p0",
+        "luat_91_2025#a23#c2-3#p0",
+        "luat_91_2025#a27#c2-3#p0",
+        "luat_attt_86_2015#a10#c3#p0",
+        "luat_91_2025#a29#c1-3#p0"
+      ],
+      "attempt": 1,
+      "feedback": ""
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Khi phát hiện vi phạm quy định về bảo vệ dữ liệu cá nhân có thể gây tổn hại đến tài sản của chủ thể dữ liệu, bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên thứ ba phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Thời hạn thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân là chậm nhất 72 giờ kể từ khi phát hiện hành vi vi phạm.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Nếu là dữ liệu nhạy cảm trong lĩnh vực tài chính, ngân hàng, hoạt động thông tin tín dụng, tổ chức hoặc cá nhân thu thập dữ liệu phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu.\",\n      \"citations\": [\n        2\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:34:17.505373+00:00"
+}

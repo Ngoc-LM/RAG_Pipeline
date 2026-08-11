@@ -1,0 +1,78 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "rerank",
+    "input": {
+      "question": "Một năm người lao động được huy động làm thêm tối đa bao nhiêu giờ?",
+      "candidates": [
+        "luat_91_2025#a25#c2#p0",
+        "luat_91_2025#a25#c3#p0",
+        "luat_91_2025#a25#c1#p0",
+        "nd_356_2025#a5#c5#p0",
+        "nd_356_2025#a5#c3#p0",
+        "luat_91_2025#a8#c5-7#p0",
+        "nd_356_2025#a5#c4#p0",
+        "nd_356_2025#a5#c1-2#p0",
+        "nd_356_2025#a15#c1-2#p0",
+        "nd_13_2023#a9#c4-6#p0",
+        "luat_91_2025#a8#c3-4#p0",
+        "nd_13_2023#a25#c7-8#p0",
+        "luat_91_2025#a38#c1-4#p0",
+        "nd_13_2023#a25#c5-6#p0",
+        "luat_91_2025#a20#c4-5#p0",
+        "luat_91_2025#a20#c6-7#p0",
+        "luat_91_2025#a4#c4-5#p0",
+        "nd_356_2025#a17#c2-3#p0",
+        "luat_91_2025#a3#c1-3#p0",
+        "nd_356_2025#a9#c3#p0",
+        "luat_91_2025#a9#c1-2#p0",
+        "luat_91_2025#a11#c1-3#p0",
+        "nd_356_2025#a8#c3#p0",
+        "nd_13_2023#a2#c3#p0",
+        "luat_91_2025#a23#c1#p0",
+        "luat_91_2025#a24#c1-2#p0",
+        "luat_91_2025#a24#c3#p0",
+        "luat_91_2025#a21#c1-2#p0",
+        "nd_356_2025#a3#c1-11#p0",
+        "luat_91_2025#a29#c1-3#p0"
+      ],
+      "candidates_digest": "eeb8fb60ddee76669f5c3d4d0ee20aa9095ed1fc5750f226a6c6db1cbcdc2d86"
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 2048,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "scores": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "score": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "score"
+              ]
+            }
+          }
+        },
+        "required": [
+          "scores"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"scores\": [\n    {\"id\": 1, \"score\": 0},\n    {\"id\": 2, \"score\": 0},\n    {\"id\": 3, \"score\": 0},\n    {\"id\": 4, \"score\": 0},\n    {\"id\": 5, \"score\": 0},\n    {\"id\": 6, \"score\": 0},\n    {\"id\": 7, \"score\": 0},\n    {\"id\": 8, \"score\": 0},\n    {\"id\": 9, \"score\": 0},\n    {\"id\": 10, \"score\": 0},\n    {\"id\": 11, \"score\": 0},\n    {\"id\": 12, \"score\": 0},\n    {\"id\": 13, \"score\": 0},\n    {\"id\": 14, \"score\": 0},\n    {\"id\": 15, \"score\": 0},\n    {\"id\": 16, \"score\": 0},\n    {\"id\": 17, \"score\": 0},\n    {\"id\": 18, \"score\": 0},\n    {\"id\": 19, \"score\": 0},\n    {\"id\": 20, \"score\": 0},\n    {\"id\": 21, \"score\": 0},\n    {\"id\": 22, \"score\": 0},\n    {\"id\": 23, \"score\": 0},\n    {\"id\": 24, \"score\": 0},\n    {\"id\": 25, \"score\": 0},\n    {\"id\": 26, \"score\": 0},\n    {\"id\": 27, \"score\": 0},\n    {\"id\": 28, \"score\": 0},\n    {\"id\": 29, \"score\": 0},\n    {\"id\": 30, \"score\": 0}\n  ]\n}",
+  "created_at": "2026-08-11T06:08:03.157349+00:00"
+}

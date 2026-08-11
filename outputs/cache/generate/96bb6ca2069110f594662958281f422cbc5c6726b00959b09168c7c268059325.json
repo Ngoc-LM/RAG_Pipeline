@@ -1,0 +1,67 @@
+{
+  "key_payload": {
+    "provider": "google",
+    "model": "gemini-3.1-flash-lite",
+    "task": "generate",
+    "input": {
+      "question": "Bên tôi cung cấp dịch vụ thư điện tử cho khách. Có bắt buộc phải cài hệ thống chặn mã độc không?",
+      "context": [
+        "luat_attt_86_2015#a11#c1-5#p0",
+        "luat_attt_86_2015#a3#c10-12#p0",
+        "luat_attt_86_2015#a7#c4-6#p0",
+        "luat_attt_86_2015#a12#c1-3#p0",
+        "luat_91_2025#a28#c3-4#p0",
+        "luat_attt_86_2015#a10#c3#p0",
+        "luat_attt_86_2015#a3#c13-15#p0",
+        "luat_attt_86_2015#a3#c16-20#p0"
+      ],
+      "attempt": 2,
+      "feedback": "Lượt trước có mệnh đề không được trích đoạn hỗ trợ:\n- \"Doanh nghiệp có trách nhiệm báo cáo cơ quan nhà nước có thẩm quyền về việc sử dụng hệ thống lọc phần mềm độc hại theo quy định của pháp luật.\" — Trích đoạn [1] chỉ quy định doanh nghiệp phải 'báo cáo cơ quan nhà nước có thẩm quyền theo quy định của pháp luật' mà không nêu rõ nội dung báo cáo là 'về việc sử dụng hệ thống lọc phần mềm độc hại'.\nSửa hoặc BỎ HẲN những mệnh đề trên. Không thêm mệnh đề mới nếu không có căn cứ trong danh sách trích đoạn. Nếu sau khi bỏ thì không còn gì để trả lời, hãy trả về abstain."
+    },
+    "params": {
+      "temperature": 0.0,
+      "max_output_tokens": 4096,
+      "thinking_budget": 0,
+      "response_mime_type": "application/json",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "abstain": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "citations"
+              ]
+            }
+          }
+        },
+        "required": [
+          "abstain",
+          "claims"
+        ]
+      }
+    },
+    "prompt_version": 1
+  },
+  "response": "{\n  \"abstain\": false,\n  \"claims\": [\n    {\n      \"text\": \"Doanh nghiệp cung cấp dịch vụ thư điện tử bắt buộc phải có hệ thống lọc phần mềm độc hại.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Hệ thống lọc phần mềm độc hại phải hoạt động trong quá trình gửi, nhận, lưu trữ thông tin trên hệ thống của doanh nghiệp.\",\n      \"citations\": [\n        1\n      ]\n    },\n    {\n      \"text\": \"Doanh nghiệp cung cấp dịch vụ thư điện tử có trách nhiệm báo cáo cơ quan nhà nước có thẩm quyền theo quy định của pháp luật.\",\n      \"citations\": [\n        1\n      ]\n    }\n  ]\n}",
+  "created_at": "2026-08-11T06:29:35.923350+00:00"
+}
