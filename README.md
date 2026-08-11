@@ -1,45 +1,70 @@
 # Pipeline RAG cho văn bản quy phạm pháp luật tiếng Việt
 
-Truy xuất lai (BM25 + embedding), hợp nhất RRF, rerank bằng LLM, sinh câu trả lời
-có trích dẫn, và một tầng kiểm chứng quyết định chấp nhận / sinh lại / từ chối trả lời.
+Trả lời câu hỏi pháp lý bằng tiếng Việt, **mỗi mệnh đề kèm trích dẫn tới đúng
+Điều — Khoản** của văn bản gốc, và từ chối trả lời khi không đủ căn cứ.
+
+Truy xuất lai (BM25 + embedding) → hợp nhất RRF → rerank listwise bằng LLM → sinh
+câu trả lời có trích dẫn → hai tầng kiểm chứng quyết định chấp nhận / sinh lại /
+từ chối.
 
 Python thuần + numpy + rank_bm25 + google-genai + groq. Không LangChain, không
 LlamaIndex, không FAISS — corpus cỡ này thì cosine brute-force bằng một phép nhân
 ma trận numpy vừa đủ nhanh vừa giải thích được từng bước.
 
-## Trạng thái
+## Chạy thử trong 30 giây (không cần API key)
 
-Repo đang dựng lại tầng truy xuất trên nền móng Chương-Điều-Khoản. Phần đã có
-chạy được và có test; phần chưa có là thiết kế đã chốt nhưng chưa viết mã.
-
-| Thành phần | File | Trạng thái |
-|---|---|---|
-| Hằng số tập trung | `src/config.py` | ✅ |
-| Parse frontmatter + Chương/Điều/Khoản | `src/ingest.py` | ✅ |
-| Chia chunk theo khoản | `src/chunk.py` | ✅ |
-| Số học khoảng cho coverage | `src/intervals.py` | ✅ |
-| Tokenizer tiếng Việt cho BM25 | `src/tokenize_vi.py` | ✅ |
-| Cache + backoff cho API | `src/llm.py` | ✅ |
-| CLI gán nhãn gold_span | `tools/annotate.py` | ✅ |
-| Gold set 20 câu | `eval/questions.json` | ✅ |
-| Index (BM25 + embedding) | `src/index.py` | ✅ |
-| Retrieve (4 arm, RRF + rerank) | `src/retrieve.py` | ✅ |
-| Evaluate truy xuất bằng coverage | `src/evaluate.py` | ✅ |
-| Sinh câu trả lời có trích dẫn | `src/generate.py` | ✅ |
-| Kiểm chứng hai tầng | `src/verify.py` | ✅ |
-| Calibrate hai ngưỡng abstain | `src/calibrate.py` | ✅ |
-| CLI đầu-cuối | `run.py` | ✅ |
-
-Toàn bộ pipeline đã dựng xong. Mọi tầng cần vector hoặc LLM đều chờ API key —
-xem phần *Trạng thái chạy thật* bên dưới.
+Toàn bộ cache lời gọi API đã được commit trong `outputs/cache/`, nên bảng kết quả
+dưới đây dựng lại được offline:
 
 ```bash
-python run.py index      --embed        # dựng chỉ mục, nhúng toàn bộ chunk
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python run.py eval --arm all --offline    # bảng truy xuất 4 arm
+.venv/bin/python -m pytest                          # 246 test, không chạm mạng
+```
+
+## Kết quả
+
+Đo trên 16 câu answerable của gold set 20 câu (`eval/questions.json`).
+`Rs` = recall **strict** (mọi `gold_span` của câu đều đạt ngưỡng coverage 0.8),
+`Ra` = recall **any** (ít nhất một span đạt).
+
+| arm | Rs@1 | Rs@5 | Rs@8 | Rs@30 | Ra@8 | cov@8 | MRR |
+|---|---|---|---|---|---|---|---|
+| `bm25` | 0.125 | 0.500 | 0.562 | 0.938 | 0.812 | 0.688 | 0.281 |
+| `dense` | 0.500 | 0.812 | 0.938 | 1.000 | 0.938 | 0.938 | 0.646 |
+| `hybrid` | 0.438 | 0.875 | 0.875 | 1.000 | 1.000 | 0.938 | 0.601 |
+| **`hybrid_rerank`** | **0.625** | **0.875** | **1.000** | **1.000** | **1.000** | **1.000** | **0.751** |
+
+Tách theo loại câu ở `Rs@1` — nơi đọc được arm nào giải quyết việc gì:
+
+| loại | `bm25` | `dense` | `hybrid` | `hybrid_rerank` |
+|---|---|---|---|---|
+| factoid 1 bước (8 câu) | 0.250 | 0.750 | 0.625 | **0.875** |
+| multi-hop (5 câu) | 0.000 | 0.000 | 0.000 | 0.000 |
+| distractor (3 câu) | 0.000 | 0.667 | 0.667 | **1.000** |
+
+Ba điều đáng nói, kể cả điều bất lợi:
+
+- **Rerank thắng trọn bộ bẫy văn bản hết hiệu lực.** Ba câu `distractor` cố tình
+  đặt một Nghị định đã hết hiệu lực cạnh văn bản thay thế nó. BM25 đưa văn bản sai
+  lên hạng 1 cả ba lần; `hybrid_rerank` đưa văn bản đúng lên hạng 1 cả ba lần.
+- **Multi-hop `Rs@8` đi từ 0.200 lên 1.000**, nhưng `Rs@1` vẫn là 0.000 ở **mọi**
+  arm — và đó là điều hiển nhiên chứ không phải thất bại: câu multi-hop cần hai
+  span ở hai văn bản khác nhau, một chunk duy nhất không thể phủ đủ.
+- **`hybrid` KÉM HƠN `dense` đơn thuần ở `Rs@1`** (0.438 so với 0.500). RRF kéo
+  theo cả lựa chọn hạng-1 tồi của BM25; chỉ tầng rerank mới gỡ lại được. Hợp nhất
+  lai không miễn phí, và bảng này cho thấy chỗ nó phải trả giá.
+
+Chi tiết `r*` từng span từng câu nằm trong `outputs/eval/retrieval.json`.
+
+## Các lệnh khác
+
+```bash
+python run.py index --embed         # dựng chỉ mục, nhúng toàn bộ chunk
 python run.py ask "Khách đòi xoá dữ liệu, bên tôi có bao lâu?"
-python run.py eval       --arm all      # bảng truy xuất bốn arm
-python run.py answer                    # chạy cả gold set qua generate + verify
-python run.py calibrate                 # quét lưới hai ngưỡng abstain
-python run.py all                       # bốn bước trên, tuần tự
+python run.py answer                # cả gold set qua generate + verify
+python run.py calibrate             # quét lưới hai ngưỡng abstain
+python run.py all                   # bốn bước, tuần tự
 ```
 
 Mọi lệnh nhận `--corpus`, `--questions`, `--out`, `--arm`, `--offline`. `run.py`
@@ -52,24 +77,46 @@ Các module cũng chạy trực tiếp được khi cần soi một tầng:
 ```bash
 python -m src.chunk  --corpus data/corpus                    # thống kê chunk
 python -m src.retrieve --corpus data/corpus --arm bm25 --qid q16
-python -m src.evaluate --corpus data/corpus --arms bm25
 python -m tools.annotate --help
-python -m pytest
 ```
 
-Arm `bm25` chạy được không cần key nào — xem phần lười hoá bên dưới.
+## Model
 
-Bảng model dùng khi tầng LLM được dựng lại:
+| Vai trò | Model | Ghi chú |
+|---|---|---|
+| Embedding | `gemini-embedding-001` | 768 chiều, cắt Matryoshka + chuẩn hoá L2 |
+| Sinh câu trả lời | `gemini-3.5-flash` | |
+| Rerank | `gemini-3.1-flash-lite` | listwise, một lời gọi cho cả danh sách |
+| LLM judge | `llama-3.3-70b-versatile` trên Groq | |
 
-| Vai trò | Model |
+Judge cố ý **khác họ model** với bộ sinh: dùng chính Gemini để chấm câu trả lời
+của Gemini thì sẽ có thiên lệch tự ưu ái.
+
+Thiết kế ban đầu chọn `gemini-2.5-flash` và `gemini-2.5-flash-lite`. Cả hai nay
+trả `404 no longer available to new users` với API key tạo mới, nên phải thay bằng
+model kế nhiệm cùng tầng. Không dùng bí danh `-latest` vì chúng trôi theo thời gian
+mà cache key băm tên model — bí danh đổi ngầm sẽ làm cache trỏ sai model mà không
+có dấu hiệu nào.
+
+## Cấu trúc
+
+| Thành phần | File |
 |---|---|
-| Embedding | `gemini-embedding-001` (768 chiều, cắt Matryoshka + chuẩn hoá L2) |
-| Sinh câu trả lời | `gemini-2.5-flash` |
-| Rerank | `gemini-2.5-flash-lite` (listwise, một lời gọi cho cả danh sách) |
-| LLM judge | `llama-3.3-70b-versatile` trên Groq |
-
-Judge cố ý khác họ model với bộ sinh: dùng chính Gemini để chấm câu trả lời của
-Gemini thì sẽ có thiên lệch tự ưu ái.
+| Hằng số tập trung | `src/config.py` |
+| Parse frontmatter + Chương/Mục/Điều/Khoản | `src/ingest.py` |
+| Chia chunk theo khoản | `src/chunk.py` |
+| Số học khoảng cho coverage | `src/intervals.py` |
+| Tokenizer tiếng Việt cho BM25 | `src/tokenize_vi.py` |
+| Cache + backoff cho API | `src/llm.py` |
+| Chỉ mục BM25 + embedding | `src/index.py` |
+| Bốn arm truy xuất | `src/retrieve.py` |
+| Sinh câu trả lời có trích dẫn | `src/generate.py` |
+| Kiểm chứng hai tầng | `src/verify.py` |
+| Đo truy xuất + chất lượng câu trả lời | `src/evaluate.py` |
+| Hiệu chuẩn hai ngưỡng abstain | `src/calibrate.py` |
+| CLI đầu-cuối | `run.py` |
+| CLI gán nhãn gold_span | `tools/annotate.py` |
+| Chuẩn bị corpus từ .doc/.docx/.pdf | `tools/normalize_raw.py` + `notebooks/` |
 
 ## Cài đặt
 
@@ -78,8 +125,11 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cp .env.example .env      # điền GEMINI_API_KEY và GROQ_API_KEY
 ```
 
-`.env` nằm trong `.gitignore`. Không commit key. Chưa cần key để chạy `src.chunk`,
-`tools.annotate` hay test — không phần nào trong số đó chạm mạng.
+`.env` nằm trong `.gitignore`. Không commit key.
+
+**Không cần key** cho: toàn bộ `pytest`, `src.chunk`, `tools.annotate`, và mọi lệnh
+chạy với `--offline` — cache đã commit phủ đủ cả bốn arm truy xuất. Chỉ cần key khi
+muốn hỏi một câu **mới** chưa có trong cache.
 
 ## Chuẩn bị corpus
 
@@ -328,39 +378,39 @@ bằng `mean_cov@k`, vốn đã là metric có thứ bậc và không cần chu�
 Bốn câu `unanswerable` không tham gia metric truy xuất — chúng đo chất lượng
 abstain, mà abstain thì thuộc tầng generate.
 
-### Baseline BM25 (arm duy nhất chạy được khi chưa có API key)
+### Cột strict đã bắt được đúng thứ nó sinh ra để bắt
+
+Con số thuyết phục nhất cho việc tách hai cột nằm ở nhóm multi-hop của arm `bm25`:
 
 ```
-                    n       Rs@1       Rs@5       Rs@8      Rs@30      Ra@8       cov@8     MRR
-bm25               16      0.125      0.500      0.562      0.938     0.812       0.688   0.281
-factoid_1hop        8      0.250      0.750      0.750      1.000     0.750       0.750   0.416
-multihop            5      0.000      0.200      0.200      0.800     1.000       0.600   0.121
-distractor          3      0.000      0.333      0.667      1.000     0.667       0.667   0.186
+multihop (5 câu)   Ra@8 = 1.000     Rs@8 = 0.200
 ```
 
-Ba điều đọc được ngay, và cả ba đều là thứ tầng dense/rerank phải cải thiện:
+BM25 gần như **luôn** tìm được *một* trong hai span, và gần như **không bao giờ**
+tìm đủ *cả hai*. Một bảng chỉ có cột "any" sẽ báo 100% và giấu sạch vấn đề. Sau
+khi thêm dense + rerank, `Rs@8` của nhóm này lên 1.000 — tức tầng rerank giải
+quyết đúng chỗ mà cột strict chỉ ra.
 
-- **`Rs@30 = 0.938` là trần trên của `hybrid_rerank`.** Reranker chỉ nhìn thấy 30
-  ứng viên, nên span nằm ngoài top-30 thì nó không có cơ hội cứu.
-- **Multi-hop: `Ra@8 = 1.000` nhưng `Rs@8 = 0.200`.** BM25 gần như luôn tìm được
-  *một* trong hai span và gần như không bao giờ tìm đủ *cả hai*. Đúng hiện tượng
-  mà cột strict sinh ra để phơi bày — một bảng chỉ có cột "any" sẽ báo 100% và
-  giấu mất toàn bộ vấn đề.
-- **`Rs@1 = 0.125` trên tổng thể, và `0.000` cho cả multihop lẫn distractor.**
-  Hạng 1 của BM25 gần như không bao giờ đúng cho hai loại câu khó.
+`Rs@1` của nhóm multi-hop bằng **0.000 ở cả bốn arm**, và đó là giới hạn cấu trúc
+chứ không phải thất bại của retriever: câu multi-hop cần hai span ở hai văn bản
+khác nhau, mà top-1 chỉ có một chunk. Chỉ số này không có cách nào khác 0.
 
 `outputs/eval/retrieval.json` giữ `r*` của từng span từng câu, nên truy được ngay
-câu nào hỏng ở đâu. Ví dụ `q10` có `r*` từng span là `[None, 2]`: span thứ hai lên
-hạng 2, span thứ nhất không xuất hiện trong 30 ứng viên đầu.
+câu nào hỏng ở đâu. Ví dụ `q10` với arm `bm25` có `r*` từng span là `[None, 2]`:
+span thứ hai lên hạng 2, span thứ nhất không xuất hiện trong 30 ứng viên đầu. Cùng
+câu đó với `hybrid_rerank` là `[8, 1]` — cả hai span đều vào được top-8.
 
 ## Bốn arm ablation
 
-| arm | mô tả | cần mạng |
+| arm | mô tả | cần gọi API lần đầu |
 |---|---|---|
-| `bm25` | chỉ từ khoá | không |
-| `dense` | chỉ embedding | có |
-| `hybrid` | RRF hợp nhất hai danh sách trên | có |
-| `hybrid_rerank` | hybrid rồi rerank listwise — arm mặc định của pipeline | có |
+| `bm25` | chỉ từ khoá | không bao giờ |
+| `dense` | chỉ embedding | embedding |
+| `hybrid` | RRF hợp nhất hai danh sách trên | embedding |
+| `hybrid_rerank` | hybrid rồi rerank listwise — arm mặc định của pipeline | embedding + rerank |
+
+Cache của cả bốn arm đã được commit, nên `--offline` chạy lại được toàn bộ bảng
+mà không cần key nào.
 
 Bốn arm dùng chung **một** chỉ mục và **một** hàm vào (`retrieve.retrieve`), khác
 nhau đúng ở cách xếp hạng. Nếu mỗi arm có đường dữ liệu riêng thì bảng ablation
@@ -674,25 +724,6 @@ nguồn tra cứu.
 - Ngưỡng được chọn và đánh giá trên cùng một gold set, không có tập held-out.
   Với 20 câu thì chia tập sẽ làm cả hai nửa vô nghĩa, nhưng con số vì thế là
   **in-sample** và phải đọc như vậy.
-
-## Trạng thái chạy thật
-
-Chưa có lời gọi API nào được thực hiện: `GEMINI_API_KEY` và `GROQ_API_KEY` chưa
-được set, và `api.groq.com` đang bị network policy của môi trường chặn
-(`generativelanguage.googleapis.com` thì thông). Cache vì vậy còn rỗng.
-
-Hệ quả cụ thể, để không ai đọc nhầm bảng số:
-
-| chạy được ngay | cần `GEMINI_API_KEY` | cần thêm `GROQ_API_KEY` |
-|---|---|---|
-| `run.py index` (không `--embed`) | `index --embed` | |
-| `run.py eval --arm bm25` | `eval` ba arm còn lại | |
-| toàn bộ `pytest` | | `ask`, `answer`, `calibrate` |
-
-`ask`/`answer`/`calibrate` cần cả hai key vì Check B gọi Groq. Nếu Groq vẫn chưa
-thông, Check A vẫn chạy bình thường còn Check B sẽ báo lỗi kết nối rõ ràng chứ
-không âm thầm bỏ qua — không có nhánh nào coi "không gọi được judge" là "đã chấm
-và đạt".
 - Bigram âm tiết chỉ xấp xỉ ranh giới từ ghép, không thay được phân từ thật; từ
   ghép ba âm tiết trở lên chỉ được bắt một phần.
 - Nếu một câu đơn lẻ dài hơn trần cắt thì hai part liền kề kề nhau chứ không chồng
@@ -700,3 +731,79 @@ và đạt".
 - `verify_coverage` sẽ raise nếu văn bản có phần mở đầu (lời nói đầu, căn cứ ban
   hành) nằm trước `Chương`/`Điều` đầu tiên, vì phần đó chưa thuộc chunk nào. Gặp
   trên corpus thật thì cần thêm một chunk cấp document cho phần mở đầu.
+- Gold set do chính tác giả pipeline soạn. Có `--leakage` chặn việc chép từ vựng,
+  nhưng không loại được thiên lệch vô thức khi người viết câu hỏi cũng là người
+  biết hệ thống truy xuất thế nào.
+
+## Giả định
+
+Những điều dưới đây được **giả định**, không được kiểm chứng, và là chỗ nên chất
+vấn đầu tiên nếu kết quả trông đẹp quá:
+
+1. **Văn bản QPPL tiếng Việt có cấu trúc Chương / Mục / Điều / Khoản nhất quán và
+   các tiêu đề luôn nằm ở đầu dòng.** Toàn bộ `src/ingest.py` đứng trên giả định
+   này. Corpus thật sau khi chuẩn hoá thoả mãn nó; một văn bản chép tay hoặc OCR
+   lệch dòng sẽ phá vỡ bộ parse. Có chốt an toàn: số khoản phải tăng liên tiếp từ
+   1, và `verify_coverage()` raise nếu có phần body không thuộc chunk nào.
+2. **Một khoản là một quy phạm trọn vẹn, đọc tách ra vẫn đúng nghĩa.** Đây là cơ
+   sở để lấy khoản làm đơn vị chunk. Không đúng với khoản chỉ có ý nghĩa khi đọc
+   cùng đoạn mở đầu của Điều — bù một phần bằng việc gắn tiêu đề Điều vào
+   `indexed_text` của mọi chunk.
+3. **Ước lượng token bằng `len(text) / 3.5` là đủ.** Nó chỉ dùng để so với trần
+   cắt và sàn gộp, không dùng để tính chi phí, nên sai số vài phần trăm không đổi
+   quyết định nào.
+4. **`gold_span` do con người gán là chân lý.** Mọi offset đều lấy từ
+   `tools/annotate.py` chạy thật, có `--validate` kiểm biên và kiểm "span nằm trọn
+   trong một Điều". Nhưng việc *chọn* khoản nào là căn cứ đúng vẫn là phán đoán
+   của người gán.
+5. **`support_ratio` từ một LLM judge xấp xỉ được groundedness.** Judge khác họ
+   model với bộ sinh để tránh thiên lệch tự ưu ái, nhưng không có ai chấm lại
+   judge. Đây là mắt xích chưa được kiểm chứng độc lập.
+6. **Ngưỡng coverage 0.8 tách được "đủ căn cứ" khỏi "chưa đủ".** Chọn theo lập
+   luận (mép chunk hay cắt vài chữ; phủ nửa khoản dễ mất vế điều kiện), không
+   chọn bằng cách quét trên dữ liệu.
+7. **Corpus đóng.** Pipeline giả định câu trả lời hoặc nằm trong 4 văn bản này,
+   hoặc không tồn tại. Nó không biết gì về văn bản sửa đổi bổ sung ban hành sau.
+
+## Nếu có thêm thời gian
+
+Theo thứ tự giá trị trên chi phí:
+
+1. **Mở rộng nhóm `unanswerable` từ 4 lên ~20 câu.** Đây là ràng buộc chặt nhất
+   hiện tại: hiệu chuẩn hai ngưỡng trên 4 điểm dương thì recall nhảy theo bước
+   0.25 và F1 gần như không có ý nghĩa thống kê. Rẻ, vì câu unanswerable không
+   cần gán `gold_span`.
+2. **Tách tập hiệu chuẩn khỏi tập đánh giá.** Cần khoảng 60 câu để chia 40/20 mà
+   cả hai nửa còn nói được điều gì. Chừng nào chưa có thì mọi số abstain là
+   in-sample.
+3. **Cho reranker nhìn sâu hơn 30 ứng viên, hoặc lặp truy xuất cho câu multi-hop.**
+   `Rs@30 = 0.938` của `bm25` cho thấy trần vẫn còn dư địa, và câu multi-hop cần
+   hai span thì một lượt truy xuất đơn không phải hình dạng đúng — truy xuất lượt
+   hai dùng chính span đã tìm được làm truy vấn sẽ hợp lý hơn.
+4. **Đo lại với `chunk_size` khác nhau.** Metric coverage được thiết kế để bất
+   biến với `chunk_size`, và đã có test cho tính chất đó, nhưng chưa có bảng thực
+   nghiệm quét `CHUNK_MAX_TOKENS` để xác nhận trên dữ liệu thật.
+5. **Thay bigram âm tiết bằng phân từ thật** và đo xem BM25 lợi bao nhiêu. Hiện
+   tránh `pyvi`/`underthesea` vì chúng kéo theo scikit-learn; nếu chấp nhận thêm
+   dependency thì đây là phép đo đáng làm.
+6. **Chấm lại judge bằng người.** Lấy ~30 mệnh đề, để người gán `supported` /
+   `not supported`, rồi đo agreement với judge. Không có con số này thì
+   `support_ratio` là một chỉ số chưa ai kiểm.
+7. **Xử lý văn bản sửa đổi bổ sung.** Corpus hiện chỉ có quan hệ "thay thế"
+   (NĐ 356 thay NĐ 13). Quan hệ "sửa đổi một số điều" khó hơn nhiều vì hiệu lực
+   được áp ở mức từng Điều chứ không mức văn bản.
+
+## Trạng thái chạy thật
+
+| tầng | trạng thái | ghi chú |
+|---|---|---|
+| Chunk, index, 4 arm truy xuất, `evaluate` | ✅ **đã chạy thật** | cache đã commit, dựng lại được bằng `--offline` |
+| `answer`, `calibrate` | ⚠️ **chưa chạy** | Check B gọi Groq, mà `api.groq.com` bị network policy của môi trường phát triển chặn (403 CONNECT) |
+
+Đây là hạn chế của **môi trường**, không phải của mã: `GROQ_API_KEY` đã có, đường
+mạng thì không. Trên máy có truy cập `api.groq.com`, `python run.py answer` và
+`python run.py calibrate` chạy được ngay với cache Gemini đã commit sẵn.
+
+Không có nhánh nào coi "không gọi được judge" là "đã chấm và đạt": Check B lỗi
+kết nối thì `with_backoff` thử lại rồi raise, `check_b` giữ nguyên `None`, và
+`abstain_stage` ghi rõ tầng chết.
