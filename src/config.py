@@ -154,6 +154,21 @@ Cả hai giá trị ở đây là điểm khởi đầu; src/calibrate.py sẽ q
 set để tối ưu F1 giữa abstain đúng và abstain nhầm.
 """
 
+CALIBRATE_TAU_RETRIEVE_GRID: Final[tuple[float, ...]] = (0.0, 0.34, 0.67, 1.0)
+"""Điểm rerank bị LƯỢNG TỬ HOÁ, nên lưới mịn hơn là vô nghĩa.
+
+Thang nguyên 0-RERANK_MAX_SCORE chuẩn hoá về [0, 1] chỉ cho đúng 4 giá trị khả dĩ
+(0, 1/3, 2/3, 1). Bốn ngưỡng ở đây rơi vào bốn khe giữa các giá trị đó, tức là bốn
+hành vi phân biệt được — thêm điểm lưới nữa chỉ tạo ra các dòng trùng nhau và làm
+bảng trông như đã dò kỹ hơn thực tế.
+"""
+
+CALIBRATE_TAU_GROUND_GRID: Final[tuple[float, ...]] = (
+    0.0, 0.25, 0.34, 0.5, 0.67, 0.75, 1.0
+)
+"""support_ratio cũng lượng tử hoá, nhưng theo SỐ MỆNH ĐỀ của từng câu (1/n, 2/n…)
+nên mẫu số đổi theo câu. Lưới này phủ các phân số thường gặp với 1-4 mệnh đề."""
+
 PROMPT_VERSION: Final[int] = 1
 """Tăng tay mỗi khi sửa bất kỳ template prompt nào.
 

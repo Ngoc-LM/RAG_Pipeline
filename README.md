@@ -27,27 +27,37 @@ chạy được và có test; phần chưa có là thiết kế đã chốt như
 | Evaluate truy xuất bằng coverage | `src/evaluate.py` | ✅ |
 | Sinh câu trả lời có trích dẫn | `src/generate.py` | ✅ |
 | Kiểm chứng hai tầng | `src/verify.py` | ✅ |
-| Calibrate hai ngưỡng abstain | — | ⬜ chưa dựng |
-| CLI đầu-cuối | — | ⬜ chưa dựng |
+| Calibrate hai ngưỡng abstain | `src/calibrate.py` | ✅ |
+| CLI đầu-cuối | `run.py` | ✅ |
 
-Lệnh chạy được đầu-cuối hôm nay:
+Toàn bộ pipeline đã dựng xong. Mọi tầng cần vector hoặc LLM đều chờ API key —
+xem phần *Trạng thái chạy thật* bên dưới.
+
+```bash
+python run.py index      --embed        # dựng chỉ mục, nhúng toàn bộ chunk
+python run.py ask "Khách đòi xoá dữ liệu, bên tôi có bao lâu?"
+python run.py eval       --arm all      # bảng truy xuất bốn arm
+python run.py answer                    # chạy cả gold set qua generate + verify
+python run.py calibrate                 # quét lưới hai ngưỡng abstain
+python run.py all                       # bốn bước trên, tuần tự
+```
+
+Mọi lệnh nhận `--corpus`, `--questions`, `--out`, `--arm`, `--offline`. `run.py`
+chỉ nối dây; toàn bộ logic nằm trong `src/` để không có đường chạy nào chỉ tồn tại
+khi gọi qua CLI mà chưa từng được test gọi tới. Exit code: `2` = cache miss lúc
+`--offline`, `3` = thiếu API key.
+
+Các module cũng chạy trực tiếp được khi cần soi một tầng:
 
 ```bash
 python -m src.chunk  --corpus data/corpus                    # thống kê chunk
-python -m src.index  --corpus data/corpus                    # dựng chỉ mục + ghi manifest
 python -m src.retrieve --corpus data/corpus --arm bm25 --qid q16
-python -m src.evaluate --corpus data/corpus --arms bm25    # bảng truy xuất
-python -m src.generate --corpus data/corpus --qid q01      # cần GEMINI_API_KEY
+python -m src.evaluate --corpus data/corpus --arms bm25
 python -m tools.annotate --help
 python -m pytest
 ```
 
-`src.chunk` in số document, số điều, số chunk, phân phối `n_tokens` và tỉ lệ chunk
-theo `status`. `src.retrieve` nhận `--question "..."` hoặc `--qid` (lấy từ gold set),
-`--arm` trong bốn arm, và `--offline`.
-
-Ba arm còn lại cần vector nên cần `GEMINI_API_KEY` (hoặc cache đã có); arm `bm25`
-thì không — xem phần lười hoá bên dưới.
+Arm `bm25` chạy được không cần key nào — xem phần lười hoá bên dưới.
 
 Bảng model dùng khi tầng LLM được dựng lại:
 
@@ -508,8 +518,53 @@ arm — thà không gác còn hơn gác bằng một đại lượng không so s
 lại đi thẳng vào generate và chỉ chịu ngưỡng sau.
 
 Giá trị hiện tại (`TAU_RETRIEVE = 0.5`, `TAU_GROUND = 0.8`) là điểm khởi đầu;
-`src/calibrate.py` sẽ quét lưới trên gold set để tối ưu F1 giữa abstain đúng và
+`src/calibrate.py` quét lưới trên gold set để tối ưu F1 giữa abstain đúng và
 abstain nhầm.
+
+### Quét lưới ngưỡng
+
+Lớp dương là **"đáng lẽ phải abstain"**, tức 4 câu `unanswerable`. Hai loại lỗi
+được tách riêng chứ không gộp vào một con số:
+
+| | ý nghĩa |
+|---|---|
+| `wrong_abstain` | từ chối một câu trả lời được — phiền, nhưng an toàn |
+| `missed_abstain` | trả lời một câu không có căn cứ — đúng dạng lỗi pipeline này sinh ra để chặn |
+
+Hệ thống không bao giờ abstain nhận precision = 0 theo quy ước ở đây, tức F1 = 0.
+Đó là hành vi mong muốn: nó không được thưởng vì né bài toán.
+
+Lưới chạy **pipeline thật** ở từng điểm chứ không mô phỏng bằng số học trên điểm
+đã thu được. Mô phỏng sẽ trượt khỏi hành vi thật ở đúng chỗ khó nhất: vòng sinh
+lại phụ thuộc `TAU_GROUND`, nên "câu trả lời ở ngưỡng 0.5" không suy ra được từ
+"câu trả lời ở ngưỡng 0.8".
+
+Chạy thật mà vẫn rẻ là nhờ cache, và nhờ hai quan sát:
+
+- Kết quả truy xuất **không** phụ thuộc ngưỡng nào, nên tính đúng một lần
+  (`retrieve_all`) rồi dùng lại cho mọi điểm lưới.
+- Prompt lượt hai dựng từ danh sách mệnh đề bị judge bác, mà danh sách đó cũng
+  không phụ thuộc ngưỡng — chỉ *quyết định có sinh lại hay không* mới phụ thuộc.
+
+Tổng lại, mỗi câu tốn tối đa 2 lời gọi generate và 2 lời gọi judge cho **toàn bộ**
+lưới, không phải 2 lời gọi mỗi điểm lưới.
+
+**Lưới `TAU_RETRIEVE` chỉ có 4 điểm, và đó là con số đúng.** Điểm rerank là thang
+nguyên `0..RERANK_MAX_SCORE` chuẩn hoá về `[0, 1]`, nên nó chỉ nhận đúng 4 giá trị
+(`0`, `1/3`, `2/3`, `1`). Bốn ngưỡng `(0.0, 0.34, 0.67, 1.0)` rơi vào bốn khe giữa
+các giá trị đó — thêm điểm lưới nữa chỉ tạo ra các dòng trùng nhau và làm bảng
+trông như đã dò kỹ hơn thực tế.
+
+Chọn điểm: F1 cao nhất; hoà thì ưu tiên ít `missed_abstain` hơn (phá hoà về phía
+an toàn), hoà tiếp thì lấy ngưỡng **thấp** hơn để không siết chặt hơn mức dữ liệu
+biện minh được.
+
+**Cảnh báo cỡ mẫu, in ra ngay trong báo cáo.** Gold set chỉ có 4 câu
+`unanswerable`, nên recall của lớp abstain nhảy theo bước 0.25 và F1 có khoảng tin
+cậy rất rộng. Vì vậy `calibrate` in **cả vùng bằng phẳng** (mọi điểm đạt đúng F1
+cao nhất, đánh dấu `~`) chứ không chỉ in argmax: hình dạng vùng đó mới là thứ biện
+minh cho lựa chọn ngưỡng. Một argmax nằm chơ vơ giữa vùng trũng là dấu hiệu overfit
+lên 4 điểm dữ liệu, không phải một ngưỡng tốt.
 
 ## Cache và chế độ offline
 
@@ -590,6 +645,12 @@ Không test nào chạm mạng. Đáng chú ý:
 - `test_generate_verify.py::test_diem_rerank_duoi_nguong_thi_abstain_truoc_khi_sinh`
   — cache rỗng + offline mà không raise, tức là không tốn lượt sinh nào.
 
+- `test_calibrate_run.py::test_tau_retrieve_tach_duoc_cau_ngoai_pham_vi` — lưới
+  chạy qua `answer_question` thật, nên bao logic hai ngưỡng chứ không chỉ bao
+  phép số học tổng hợp.
+- `test_calibrate_run.py::test_khong_bao_gio_abstain_thi_f1_bang_0` — hệ thống né
+  bài toán không được thưởng.
+
 Phía dense, rerank, generate và judge được kiểm bằng cách **gieo sẵn cache** rồi
 chạy đúng đường dữ liệu thật, chứ không monkeypatch hàm gọi API. Nhờ vậy test bao
 luôn cả hình dạng cache key — thứ mà một stub sẽ bỏ lọt.
@@ -608,6 +669,30 @@ nguồn tra cứu.
 - `RERANK_CANDIDATES = 30` là trần cứng: gold_span nằm ngoài top-30 của RRF thì
   rerank không có cơ hội cứu. Recall@30 của arm `hybrid` vì vậy là trần trên của
   `hybrid_rerank`, và cần được báo cáo cùng nhau.
+- Hai ngưỡng abstain được hiệu chuẩn trên **4** câu unanswerable. Con số F1 có
+  khoảng tin cậy rất rộng; đó là lý do `calibrate` in cả vùng bằng phẳng.
+- Ngưỡng được chọn và đánh giá trên cùng một gold set, không có tập held-out.
+  Với 20 câu thì chia tập sẽ làm cả hai nửa vô nghĩa, nhưng con số vì thế là
+  **in-sample** và phải đọc như vậy.
+
+## Trạng thái chạy thật
+
+Chưa có lời gọi API nào được thực hiện: `GEMINI_API_KEY` và `GROQ_API_KEY` chưa
+được set, và `api.groq.com` đang bị network policy của môi trường chặn
+(`generativelanguage.googleapis.com` thì thông). Cache vì vậy còn rỗng.
+
+Hệ quả cụ thể, để không ai đọc nhầm bảng số:
+
+| chạy được ngay | cần `GEMINI_API_KEY` | cần thêm `GROQ_API_KEY` |
+|---|---|---|
+| `run.py index` (không `--embed`) | `index --embed` | |
+| `run.py eval --arm bm25` | `eval` ba arm còn lại | |
+| toàn bộ `pytest` | | `ask`, `answer`, `calibrate` |
+
+`ask`/`answer`/`calibrate` cần cả hai key vì Check B gọi Groq. Nếu Groq vẫn chưa
+thông, Check A vẫn chạy bình thường còn Check B sẽ báo lỗi kết nối rõ ràng chứ
+không âm thầm bỏ qua — không có nhánh nào coi "không gọi được judge" là "đã chấm
+và đạt".
 - Bigram âm tiết chỉ xấp xỉ ranh giới từ ghép, không thay được phân từ thật; từ
   ghép ba âm tiết trở lên chỉ được bắt một phần.
 - Nếu một câu đơn lẻ dài hơn trần cắt thì hai part liền kề kề nhau chứ không chồng

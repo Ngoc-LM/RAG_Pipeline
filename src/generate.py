@@ -247,6 +247,8 @@ def answer_question(
     results: Sequence[Retrieved],
     *,
     offline: bool,
+    tau_retrieve: float | None = None,
+    tau_ground: float | None = None,
 ) -> AnswerResult:
     """Điều phối: gác ngưỡng truy xuất -> sinh -> Check A -> Check B -> sinh lại.
 
@@ -254,12 +256,15 @@ def answer_question(
     chặn trên còn cosine nằm trong [-1, 1], nên một ngưỡng chung cho cả bốn arm
     sẽ mang ý nghĩa khác nhau ở mỗi arm — thà không gác còn hơn gác bằng một con
     số không so sánh được.
+
+    Hai ngưỡng để None thì lấy từ config; truyền tay khi quét lưới ở calibrate.
     """
+    threshold = config.TAU_RETRIEVE if tau_retrieve is None else tau_retrieve
     if not results:
         return _abstain(question, "retrieve", [], None)
 
     top_score = results[0].rerank_score
-    if top_score is not None and top_score < config.TAU_RETRIEVE:
+    if top_score is not None and top_score < threshold:
         return _abstain(question, "retrieve", [], top_score)
 
     chunks = [r.chunk for r in results]
@@ -284,7 +289,7 @@ def answer_question(
         )
         attempts.append(Attempt(index, draft, check_a, check_b))
 
-        if check_a.ok and check_b is not None and grounded(check_b):
+        if check_a.ok and check_b is not None and grounded(check_b, tau_ground):
             text, labels = render_answer(draft, chunks)
             return AnswerResult(
                 question=question,

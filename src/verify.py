@@ -197,8 +197,9 @@ def check_grounding(
     return CheckB(verdicts=verdicts, support_ratio=supported / len(verdicts))
 
 
-def grounded(check: CheckB) -> bool:
-    return check.support_ratio >= config.TAU_GROUND
+def grounded(check: CheckB, tau: float | None = None) -> bool:
+    """`tau` để None thì lấy config; truyền tay khi quét lưới ở calibrate."""
+    return check.support_ratio >= (config.TAU_GROUND if tau is None else tau)
 
 
 def retry_feedback(check_a: CheckA, check_b: CheckB | None, claim_texts: Sequence[str]) -> str:
