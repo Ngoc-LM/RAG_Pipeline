@@ -1,0 +1,1570 @@
+{
+  "arm": "hybrid_rerank",
+  "tau_retrieve": 0.0,
+  "tau_ground": 1.0,
+  "abstain": {
+    "n": 20,
+    "true_abstain": 4,
+    "wrong_abstain": 0,
+    "missed_abstain": 0,
+    "true_answer": 16,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+  },
+  "faithfulness": {
+    "n_answered": 16,
+    "n_abstained": 4,
+    "support_ratio_first": 0.9597,
+    "support_ratio_final": 1.0,
+    "n_retry": 3,
+    "n_check_a_fail": 0,
+    "abstain_stage": {
+      "model": 4
+    }
+  },
+  "questions": [
+    {
+      "qid": "q01",
+      "type": "factoid_1hop",
+      "answerable": true,
+      "question": "Công ty bị phát hiện bán danh sách khách hàng ra ngoài thì trần tiền phạt được xác định dựa trên cái gì?",
+      "answer": "Mức phạt tiền tối đa đối với hành vi mua, bán dữ liệu cá nhân là 10 lần khoản thu có được từ hành vi vi phạm. [1] Trường hợp không có khoản thu từ hành vi vi phạm hoặc mức phạt tính theo khoản thu thấp hơn mức phạt tiền tối đa quy định tại khoản 5 Điều 8 thì áp dụng mức phạt tiền theo quy định tại khoản 5 Điều 8. [1] Mức phạt tiền tối đa đối với các hành vi vi phạm khác trong lĩnh vực bảo vệ dữ liệu cá nhân là 03 tỷ đồng. [2]",
+      "citations": [
+        "[1] Điều 8 Khoản 3-4 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15",
+        "[2] Điều 8 Khoản 5-7 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Mức phạt tiền tối đa đối với hành vi mua, bán dữ liệu cá nhân là 10 lần khoản thu có được từ hành vi vi phạm.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Trường hợp không có khoản thu từ hành vi vi phạm hoặc mức phạt tính theo khoản thu thấp hơn mức phạt tiền tối đa quy định tại khoản 5 Điều 8 thì áp dụng mức phạt tiền theo quy định tại khoản 5 Điều 8.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Mức phạt tiền tối đa đối với các hành vi vi phạm khác trong lĩnh vực bảo vệ dữ liệu cá nhân là 03 tỷ đồng.",
+                "citations": [
+                  2
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với quy định tại khoản 3 Điều 8 trong trích đoạn [1]."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với quy định tại khoản 3 Điều 8 trong trích đoạn [1] (trong đó 'Điều này' chính là Điều 8)."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với quy định tại khoản 5 Điều 8 trong trích đoạn [2]."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q02",
+      "type": "factoid_1hop",
+      "answerable": true,
+      "question": "Sau khi bắt đầu đẩy hồ sơ khách sang máy chủ đặt ở nước khác, bên tôi có bao nhiêu ngày để nộp giấy tờ cho cơ quan quản lý?",
+      "answer": "Cơ quan, tổ chức, cá nhân chuyển dữ liệu cá nhân xuyên biên giới phải lập hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới. [1] Hồ sơ này phải được gửi cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân trong thời gian 60 ngày kể từ ngày đầu tiên chuyển dữ liệu cá nhân xuyên biên giới. [1]",
+      "citations": [
+        "[1] Điều 20 Khoản 2-3 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Cơ quan, tổ chức, cá nhân chuyển dữ liệu cá nhân xuyên biên giới phải lập hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Hồ sơ này phải được gửi cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân trong thời gian 60 ngày kể từ ngày đầu tiên chuyển dữ liệu cá nhân xuyên biên giới.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định rõ cơ quan, tổ chức, cá nhân chuyển dữ liệu cá nhân xuyên biên giới phải lập hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định hồ sơ này phải được gửi cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân trong thời gian 60 ngày kể từ ngày đầu tiên chuyển dữ liệu cá nhân xuyên biên giới."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q03",
+      "type": "factoid_1hop",
+      "answerable": true,
+      "question": "Bộ giấy tờ đánh giá đã nộp cho cơ quan quản lý thì bao lâu phải rà soát lại một lần?",
+      "answer": "Hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới được cập nhật định kỳ 06 tháng khi có sự thay đổi. [1] Hồ sơ phải được cập nhật ngay khi có sự thay đổi về tổ chức, cá nhân cung cấp dịch vụ bảo vệ dữ liệu cá nhân hoặc phát sinh, thay đổi ngành, nghề, dịch vụ kinh doanh liên quan đến xử lý dữ liệu cá nhân. [1] Hồ sơ phải được cập nhật ngay khi cơ quan, tổ chức, đơn vị được tổ chức lại, chấm dứt hoạt động, giải thể, phá sản. [1]",
+      "citations": [
+        "[1] Điều 22 Khoản 1-4 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới được cập nhật định kỳ 06 tháng khi có sự thay đổi.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Hồ sơ phải được cập nhật ngay khi có sự thay đổi về tổ chức, cá nhân cung cấp dịch vụ bảo vệ dữ liệu cá nhân hoặc phát sinh, thay đổi ngành, nghề, dịch vụ kinh doanh liên quan đến xử lý dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Hồ sơ phải được cập nhật ngay khi cơ quan, tổ chức, đơn vị được tổ chức lại, chấm dứt hoạt động, giải thể, phá sản.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp hoàn toàn với Khoản 1 Điều 22 tại trích đoạn [1]."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với các trường hợp cập nhật ngay tại điểm b và c Khoản 2 Điều 22 trong trích đoạn [1]."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với trường hợp cập nhật ngay tại điểm a Khoản 2 Điều 22 trong trích đoạn [1]."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q04",
+      "type": "factoid_1hop",
+      "answerable": true,
+      "question": "Muốn đăng ảnh và chuyện riêng của một đứa trẻ 10 tuổi lên mạng thì cần ai gật đầu?",
+      "answer": "Việc xử lý dữ liệu cá nhân của trẻ em nhằm công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân của trẻ em từ đủ 07 tuổi trở lên phải có sự đồng ý của chính trẻ em đó. [1] Việc xử lý dữ liệu cá nhân của trẻ em từ đủ 07 tuổi trở lên nhằm công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân cũng cần có sự đồng ý của người đại diện theo pháp luật của trẻ em. [1]",
+      "citations": [
+        "[1] Điều 24 Khoản 1-2 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Việc xử lý dữ liệu cá nhân của trẻ em nhằm công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân của trẻ em từ đủ 07 tuổi trở lên phải có sự đồng ý của chính trẻ em đó.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Việc xử lý dữ liệu cá nhân của trẻ em từ đủ 07 tuổi trở lên nhằm công bố, tiết lộ thông tin về đời sống riêng tư, bí mật cá nhân cũng cần có sự đồng ý của người đại diện theo pháp luật của trẻ em.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định rõ việc xử lý dữ liệu cá nhân của trẻ em từ đủ 07 tuổi trở lên để công bố, tiết lộ đời sống riêng tư, bí mật cá nhân phải có sự đồng ý của trẻ em."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định rõ việc xử lý dữ liệu cá nhân của trẻ em từ đủ 07 tuổi trở lên để công bố, tiết lộ đời sống riêng tư, bí mật cá nhân phải có sự đồng ý của người đại diện theo pháp luật."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q05",
+      "type": "factoid_1hop",
+      "answerable": true,
+      "question": "Khách muốn xem lại và sửa thông tin của họ đang nằm ở chỗ bên tôi. Bên tôi phải trả lời và làm xong trong bao lâu?",
+      "answer": "Khi nhận được yêu cầu xem hoặc chỉnh sửa dữ liệu cá nhân, bên kiểm soát dữ liệu cá nhân phải phản hồi trong thời hạn 02 ngày làm việc. [1] Bên kiểm soát dữ liệu cá nhân phải cung cấp đầy đủ thông tin về thủ tục và thực hiện yêu cầu xem hoặc chỉnh sửa dữ liệu trong thời hạn 10 ngày. [1] Trường hợp cần yêu cầu bên xử lý dữ liệu cá nhân hoặc bên thứ ba chỉnh sửa dữ liệu, thời hạn thực hiện là 15 ngày. [1] Nếu cần gia hạn thời gian xử lý do tính chất phức tạp, bên kiểm soát dữ liệu cá nhân được gia hạn tối đa 01 lần với thời hạn không quá 10 ngày. [1] Khi gia hạn, bên kiểm soát dữ liệu cá nhân phải thông báo lý do cho chủ thể dữ liệu và chịu trách nhiệm chứng minh việc gia hạn là cần thiết, hợp lý. [1]",
+      "citations": [
+        "[1] Điều 5 Khoản 3 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Khi nhận được yêu cầu xem hoặc chỉnh sửa dữ liệu cá nhân, bên kiểm soát dữ liệu cá nhân phải phản hồi trong thời hạn 02 ngày làm việc.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Bên kiểm soát dữ liệu cá nhân phải cung cấp đầy đủ thông tin về thủ tục và thực hiện yêu cầu xem hoặc chỉnh sửa dữ liệu trong thời hạn 10 ngày.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Trường hợp cần yêu cầu bên xử lý dữ liệu cá nhân hoặc bên thứ ba chỉnh sửa dữ liệu, thời hạn thực hiện là 15 ngày.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Nếu cần gia hạn thời gian xử lý do tính chất phức tạp, bên kiểm soát dữ liệu cá nhân được gia hạn tối đa 01 lần với thời hạn không quá 10 ngày.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Khi gia hạn, bên kiểm soát dữ liệu cá nhân phải thông báo lý do cho chủ thể dữ liệu và chịu trách nhiệm chứng minh việc gia hạn là cần thiết, hợp lý.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [1] nêu rõ khi nhận được yêu cầu xem, chỉnh sửa hoặc yêu cầu chỉnh sửa dữ liệu cá nhân, bên kiểm soát dữ liệu cá nhân phải phản hồi trong thời hạn 02 ngày làm việc."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định việc cung cấp đầy đủ thông tin cho chủ thể dữ liệu cá nhân về thủ tục và thực hiện trong thời hạn 10 ngày."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định trường hợp cần yêu cầu bên xử lý dữ liệu cá nhân, bên thứ ba chỉnh sửa dữ liệu cá nhân thì thực hiện trong thời hạn 15 ngày."
+              },
+              {
+                "claim_index": 4,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định trường hợp cần gia hạn thời gian xử lý do tính chất, mức độ phức tạp thì được kéo dài thêm tối đa 01 lần gia hạn trong thời hạn không quá 10 ngày."
+              },
+              {
+                "claim_index": 5,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định khi gia hạn, bên kiểm soát dữ liệu cá nhân phải thông báo lý do cần gia hạn và chịu trách nhiệm chứng minh việc gia hạn là cần thiết, hợp lý."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q06",
+      "type": "factoid_1hop",
+      "answerable": true,
+      "question": "Người được công ty giao phụ trách mảng này cần bằng cấp gì và bao nhiêu năm đi làm?",
+      "answer": "Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có trình độ cao đẳng trở lên. [2] Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có ít nhất 02 năm kinh nghiệm công tác kể từ thời điểm tốt nghiệp trong các lĩnh vực liên quan như pháp chế, công nghệ thông tin, an ninh mạng, an ninh dữ liệu, quản trị rủi ro, kiểm soát tuân thủ, quản lý nhân sự hoặc tổ chức cán bộ. [2] Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải đã được đào tạo, bồi dưỡng kiến thức pháp luật và kỹ năng chuyên môn về bảo vệ dữ liệu cá nhân. [2]",
+      "citations": [
+        "[2] Điều 13 Khoản 1-2 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có trình độ cao đẳng trở lên.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có ít nhất 02 năm kinh nghiệm công tác kể từ thời điểm tốt nghiệp trong các lĩnh vực liên quan như pháp chế, công nghệ thông tin, an ninh mạng, an ninh dữ liệu, quản trị rủi ro, kiểm soát tuân thủ, quản lý nhân sự hoặc tổ chức cán bộ.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải đã được đào tạo, bồi dưỡng kiến thức pháp luật và kỹ năng chuyên môn về bảo vệ dữ liệu cá nhân.",
+                "citations": [
+                  2
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [2] khoản 2a quy định rõ nhân sự bảo vệ dữ liệu cá nhân được cơ quan, tổ chức chỉ định phải có trình độ cao đẳng trở lên."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [2] khoản 2b quy định rõ yêu cầu về ít nhất 02 năm kinh nghiệm công tác kể từ khi tốt nghiệp trong các lĩnh vực được liệt kê."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Trích đoạn [2] khoản 2c quy định rõ yêu cầu về việc đã được đào tạo, bồi dưỡng kiến thức pháp luật và kỹ năng chuyên môn về bảo vệ dữ liệu cá nhân."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q07",
+      "type": "factoid_1hop",
+      "answerable": true,
+      "question": "Bên tôi cung cấp dịch vụ thư điện tử cho khách. Có bắt buộc phải cài hệ thống chặn mã độc không?",
+      "answer": "Doanh nghiệp cung cấp dịch vụ thư điện tử bắt buộc phải có hệ thống lọc phần mềm độc hại. [1] Hệ thống lọc phần mềm độc hại phải hoạt động trong quá trình gửi, nhận, lưu trữ thông tin trên hệ thống của doanh nghiệp. [1] Doanh nghiệp cung cấp dịch vụ thư điện tử có trách nhiệm báo cáo cơ quan nhà nước có thẩm quyền theo quy định của pháp luật. [1]",
+      "citations": [
+        "[1] Điều 11 Khoản 1-5 Luật An toàn thông tin mạng số 86/2015/QH13"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 0.6666666666666666,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Doanh nghiệp cung cấp dịch vụ thư điện tử bắt buộc phải có hệ thống lọc phần mềm độc hại.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Hệ thống lọc phần mềm độc hại phải hoạt động trong quá trình gửi, nhận, lưu trữ thông tin trên hệ thống của doanh nghiệp.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Doanh nghiệp có trách nhiệm báo cáo cơ quan nhà nước có thẩm quyền về việc sử dụng hệ thống lọc phần mềm độc hại theo quy định của pháp luật.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 0.6667,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Điều 11 Khoản 3 trích đoạn [1] quy định rõ doanh nghiệp cung cấp dịch vụ thư điện tử phải có hệ thống lọc phần mềm độc hại."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Điều 11 Khoản 3 trích đoạn [1] nêu rõ hệ thống lọc phần mềm độc hại phải có trong quá trình gửi, nhận, lưu trữ thông tin trên hệ thống của doanh nghiệp."
+              },
+              {
+                "claim_index": 3,
+                "supported": false,
+                "reason": "Trích đoạn [1] chỉ quy định doanh nghiệp phải 'báo cáo cơ quan nhà nước có thẩm quyền theo quy định của pháp luật' mà không nêu rõ nội dung báo cáo là 'về việc sử dụng hệ thống lọc phần mềm độc hại'."
+              }
+            ]
+          }
+        },
+        {
+          "attempt": 2,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Doanh nghiệp cung cấp dịch vụ thư điện tử bắt buộc phải có hệ thống lọc phần mềm độc hại.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Hệ thống lọc phần mềm độc hại phải hoạt động trong quá trình gửi, nhận, lưu trữ thông tin trên hệ thống của doanh nghiệp.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Doanh nghiệp cung cấp dịch vụ thư điện tử có trách nhiệm báo cáo cơ quan nhà nước có thẩm quyền theo quy định của pháp luật.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Khoản 3 Điều 11 trích đoạn [1] quy định rõ doanh nghiệp cung cấp dịch vụ thư điện tử phải có hệ thống lọc phần mềm độc hại."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Khoản 3 Điều 11 trích đoạn [1] quy định hệ thống lọc phần mềm độc hại phải có trong quá trình gửi, nhận, lưu trữ thông tin trên hệ thống của mình."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Khoản 3 Điều 11 trích đoạn [1] quy định doanh nghiệp cung cấp dịch vụ thư điện tử phải báo cáo cơ quan nhà nước có thẩm quyền theo quy định của pháp luật."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q08",
+      "type": "factoid_1hop",
+      "answerable": true,
+      "question": "Bộ nào được giao lo việc bảo mật cho hạ tầng phân giải địa chỉ web cấp quốc gia?",
+      "answer": "Bộ Thông tin và Truyền thông có trách nhiệm thực hiện bảo đảm an toàn thông tin mạng cho hệ thống máy chủ tên miền quốc gia Việt Nam. [1]",
+      "citations": [
+        "[1] Điều 12 Khoản 1-3 Luật An toàn thông tin mạng số 86/2015/QH13"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Bộ Thông tin và Truyền thông có trách nhiệm thực hiện bảo đảm an toàn thông tin mạng cho hệ thống máy chủ tên miền quốc gia Việt Nam.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Nội dung mệnh đề trùng khớp hoàn toàn với Khoản 3 Điều 12 trong trích đoạn [1]."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q09",
+      "type": "multihop",
+      "answerable": true,
+      "question": "Hai công ty sáp nhập, bên tôi tiếp nhận toàn bộ danh sách khách của bên kia. Có phải ký kết văn bản riêng cho việc bàn giao đó không, và trong đó cần ghi những gì?",
+      "answer": "Tổ chức chuyển giao dữ liệu cá nhân trong trường hợp sáp nhập phải xác lập thỏa thuận về việc chuyển giao dữ liệu cá nhân với bên nhận. [1][2] Thỏa thuận chuyển giao dữ liệu cá nhân phải nêu rõ mục đích chuyển giao. [1] Thỏa thuận phải nêu rõ đối tượng chủ thể dữ liệu cá nhân và loại dữ liệu cá nhân được chuyển giao phù hợp với mục đích chuyển giao. [1] Thỏa thuận phải nêu rõ thời hạn xử lý dữ liệu cá nhân, yêu cầu về xóa, hủy dữ liệu cá nhân sau khi hoàn thành mục đích chuyển giao. [1] Thỏa thuận phải nêu rõ cơ sở pháp lý của việc chuyển giao dữ liệu cá nhân. [1] Thỏa thuận phải nêu rõ trách nhiệm bảo vệ dữ liệu cá nhân trong quá trình chuyển giao, xử lý dữ liệu cá nhân. [1] Thỏa thuận phải nêu rõ trách nhiệm thực hiện các quyền của chủ thể dữ liệu cá nhân. [1] Thỏa thuận phải nêu rõ trách nhiệm phối hợp và tuân thủ của các bên trong trường hợp phát hiện vi phạm quy định bảo vệ dữ liệu cá nhân. [1]",
+      "citations": [
+        "[1] Điều 7 Khoản 1 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân",
+        "[2] Điều 17 Khoản 1-3 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 0.8888888888888888,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Khi sáp nhập tổ chức, việc chuyển giao dữ liệu cá nhân để tiếp tục xử lý là một trường hợp được phép thực hiện.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Tổ chức chuyển giao dữ liệu cá nhân trong trường hợp sáp nhập phải xác lập thỏa thuận về việc chuyển giao dữ liệu cá nhân với bên nhận.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận chuyển giao dữ liệu cá nhân phải nêu rõ mục đích chuyển giao.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ đối tượng chủ thể dữ liệu và loại dữ liệu cá nhân được chuyển giao phù hợp với mục đích.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ thời hạn xử lý dữ liệu và yêu cầu về xóa, hủy dữ liệu sau khi hoàn thành mục đích.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ cơ sở pháp lý của việc chuyển giao.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ trách nhiệm bảo vệ dữ liệu cá nhân trong quá trình chuyển giao, xử lý.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ trách nhiệm thực hiện các quyền của chủ thể dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ trách nhiệm phối hợp và tuân thủ của các bên khi phát hiện vi phạm quy định bảo vệ dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 0.8889,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [2] tại Điều 17 Khoản 1 điểm c quy định việc chuyển giao dữ liệu cá nhân để tiếp tục xử lý trong trường hợp sáp nhập là một trường hợp được thực hiện."
+              },
+              {
+                "claim_index": 2,
+                "supported": false,
+                "reason": "Trích đoạn [1] chỉ nêu yêu cầu xác lập thỏa thuận đối với các trường hợp tại điểm a, c, d khoản 1 Điều 17 mà không định nghĩa 'sáp nhập' thuộc điểm nào; thông tin 'sáp nhập' thuộc điểm c nằm ở trích đoạn [2] không được viện dẫn cho mệnh đề này."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 7 Khoản 1 điểm a quy định thỏa thuận phải nêu rõ mục đích chuyển giao dữ liệu cá nhân."
+              },
+              {
+                "claim_index": 4,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 7 Khoản 1 điểm b quy định thỏa thuận phải nêu rõ đối tượng chủ thể dữ liệu cá nhân và loại dữ liệu cá nhân được chuyển giao phù hợp với mục đích chuyển giao."
+              },
+              {
+                "claim_index": 5,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 7 Khoản 1 điểm c quy định thỏa thuận phải nêu rõ thời hạn xử lý dữ liệu cá nhân, yêu cầu về xóa, hủy dữ liệu cá nhân sau khi hoàn thành mục đích chuyển giao."
+              },
+              {
+                "claim_index": 6,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 7 Khoản 1 điểm d quy định thỏa thuận phải nêu rõ cơ sở pháp lý của việc chuyển giao dữ liệu cá nhân."
+              },
+              {
+                "claim_index": 7,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 7 Khoản 1 điểm đ quy định thỏa thuận phải nêu rõ trách nhiệm bảo vệ dữ liệu cá nhân trong quá trình chuyển giao, xử lý dữ liệu cá nhân."
+              },
+              {
+                "claim_index": 8,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 7 Khoản 1 điểm e quy định thỏa thuận phải nêu rõ trách nhiệm thực hiện các quyền của chủ thể dữ liệu cá nhân."
+              },
+              {
+                "claim_index": 9,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 7 Khoản 1 điểm g quy định thỏa thuận phải nêu rõ trách nhiệm phối hợp và tuân thủ của các bên trong trường hợp phát hiện vi phạm quy định bảo vệ dữ liệu cá nhân."
+              }
+            ]
+          }
+        },
+        {
+          "attempt": 2,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Tổ chức chuyển giao dữ liệu cá nhân trong trường hợp sáp nhập phải xác lập thỏa thuận về việc chuyển giao dữ liệu cá nhân với bên nhận.",
+                "citations": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "text": "Thỏa thuận chuyển giao dữ liệu cá nhân phải nêu rõ mục đích chuyển giao.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ đối tượng chủ thể dữ liệu cá nhân và loại dữ liệu cá nhân được chuyển giao phù hợp với mục đích chuyển giao.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ thời hạn xử lý dữ liệu cá nhân, yêu cầu về xóa, hủy dữ liệu cá nhân sau khi hoàn thành mục đích chuyển giao.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ cơ sở pháp lý của việc chuyển giao dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ trách nhiệm bảo vệ dữ liệu cá nhân trong quá trình chuyển giao, xử lý dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ trách nhiệm thực hiện các quyền của chủ thể dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thỏa thuận phải nêu rõ trách nhiệm phối hợp và tuân thủ của các bên trong trường hợp phát hiện vi phạm quy định bảo vệ dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [2] xác định sáp nhập là một trường hợp chuyển giao dữ liệu cá nhân (điểm c khoản 1), và trích đoạn [1] quy định tổ chức chuyển giao theo điểm c khoản 1 Điều 17 phải xác lập thỏa thuận với bên nhận."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ mục đích chuyển giao dữ liệu cá nhân tại điểm a khoản 1."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ đối tượng chủ thể và loại dữ liệu cá nhân được chuyển giao phù hợp với mục đích tại điểm b khoản 1."
+              },
+              {
+                "claim_index": 4,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ thời hạn xử lý và yêu cầu xóa, hủy dữ liệu sau khi hoàn thành mục đích tại điểm c khoản 1."
+              },
+              {
+                "claim_index": 5,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ cơ sở pháp lý của việc chuyển giao tại điểm d khoản 1."
+              },
+              {
+                "claim_index": 6,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ trách nhiệm bảo vệ dữ liệu cá nhân trong quá trình chuyển giao, xử lý tại điểm đ khoản 1."
+              },
+              {
+                "claim_index": 7,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ trách nhiệm thực hiện các quyền của chủ thể dữ liệu cá nhân tại điểm e khoản 1."
+              },
+              {
+                "claim_index": 8,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định thỏa thuận chuyển giao phải nêu rõ trách nhiệm phối hợp và tuân thủ khi phát hiện vi phạm tại điểm g khoản 1."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q10",
+      "type": "multihop",
+      "answerable": true,
+      "question": "So với nghĩa vụ chung khi để lộ dữ liệu, một ngân hàng còn phải làm thêm điều gì?",
+      "answer": "Trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm, ngân hàng có trách nhiệm thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân. [1] Nội dung thông báo về việc lộ, mất dữ liệu nhạy cảm phải đảm bảo tối thiểu các nội dung theo quy định của pháp luật. [1]",
+      "citations": [
+        "[1] Điều 8 Khoản 3 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm, ngân hàng có trách nhiệm thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Nội dung thông báo về việc lộ, mất dữ liệu nhạy cảm phải đảm bảo tối thiểu các nội dung theo quy định của pháp luật.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định rõ trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm trong lĩnh vực tài chính, ngân hàng, tổ chức thu thập dữ liệu có trách nhiệm thông báo cho cơ quan chuyên trách và chủ thể dữ liệu."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [1] nêu rõ nội dung thông báo cần đảm bảo tối thiểu các nội dung quy định tại khoản 1 Điều 28 của Nghị định này."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q11",
+      "type": "multihop",
+      "answerable": true,
+      "question": "Lịch sử giao dịch của khách tại ngân hàng được xếp vào nhóm dữ liệu nào, và việc xếp nhóm đó kéo theo nghĩa vụ gì cho ngân hàng?",
+      "answer": "Lịch sử giao dịch của khách hàng tại các tổ chức tín dụng, chi nhánh ngân hàng nước ngoài được xếp vào nhóm dữ liệu cá nhân nhạy cảm. [1] Trong quá trình xử lý dữ liệu cá nhân nhạy cảm, ngân hàng phải thiết lập quy định phân quyền giới hạn truy cập, quy trình xử lý và các biện pháp bảo mật. [1] Ngân hàng có trách nhiệm áp dụng tiêu chuẩn, quy chuẩn kỹ thuật bảo vệ dữ liệu cá nhân, quy chuẩn kỹ thuật khử nhận dạng và ẩn danh dữ liệu cá nhân. [4] Ngân hàng phải thực hiện đánh giá tuân thủ các quy định về bảo vệ dữ liệu cá nhân định kỳ 01 năm/lần và ghi lại nhật ký toàn bộ hoạt động xử lý dữ liệu cá nhân. [4] Khi xin sự đồng ý của chủ thể dữ liệu, ngân hàng phải đảm bảo nêu rõ mục đích xử lý, nguồn thu thập, thời gian lưu trữ, cơ chế rút lại sự đồng ý và chính sách xóa, hủy dữ liệu. [3] Trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm, ngân hàng có trách nhiệm thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân. [5] Ngân hàng phải thực hiện đầy đủ quy định về bảo vệ dữ liệu cá nhân nhạy cảm và các tiêu chuẩn an toàn, bảo mật trong hoạt động tài chính, ngân hàng. [7]",
+      "citations": [
+        "[1] Điều 4 Khoản 1-2 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân",
+        "[3] Điều 8 Khoản 2 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân",
+        "[4] Điều 8 Khoản 1 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân",
+        "[5] Điều 8 Khoản 3 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân",
+        "[7] Điều 27 Khoản 1 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Lịch sử giao dịch của khách hàng tại các tổ chức tín dụng, chi nhánh ngân hàng nước ngoài được xếp vào nhóm dữ liệu cá nhân nhạy cảm.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Trong quá trình xử lý dữ liệu cá nhân nhạy cảm, ngân hàng phải thiết lập quy định phân quyền giới hạn truy cập, quy trình xử lý và các biện pháp bảo mật.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Ngân hàng có trách nhiệm áp dụng tiêu chuẩn, quy chuẩn kỹ thuật bảo vệ dữ liệu cá nhân, quy chuẩn kỹ thuật khử nhận dạng và ẩn danh dữ liệu cá nhân.",
+                "citations": [
+                  4
+                ]
+              },
+              {
+                "text": "Ngân hàng phải thực hiện đánh giá tuân thủ các quy định về bảo vệ dữ liệu cá nhân định kỳ 01 năm/lần và ghi lại nhật ký toàn bộ hoạt động xử lý dữ liệu cá nhân.",
+                "citations": [
+                  4
+                ]
+              },
+              {
+                "text": "Khi xin sự đồng ý của chủ thể dữ liệu, ngân hàng phải đảm bảo nêu rõ mục đích xử lý, nguồn thu thập, thời gian lưu trữ, cơ chế rút lại sự đồng ý và chính sách xóa, hủy dữ liệu.",
+                "citations": [
+                  3
+                ]
+              },
+              {
+                "text": "Trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm, ngân hàng có trách nhiệm thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân.",
+                "citations": [
+                  5
+                ]
+              },
+              {
+                "text": "Ngân hàng phải thực hiện đầy đủ quy định về bảo vệ dữ liệu cá nhân nhạy cảm và các tiêu chuẩn an toàn, bảo mật trong hoạt động tài chính, ngân hàng.",
+                "citations": [
+                  7
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 4 Khoản 1 điểm k liệt kê cụ thể dữ liệu về lịch sử giao dịch của tài khoản ngân hàng và lịch sử giao dịch tài chính của khách hàng tại các tổ chức tín dụng, chi nhánh ngân hàng nước ngoài là dữ liệu cá nhân nhạy cảm."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [1] tại Điều 4 Khoản 2 quy định cơ quan, tổ chức (bao gồm ngân hàng) khi xử lý dữ liệu cá nhân nhạy cảm phải thiết lập quy định phân quyền giới hạn truy cập, quy trình xử lý và các biện pháp bảo mật."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Trích đoạn [4] tại Điều 8 Khoản 1 quy định tổ chức, cá nhân hoạt động trong lĩnh vực tài chính, ngân hàng có trách nhiệm áp dụng tiêu chuẩn, quy chuẩn kỹ thuật bảo vệ dữ liệu cá nhân, quy chuẩn kỹ thuật khử nhận dạng và ẩn danh dữ liệu cá nhân."
+              },
+              {
+                "claim_index": 4,
+                "supported": true,
+                "reason": "Trích đoạn [4] tại Điều 8 Khoản 1 quy định tổ chức, cá nhân hoạt động trong lĩnh vực tài chính, ngân hàng phải thực hiện đánh giá tuân thủ định kỳ 01 năm/lần và ghi lại nhật ký toàn bộ hoạt động xử lý dữ liệu cá nhân."
+              },
+              {
+                "claim_index": 5,
+                "supported": true,
+                "reason": "Trích đoạn [3] tại Điều 8 Khoản 2 quy định tổ chức, cá nhân hoạt động trong lĩnh vực tài chính, ngân hàng khi xin sự đồng ý của chủ thể dữ liệu phải nêu rõ mục đích xử lý, nguồn thu thập, thời gian lưu trữ, cơ chế rút lại sự đồng ý và chính sách xóa, hủy dữ liệu."
+              },
+              {
+                "claim_index": 6,
+                "supported": true,
+                "reason": "Trích đoạn [5] tại Điều 8 Khoản 3 quy định trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu nhạy cảm trong lĩnh vực tài chính, ngân hàng, tổ chức trực tiếp thu thập phải thông báo cho cơ quan chuyên trách và chủ thể dữ liệu."
+              },
+              {
+                "claim_index": 7,
+                "supported": true,
+                "reason": "Trích đoạn [7] tại Điều 27 Khoản 1 điểm a quy định tổ chức, cá nhân hoạt động trong lĩnh vực tài chính, ngân hàng có trách nhiệm thực hiện đầy đủ quy định về bảo vệ dữ liệu cá nhân nhạy cảm và các tiêu chuẩn an toàn, bảo mật."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q12",
+      "type": "multihop",
+      "answerable": true,
+      "question": "Hai đạo luật đang còn hiệu lực dùng hai cách gọi khác nhau cho thông tin về một con người. Cách hiểu của mỗi đạo luật khác nhau ra sao?",
+      "answer": "Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 định nghĩa dữ liệu cá nhân là dữ liệu số hoặc thông tin dưới dạng khác xác định hoặc giúp xác định một con người cụ thể. [1] Luật An toàn thông tin mạng số 86/2015/QH13 định nghĩa thông tin cá nhân là thông tin gắn với việc xác định danh tính của một người cụ thể. [2]",
+      "citations": [
+        "[1] Điều 2 Khoản 1-2 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15",
+        "[2] Điều 3 Khoản 13-15 Luật An toàn thông tin mạng số 86/2015/QH13"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 định nghĩa dữ liệu cá nhân là dữ liệu số hoặc thông tin dưới dạng khác xác định hoặc giúp xác định một con người cụ thể.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Luật An toàn thông tin mạng số 86/2015/QH13 định nghĩa thông tin cá nhân là thông tin gắn với việc xác định danh tính của một người cụ thể.",
+                "citations": [
+                  2
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [1] nêu chính xác định nghĩa về dữ liệu cá nhân khớp với nội dung mệnh đề."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [2] nêu chính xác định nghĩa về thông tin cá nhân khớp với nội dung mệnh đề."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q13",
+      "type": "multihop",
+      "answerable": true,
+      "question": "Khách đòi rút lại sự cho phép, nhưng bên tôi đang giữ dữ liệu đó để phục vụ yêu cầu của cơ quan nhà nước. Bên tôi có buộc phải dừng trong thời hạn quy định không?",
+      "answer": "Việc thực hiện yêu cầu rút lại sự đồng ý cho phép xử lý dữ liệu cá nhân không áp dụng đối với trường hợp xử lý dữ liệu cá nhân không cần sự đồng ý của chủ thể dữ liệu cá nhân theo quy định tại Điều 19 Luật Bảo vệ dữ liệu cá nhân. [2] Việc xử lý dữ liệu cá nhân phục vụ hoạt động của cơ quan nhà nước, hoạt động quản lý nhà nước theo quy định của pháp luật là trường hợp không cần sự đồng ý của chủ thể dữ liệu cá nhân. [4] Do đó, bên bạn không buộc phải dừng xử lý dữ liệu trong thời hạn quy định đối với yêu cầu rút lại sự đồng ý trong trường hợp dữ liệu đó đang được xử lý để phục vụ yêu cầu của cơ quan nhà nước. [2][4]",
+      "citations": [
+        "[2] Điều 5 Khoản 1-2 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân",
+        "[4] Điều 19 Khoản 1 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Việc thực hiện yêu cầu rút lại sự đồng ý cho phép xử lý dữ liệu cá nhân không áp dụng đối với trường hợp xử lý dữ liệu cá nhân không cần sự đồng ý của chủ thể dữ liệu cá nhân theo quy định tại Điều 19 Luật Bảo vệ dữ liệu cá nhân.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Việc xử lý dữ liệu cá nhân phục vụ hoạt động của cơ quan nhà nước, hoạt động quản lý nhà nước theo quy định của pháp luật là trường hợp không cần sự đồng ý của chủ thể dữ liệu cá nhân.",
+                "citations": [
+                  4
+                ]
+              },
+              {
+                "text": "Do đó, bên bạn không buộc phải dừng xử lý dữ liệu trong thời hạn quy định đối với yêu cầu rút lại sự đồng ý trong trường hợp dữ liệu đó đang được xử lý để phục vụ yêu cầu của cơ quan nhà nước.",
+                "citations": [
+                  2,
+                  4
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [2] nêu rõ việc thực hiện yêu cầu rút lại sự đồng ý trong thời hạn quy định có ngoại lệ là 'trừ trường hợp xử lý dữ liệu cá nhân không cần sự đồng ý của chủ thể dữ liệu cá nhân theo quy định tại Điều 19 Luật Bảo vệ dữ liệu cá nhân'."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [4] tại điểm c khoản 1 liệt kê việc 'Phục vụ hoạt động của cơ quan nhà nước, hoạt động quản lý nhà nước theo quy định của pháp luật' là một trong các trường hợp xử lý dữ liệu không cần sự đồng ý của chủ thể dữ liệu."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Kết hợp trích đoạn [2] (ngoại lệ về thời hạn thực hiện rút lại sự đồng ý đối với trường hợp tại Điều 19) và trích đoạn [4] (xác định phục vụ cơ quan nhà nước thuộc Điều 19), đủ căn cứ để kết luận bên xử lý không buộc phải dừng trong thời hạn quy định."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q14",
+      "type": "distractor",
+      "answerable": true,
+      "question": "Công ty tôi vừa xác định có một vụ rò rỉ dữ liệu nghiêm trọng ảnh hưởng tới tài sản của khách. Phải gửi thông báo tới đâu và trong bao lâu?",
+      "answer": "Khi phát hiện vi phạm quy định về bảo vệ dữ liệu cá nhân có thể gây tổn hại đến tài sản của chủ thể dữ liệu, bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên thứ ba phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân. [1] Thời hạn thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân là chậm nhất 72 giờ kể từ khi phát hiện hành vi vi phạm. [1] Nếu là dữ liệu nhạy cảm trong lĩnh vực tài chính, ngân hàng, hoạt động thông tin tín dụng, tổ chức hoặc cá nhân thu thập dữ liệu phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu. [2]",
+      "citations": [
+        "[1] Điều 23 Khoản 1 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15",
+        "[2] Điều 8 Khoản 3 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Khi phát hiện vi phạm quy định về bảo vệ dữ liệu cá nhân có thể gây tổn hại đến tài sản của chủ thể dữ liệu, bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên thứ ba phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Thời hạn thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân là chậm nhất 72 giờ kể từ khi phát hiện hành vi vi phạm.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Nếu là dữ liệu nhạy cảm trong lĩnh vực tài chính, ngân hàng, hoạt động thông tin tín dụng, tổ chức hoặc cá nhân thu thập dữ liệu phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân và chủ thể dữ liệu cá nhân trong thời hạn không quá 72 giờ sau khi phát hiện lộ, mất dữ liệu.",
+                "citations": [
+                  2
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Mệnh đề khớp hoàn toàn với nội dung tại Điều 23 Khoản 1 trích đoạn [1] về đối tượng thông báo, điều kiện (gây tổn hại đến tài sản) và cơ quan tiếp nhận thông báo."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Mệnh đề khớp hoàn toàn với thời hạn thông báo được quy định tại Điều 23 Khoản 1 trích đoạn [1]."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Mệnh đề khớp hoàn toàn với nội dung tại Điều 8 Khoản 3 trích đoạn [2] về loại dữ liệu, lĩnh vực, đối tượng có trách nhiệm thông báo, đối tượng nhận thông báo và thời hạn."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q15",
+      "type": "distractor",
+      "answerable": true,
+      "question": "Khách gửi yêu cầu xoá sạch thông tin của họ. Bên tôi phải hoàn tất trong bao lâu?",
+      "answer": "Khi nhận được yêu cầu xóa dữ liệu cá nhân, bên kiểm soát dữ liệu cá nhân phải phản hồi trong thời hạn 02 ngày làm việc. [1] Bên kiểm soát dữ liệu cá nhân phải thực hiện yêu cầu xóa dữ liệu trong thời hạn 20 ngày. [1] Trường hợp cần yêu cầu bên xử lý dữ liệu cá nhân hoặc bên thứ ba xóa dữ liệu, thời hạn thực hiện là 30 ngày. [1] Nếu yêu cầu phức tạp, thời gian xử lý có thể được gia hạn tối đa 01 lần với thời hạn không quá 20 ngày. [1]",
+      "citations": [
+        "[1] Điều 5 Khoản 4 Nghị định 356/2025/NĐ-CP quy định chi tiết một số điều và biện pháp thi hành Luật Bảo vệ dữ liệu cá nhân"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 1.0,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Khi nhận được yêu cầu xóa dữ liệu cá nhân, bên kiểm soát dữ liệu cá nhân phải phản hồi trong thời hạn 02 ngày làm việc.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Bên kiểm soát dữ liệu cá nhân phải thực hiện yêu cầu xóa dữ liệu trong thời hạn 20 ngày.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Trường hợp cần yêu cầu bên xử lý dữ liệu cá nhân hoặc bên thứ ba xóa dữ liệu, thời hạn thực hiện là 30 ngày.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Nếu yêu cầu phức tạp, thời gian xử lý có thể được gia hạn tối đa 01 lần với thời hạn không quá 20 ngày.",
+                "citations": [
+                  1
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Trích đoạn [1] nêu rõ khi nhận yêu cầu xóa dữ liệu cá nhân, bên kiểm soát dữ liệu cá nhân phải phản hồi trong thời hạn 02 ngày làm việc."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định việc thực hiện yêu cầu xóa dữ liệu cá nhân trong thời hạn 20 ngày."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định trường hợp yêu cầu bên xử lý dữ liệu cá nhân, bên thứ ba xóa dữ liệu thì thực hiện trong thời hạn 30 ngày."
+              },
+              {
+                "claim_index": 4,
+                "supported": true,
+                "reason": "Trích đoạn [1] quy định tùy theo mức độ phức tạp, có thể gia hạn tối đa 01 lần không quá 20 ngày."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q16",
+      "type": "distractor",
+      "answerable": true,
+      "question": "Bên tôi làm dịch vụ tiếp thị, muốn dùng danh sách khách do một đối tác chuyển sang để chạy quảng cáo. Có được phép không?",
+      "answer": "Tổ chức kinh doanh dịch vụ quảng cáo được phép sử dụng dữ liệu cá nhân của khách hàng do bên kiểm soát dữ liệu cá nhân chuyển giao theo thỏa thuận để kinh doanh dịch vụ quảng cáo. [1] Việc xử lý dữ liệu cá nhân của khách hàng để kinh doanh dịch vụ quảng cáo phải được sự đồng ý của khách hàng. [2] Khách hàng phải được biết rõ nội dung, phương thức, hình thức, tần suất giới thiệu sản phẩm và được cung cấp phương thức để từ chối nhận thông tin quảng cáo. [2] Việc sử dụng dữ liệu cá nhân để quảng cáo phải tuân thủ các quy định của pháp luật về phòng, chống tin nhắn rác, thư điện tử rác, cuộc gọi rác và pháp luật về quảng cáo. [2] Tổ chức kinh doanh dịch vụ quảng cáo có trách nhiệm chứng minh việc sử dụng dữ liệu cá nhân của khách hàng là tuân thủ quy định pháp luật. [3]",
+      "citations": [
+        "[1] Điều 28 Khoản 1-2 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15",
+        "[2] Điều 28 Khoản 3-4 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15",
+        "[3] Điều 28 Khoản 5-7 Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15"
+      ],
+      "abstained": false,
+      "abstain_stage": null,
+      "retrieval_score": 1.0,
+      "support_ratio_first": 0.8,
+      "support_ratio_final": 1.0,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Tổ chức kinh doanh dịch vụ quảng cáo chỉ được sử dụng dữ liệu cá nhân của khách hàng được bên kiểm soát dữ liệu cá nhân chuyển giao theo thỏa thuận để kinh doanh dịch vụ quảng cáo.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Việc xử lý dữ liệu cá nhân của khách hàng để kinh doanh dịch vụ quảng cáo phải được sự đồng ý của khách hàng.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Khách hàng cần được biết rõ nội dung, phương thức, hình thức, tần suất giới thiệu sản phẩm và được cung cấp phương thức để từ chối nhận thông tin quảng cáo.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Việc sử dụng dữ liệu cá nhân để quảng cáo phải phù hợp với quy định của pháp luật về phòng, chống tin nhắn rác, thư điện tử rác, cuộc gọi rác và quy định về quảng cáo.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Tổ chức kinh doanh dịch vụ quảng cáo có trách nhiệm chứng minh việc sử dụng dữ liệu cá nhân của khách hàng là tuân thủ các quy định pháp luật.",
+                "citations": [
+                  3
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 0.8,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": false,
+                "reason": "Trích đoạn [1] nêu tổ chức kinh doanh dịch vụ quảng cáo được sử dụng dữ liệu từ hai nguồn: được chuyển giao theo thỏa thuận HOẶC thu thập qua hoạt động kinh doanh của mình. Mệnh đề dùng từ 'chỉ được' để giới hạn chỉ còn một nguồn là chuyển giao theo thỏa thuận, nên không chính xác so với trích đoạn."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Mệnh đề khớp hoàn toàn với nội dung tại Khoản 3 Điều 28 trong trích đoạn [2]."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Mệnh đề khớp hoàn toàn với nội dung tại Khoản 3 Điều 28 trong trích đoạn [2]."
+              },
+              {
+                "claim_index": 4,
+                "supported": true,
+                "reason": "Mệnh đề khớp hoàn toàn với nội dung tại Khoản 4 Điều 28 trong trích đoạn [2]."
+              },
+              {
+                "claim_index": 5,
+                "supported": true,
+                "reason": "Mệnh đề phản ánh đúng trách nhiệm chứng minh việc sử dụng dữ liệu và tuân thủ quy định pháp luật được nêu tại Khoản 7 Điều 28 trong trích đoạn [3]."
+              }
+            ]
+          }
+        },
+        {
+          "attempt": 2,
+          "draft": {
+            "abstain": false,
+            "reason": "",
+            "claims": [
+              {
+                "text": "Tổ chức kinh doanh dịch vụ quảng cáo được phép sử dụng dữ liệu cá nhân của khách hàng do bên kiểm soát dữ liệu cá nhân chuyển giao theo thỏa thuận để kinh doanh dịch vụ quảng cáo.",
+                "citations": [
+                  1
+                ]
+              },
+              {
+                "text": "Việc xử lý dữ liệu cá nhân của khách hàng để kinh doanh dịch vụ quảng cáo phải được sự đồng ý của khách hàng.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Khách hàng phải được biết rõ nội dung, phương thức, hình thức, tần suất giới thiệu sản phẩm và được cung cấp phương thức để từ chối nhận thông tin quảng cáo.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Việc sử dụng dữ liệu cá nhân để quảng cáo phải tuân thủ các quy định của pháp luật về phòng, chống tin nhắn rác, thư điện tử rác, cuộc gọi rác và pháp luật về quảng cáo.",
+                "citations": [
+                  2
+                ]
+              },
+              {
+                "text": "Tổ chức kinh doanh dịch vụ quảng cáo có trách nhiệm chứng minh việc sử dụng dữ liệu cá nhân của khách hàng là tuân thủ quy định pháp luật.",
+                "citations": [
+                  3
+                ]
+              }
+            ]
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": {
+            "support_ratio": 1.0,
+            "verdicts": [
+              {
+                "claim_index": 1,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với Khoản 1 Điều 28 tại trích đoạn [1]."
+              },
+              {
+                "claim_index": 2,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với phần đầu Khoản 3 Điều 28 tại trích đoạn [2]."
+              },
+              {
+                "claim_index": 3,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với các điều kiện đi kèm trong Khoản 3 Điều 28 tại trích đoạn [2]."
+              },
+              {
+                "claim_index": 4,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với Khoản 4 Điều 28 tại trích đoạn [2]."
+              },
+              {
+                "claim_index": 5,
+                "supported": true,
+                "reason": "Nội dung mệnh đề khớp với Khoản 7 Điều 28 tại trích đoạn [3], quy định về trách nhiệm chứng minh việc sử dụng dữ liệu và tuân thủ quy định pháp luật."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "qid": "q17",
+      "type": "unanswerable_oos",
+      "answerable": false,
+      "question": "Doanh nghiệp phải giữ hóa đơn điện tử trong bao nhiêu năm trước khi được huỷ?",
+      "answer": "Không đủ căn cứ trong tài liệu.",
+      "citations": [],
+      "abstained": true,
+      "abstain_stage": "model",
+      "retrieval_score": 0.0,
+      "support_ratio_first": null,
+      "support_ratio_final": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": true,
+            "reason": "Các trích đoạn được cung cấp không chứa thông tin về thời hạn lưu trữ hóa đơn điện tử trước khi được hủy.",
+            "claims": []
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": null
+        }
+      ]
+    },
+    {
+      "qid": "q18",
+      "type": "unanswerable_oos",
+      "answerable": false,
+      "question": "Một năm người lao động được huy động làm thêm tối đa bao nhiêu giờ?",
+      "answer": "Không đủ căn cứ trong tài liệu.",
+      "citations": [],
+      "abstained": true,
+      "abstain_stage": "model",
+      "retrieval_score": 0.0,
+      "support_ratio_first": null,
+      "support_ratio_final": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": true,
+            "reason": "Các trích đoạn được cung cấp không chứa thông tin về số giờ làm thêm tối đa của người lao động trong một năm.",
+            "claims": []
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": null
+        }
+      ]
+    },
+    {
+      "qid": "q19",
+      "type": "unanswerable_nearmiss",
+      "answerable": false,
+      "question": "Dữ liệu khách hàng được phép giữ tối đa bao nhiêu tháng trước khi buộc phải xoá?",
+      "answer": "Không đủ căn cứ trong tài liệu.",
+      "citations": [],
+      "abstained": true,
+      "abstain_stage": "model",
+      "retrieval_score": 0.3333333333333333,
+      "support_ratio_first": null,
+      "support_ratio_final": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": true,
+            "reason": "Các trích đoạn được cung cấp không quy định về thời hạn tối đa được phép lưu trữ dữ liệu khách hàng trước khi buộc phải xóa.",
+            "claims": []
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": null
+        }
+      ]
+    },
+    {
+      "qid": "q20",
+      "type": "unanswerable_nearmiss",
+      "answerable": false,
+      "question": "Nộp bộ giấy tờ đánh giá cho cơ quan quản lý có phải trả khoản tiền nào không, và bao nhiêu?",
+      "answer": "Không đủ căn cứ trong tài liệu.",
+      "citations": [],
+      "abstained": true,
+      "abstain_stage": "model",
+      "retrieval_score": 0.0,
+      "support_ratio_first": null,
+      "support_ratio_final": null,
+      "attempts": [
+        {
+          "attempt": 1,
+          "draft": {
+            "abstain": true,
+            "reason": "Các trích đoạn được cung cấp không chứa thông tin về việc có phải trả khoản tiền nào hay không khi nộp bộ giấy tờ đánh giá cho cơ quan quản lý.",
+            "claims": []
+          },
+          "check_a": {
+            "ok": true,
+            "problems": []
+          },
+          "check_b": null
+        }
+      ]
+    }
+  ]
+}

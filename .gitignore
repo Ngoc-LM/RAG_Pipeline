@@ -4,9 +4,16 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
-# outputs/ là dẫn xuất, trừ cache — cache mới là thứ làm --offline tái hiện được
+# outputs/ phần lớn là dẫn xuất, nhưng bốn thứ dưới đây PHẢI commit:
+#  - cache/       : thứ làm --offline tái hiện được mọi con số mà không cần API key
+#  - demo_answers.md : deliverable "3-5 câu trả lời kèm trích dẫn" của đề bài
+#  - eval/        : bằng chứng cho mọi bảng số trong README, đọc được không cần chạy
+#  - index/       : ảnh chụp danh sách chunk kèm tham số đã dùng
 outputs/*
 !outputs/cache/
+!outputs/demo_answers.md
+!outputs/eval/
+!outputs/index/
 
 # File nguồn của bước chuẩn bị corpus: nhị phân, nặng, và tái tạo được từ nguồn
 # gốc. Chỉ commit data/corpus/*.txt là kết quả đã chuẩn hoá.
