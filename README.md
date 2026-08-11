@@ -22,21 +22,27 @@ chạy được và có test; phần chưa có là thiết kế đã chốt như
 | Cache + backoff cho API | `src/llm.py` | ✅ |
 | CLI gán nhãn gold_span | `tools/annotate.py` | ✅ |
 | Gold set 20 câu | `eval/questions.json` | ✅ |
-| Index (embed + BM25) | — | ⬜ chưa dựng |
-| Retrieve (RRF + rerank) | — | ⬜ chưa dựng |
+| Index (BM25 + embedding) | `src/index.py` | ✅ |
+| Retrieve (4 arm, RRF + rerank) | `src/retrieve.py` | ✅ |
 | Generate + verify hai tầng | — | ⬜ chưa dựng |
 | Evaluate + calibrate | — | ⬜ chưa dựng |
 
-Lệnh duy nhất chạy được đầu-cuối hôm nay:
+Lệnh chạy được đầu-cuối hôm nay:
 
 ```bash
-python -m src.chunk --corpus tests/fixtures/corpus
+python -m src.chunk  --corpus data/corpus                    # thống kê chunk
+python -m src.index  --corpus data/corpus                    # dựng chỉ mục + ghi manifest
+python -m src.retrieve --corpus data/corpus --arm bm25 --qid q16
+python -m tools.annotate --help
+python -m pytest
 ```
 
-In số document, số điều, số chunk, phân phối `n_tokens` và tỉ lệ chunk theo
-`status`. Đổi `--corpus data/corpus` khi đã có corpus thật.
+`src.chunk` in số document, số điều, số chunk, phân phối `n_tokens` và tỉ lệ chunk
+theo `status`. `src.retrieve` nhận `--question "..."` hoặc `--qid` (lấy từ gold set),
+`--arm` trong bốn arm, và `--offline`.
 
-Ngoài ra: `python -m tools.annotate --help` và `python -m pytest`.
+Ba arm còn lại cần vector nên cần `GEMINI_API_KEY` (hoặc cache đã có); arm `bm25`
+thì không — xem phần lười hoá bên dưới.
 
 Bảng model dùng khi tầng LLM được dựng lại:
 
@@ -296,24 +302,93 @@ bằng `mean_cov@k`, vốn đã là metric có thứ bậc và không cần chu�
 
 ## Bốn arm ablation
 
-> Thiết kế đã chốt; chưa dựng lại.
+| arm | mô tả | cần mạng |
+|---|---|---|
+| `bm25` | chỉ từ khoá | không |
+| `dense` | chỉ embedding | có |
+| `hybrid` | RRF hợp nhất hai danh sách trên | có |
+| `hybrid_rerank` | hybrid rồi rerank listwise — arm mặc định của pipeline | có |
 
-| arm | mô tả |
-|---|---|
-| `bm25` | chỉ từ khoá |
-| `dense` | chỉ embedding |
-| `hybrid` | RRF hợp nhất hai danh sách trên |
-| `hybrid_rerank` | hybrid rồi rerank listwise — arm mặc định của pipeline |
+Bốn arm dùng chung **một** chỉ mục và **một** hàm vào (`retrieve.retrieve`), khác
+nhau đúng ở cách xếp hạng. Nếu mỗi arm có đường dữ liệu riêng thì bảng ablation
+so nhầm hai đường dữ liệu chứ không so hai cơ chế xếp hạng.
 
-RRF hợp nhất theo **hạng** chứ không theo điểm, vì điểm BM25 và cosine không cùng
-thang đo và mọi cách chuẩn hoá về một thang đều tuỳ tiện.
+RRF hợp nhất theo **hạng** chứ không theo điểm, vì điểm BM25 không chặn trên còn
+cosine nằm trong `[-1, 1]`; mọi cách chuẩn hoá hai thang đó về một đều tuỳ tiện.
+`score(d) = Σ 1/(RRF_K + rank(d))`, hạng tính từ 1, chunk vắng mặt trong một danh
+sách thì không cộng gì từ danh sách đó — không cần điểm phạt, vì độ sâu cắt đã là
+hình phạt rồi.
+
+Phá hoà điểm bằng chỉ số chunk ở mọi nơi. BM25 trả 0.0 cho rất nhiều chunk cùng
+lúc, mà một thứ tự không tất định ở đó làm mọi con số đánh giá nhảy giữa hai lần
+chạy trên cùng dữ liệu.
 
 Bảng tách theo `type` là chỗ đáng nhìn nhất: câu `distractor` (nhiều văn bản cùng
 bàn một chủ đề, chỉ một chứa đáp án) là nơi rerank phải chứng minh nó đáng tiền.
+Ví dụ đo được, `q16` với arm `bm25` trên corpus thật:
 
-Rerank chấm cả danh sách trong **đúng một** lời gọi LLM. Pointwise mỗi ứng viên một
-call sẽ tốn n lần quota; free tier giới hạn RPM thấp nên listwise là bắt buộc chứ
-không chỉ là tối ưu.
+```
+1. 63.66  Điều 21 Khoản 1-3 Nghị định 13/2023/NĐ-CP   [expired]   ← mồi nhử
+2. 38.87  Điều 28 Khoản 5-7 Luật 91/2025/QH15         [active]
+3. 32.29  Điều 28 Khoản 1-2 Luật 91/2025/QH15         [active]    ← span đúng
+```
+
+Từ khoá "tiếp thị" chỉ có trong văn bản đã hết hiệu lực, nên BM25 đẩy nó lên hạng
+1 với điểm gần gấp đôi. Đây chính là khoảng cách mà rerank phải bù.
+
+### Rerank listwise
+
+Chấm cả danh sách trong **đúng một** lời gọi LLM. Pointwise mỗi ứng viên một call
+sẽ tốn `RERANK_CANDIDATES` lần quota cho mỗi câu hỏi; free tier giới hạn RPM thấp
+nên listwise là bắt buộc chứ không chỉ là tối ưu. Đánh đổi đã biết: model nhìn
+thấy cả danh sách nên điểm không độc lập hoàn toàn giữa các ứng viên.
+
+Thang điểm là **số nguyên 0-3**, chuẩn hoá về `[0, 1]` khi trả ra. Hỏi LLM một số
+thực trong `[0, 1]` thì cùng một ứng viên nhận 0.85 hay 0.9 tuỳ lượt; ranh giới
+"2 hay 3" thì model giữ nhất quán hơn nhiều. Điểm đã chuẩn hoá này cũng chính là
+đại lượng mà ngưỡng abstain trước generate sẽ so.
+
+Ứng viên được đánh số thứ tự `[1]`..`[n]` trong prompt chứ không dùng `chunk_id`:
+id ngắn thì output ngắn hơn và model ít bịa hơn, còn ánh xạ ngược về `chunk_id`
+làm ở phía Python nên không mất mát gì.
+
+Ba quy tắc phòng thủ khi đọc output, tất cả đều có test:
+
+- Ordinal ngoài `[1, n]` bị **bỏ**, không ánh xạ đại sang một chunk nào đó.
+- Ứng viên không được chấm nhận **0**. Im lặng không phải bằng chứng ủng hộ, và
+  cách tính này không thưởng cho reranker trả thiếu để rút ngắn output.
+- Không chấm được ứng viên nào, hoặc JSON hỏng, thì **raise**. Âm thầm rơi về
+  thứ tự RRF sẽ biến một tầng chết thành một tầng trông như đang chạy.
+
+Hoà điểm rerank thì **giữ thứ tự RRF**. Thang 0-3 hoà rất nhiều, và rơi về một
+thứ tự tuỳ ý ở đó là vứt bỏ toàn bộ tín hiệu của tầng hợp nhất bên dưới.
+
+Prompt rerank có nêu trạng thái hiệu lực của từng ứng viên kèm quy tắc "văn bản
+`expired` không còn là căn cứ hợp lệ khi đã có ứng viên `active` cùng nội dung".
+Nói thẳng: điều đó khiến ba câu `distractor` đo **cả** hiệu lực của câu lệnh này
+chứ không chỉ đo năng lực nội tại của model. Đó là một lựa chọn thiết kế có ý
+thức — lọc cứng theo `status` ở tầng chỉ mục thì rẻ hơn nhưng sai, vì văn bản hết
+hiệu lực vẫn cần truy xuất được khi câu hỏi hỏi về giai đoạn trước.
+
+### Chỉ mục và phép nhúng nạp trễ
+
+BM25 và embedding dùng chung đúng một danh sách chunk và đúng một chuỗi đầu vào
+(`Chunk.indexed_text`), nên chỉ số hàng là danh tính chung: RRF chỉ việc hợp nhất
+hai danh sách chỉ số, không cần ánh xạ id qua lại.
+
+Phía embedding **nạp trễ**: `build_index()` không chạm mạng, vector chỉ được nhúng
+ở lần gọi `dense_scores()` đầu tiên. Arm `bm25` không cần vector nào, nên bắt nó
+chờ 160 lời gọi embedding chỉ để chạy được là sai; lười hoá cũng khiến `--offline`
+với cache rỗng vẫn chạy được arm thuần từ khoá thay vì chết ngay ở bước dựng chỉ
+mục.
+
+Cosine tính bằng một phép nhân ma trận `(160, 768) × (768,)`. Cả hai phía đã chuẩn
+hoá L2 nên tích vô hướng **chính là** cosine — không cần chỉ mục xấp xỉ, và không
+có cấu trúc dữ liệu nào phải giải thích thêm.
+
+`outputs/index/chunks.json` là ảnh chụp danh sách chunk kèm tham số chunk đã dùng.
+Vector **không** nằm ở đó: chúng đã có trong `outputs/cache/embed/` theo từng text.
+Chép sang nơi thứ hai chỉ tạo ra hai nguồn sự thật lệch pha nhau khi đổi tham số.
 
 ### Tokenizer tiếng Việt cho BM25
 
@@ -417,6 +492,16 @@ Không test nào chạm mạng. Đáng chú ý:
 - `test_cache.py` — cái gì làm đổi cache key, `CacheMiss` lúc offline, phân loại
   lỗi retryable, và dedup embedding.
 - `test_annotate.py` — ánh xạ offset khi bỏ dấu, và các ca `--validate` bắt lỗi.
+- `test_index_retrieve.py::test_arm_bm25_chay_duoc_offline_voi_cache_rong` — arm
+  từ khoá không tạo ra một file cache nào; đây là bằng chứng cho phép nạp trễ.
+- `test_index_retrieve.py::test_rrf_khong_phu_thuoc_thang_diem` — nhân điểm lên
+  1000 lần mà giữ nguyên thứ hạng thì kết quả hợp nhất không đổi.
+- `test_index_retrieve.py::test_arm_rerank_hoa_diem_thi_giu_thu_tu_rrf` — reranker
+  chấm mọi ứng viên bằng nhau thì thứ tự ra đúng bằng thứ tự RRF.
+
+Phía dense và rerank được kiểm bằng cách **gieo sẵn cache** rồi chạy đúng đường dữ
+liệu thật, chứ không monkeypatch hàm gọi API. Nhờ vậy test bao luôn cả hình dạng
+cache key — thứ mà một stub sẽ bỏ lọt.
 
 `tests/fixtures/corpus/` chứa hai văn bản **giả lập** (Quy chế 99/2099 và Thông tư
 88/2088 hư cấu, một `active` một `expired`) để chạy được toàn bộ pipeline mà không
@@ -427,6 +512,11 @@ nguồn tra cứu.
 
 - Reranker chấm trong một lời gọi listwise: model thấy cả danh sách nên điểm không
   hoàn toàn độc lập giữa các ứng viên.
+- Quy tắc hiệu lực nằm trong prompt rerank, nên ba câu `distractor` đo cả câu lệnh
+  đó chứ không chỉ đo model. Số liệu phải đọc kèm ghi chú này.
+- `RERANK_CANDIDATES = 30` là trần cứng: gold_span nằm ngoài top-30 của RRF thì
+  rerank không có cơ hội cứu. Recall@30 của arm `hybrid` vì vậy là trần trên của
+  `hybrid_rerank`, và cần được báo cáo cùng nhau.
 - Bigram âm tiết chỉ xấp xỉ ranh giới từ ghép, không thay được phân từ thật; từ
   ghép ba âm tiết trở lên chỉ được bắt một phần.
 - Nếu một câu đơn lẻ dài hơn trần cắt thì hai part liền kề kề nhau chứ không chồng
