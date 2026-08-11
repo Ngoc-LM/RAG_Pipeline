@@ -189,6 +189,14 @@ d) Các trường hợp khác theo quy định của Chính phủ.
 5. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên xử lý dữ liệu cá nhân cập nhật, bổ sung hồ sơ đánh giá tác động xử lý dữ liệu cá nhân khi có sự thay đổi về nội dung hồ sơ đã gửi cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân.
 6. Cơ quan nhà nước có thẩm quyền không phải thực hiện quy định về đánh giá tác động xử lý dữ liệu cá nhân quy định tại Điều này.
 7. Chính phủ quy định thành phần hồ sơ, điều kiện, trình tự, thủ tục đánh giá tác động xử lý dữ liệu cá nhân.
+Điều 22. Cập nhật hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới
+1. Hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới được cập nhật định kỳ 06 tháng khi có sự thay đổi hoặc cập nhật ngay trong các trường hợp quy định tại khoản 2 Điều này.
+2. Các trường hợp thay đổi cần cập nhật ngay bao gồm:
+a) Khi cơ quan, tổ chức, đơn vị được tổ chức lại, chấm dứt hoạt động, giải thể, phá sản theo quy định của pháp luật;
+b) Khi có sự thay đổi thông tin về tổ chức, cá nhân cung cấp dịch vụ bảo vệ dữ liệu cá nhân;
+c) Khi phát sinh hoặc thay đổi ngành, nghề, dịch vụ kinh doanh liên quan đến xử lý dữ liệu cá nhân đã đăng ký trong hồ sơ đánh giá tác động xử lý dữ liệu cá nhân, hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới.
+3. Việc cập nhật hồ sơ đánh giá tác động xử lý dữ liệu cá nhân và hồ sơ đánh giá tác động chuyển dữ liệu cá nhân xuyên biên giới được thực hiện trên Cổng thông tin quốc gia về bảo vệ dữ liệu cá nhân hoặc tại cơ quan chuyên trách bảo vệ dữ liệu cá nhân.
+4. Chính phủ quy định chi tiết Điều này.
 Điều 23. Thông báo vi phạm quy định về bảo vệ dữ liệu cá nhân
 1. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân, bên thứ ba phát hiện vi phạm quy định về bảo vệ dữ liệu cá nhân có thể gây tổn hại đến quốc phòng, an ninh quốc gia, trật tự, an toàn xã hội hoặc xâm phạm đến tính mạng, sức khỏe, danh dự, nhân phẩm, tài sản của chủ thể dữ liệu cá nhân thì phải thông báo cho cơ quan chuyên trách bảo vệ dữ liệu cá nhân chậm nhất là 72 giờ kể từ khi phát hiện hành vi vi phạm. Trường hợp bên xử lý dữ liệu cá nhân phát hiện hành vi vi phạm phải thông báo kịp thời cho bên kiểm soát dữ liệu cá nhân hoặc bên kiểm soát và xử lý dữ liệu cá nhân.
 2. Bên kiểm soát dữ liệu cá nhân, bên kiểm soát và xử lý dữ liệu cá nhân phải lập biên bản xác nhận về việc xảy ra hành vi vi phạm quy định về bảo vệ dữ liệu cá nhân, phối hợp với cơ quan chuyên trách bảo vệ dữ liệu cá nhân xử lý hành vi vi phạm.
