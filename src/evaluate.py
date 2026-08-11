@@ -24,6 +24,7 @@ from typing import Any, Iterable, Sequence
 
 from src import config
 from src.chunk import Chunk
+from src.generate import AnswerResult, answer_question
 from src.index import Index, build_index
 from src.ingest import Document, load_corpus
 from src.intervals import Interval, coverage, interval_union
@@ -292,6 +293,134 @@ def write_report(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     return target
+
+
+# --- Chất lượng câu trả lời ------------------------------------------------
+def retrieve_all(
+    index: Index, questions: Sequence[Question], *, arm: str, offline: bool
+) -> list[list[Retrieved]]:
+    """Truy xuất một lần cho mọi câu.
+
+    Kết quả truy xuất KHÔNG phụ thuộc hai ngưỡng abstain, nên calibrate tính nó
+    đúng một lần rồi dùng lại cho mọi điểm lưới.
+    """
+    return [
+        list(retrieve(index, q.question, arm=arm, top_k=config.RETRIEVE_TOP_K, offline=offline))
+        for q in questions
+    ]
+
+
+def answer_all(
+    questions: Sequence[Question],
+    retrievals: Sequence[Sequence[Retrieved]],
+    *,
+    offline: bool,
+    tau_retrieve: float | None = None,
+    tau_ground: float | None = None,
+) -> list[AnswerResult]:
+    return [
+        answer_question(
+            q.question, results, offline=offline,
+            tau_retrieve=tau_retrieve, tau_ground=tau_ground,
+        )
+        for q, results in zip(questions, retrievals)
+    ]
+
+
+def abstain_stats(
+    questions: Sequence[Question], answers: Sequence[AnswerResult]
+) -> dict[str, Any]:
+    """Ma trận nhầm lẫn của quyết định abstain, lớp dương = "đáng lẽ phải abstain".
+
+    Hai loại lỗi không đối xứng và được tách ra chứ không gộp vào một con số:
+    `wrong_abstain` là từ chối một câu trả lời được (phiền, nhưng an toàn), còn
+    `missed_abstain` là trả lời một câu không có căn cứ trong corpus — đúng dạng
+    lỗi mà cả pipeline này sinh ra để chặn.
+
+    Hệ thống không bao giờ abstain sẽ có precision = 0 theo quy ước ở đây, tức
+    F1 = 0. Đó là hành vi mong muốn: nó không được thưởng vì né bài toán.
+    """
+    tp = sum(1 for q, a in zip(questions, answers) if not q.answerable and a.abstained)
+    fp = sum(1 for q, a in zip(questions, answers) if q.answerable and a.abstained)
+    fn = sum(1 for q, a in zip(questions, answers) if not q.answerable and not a.abstained)
+    tn = sum(1 for q, a in zip(questions, answers) if q.answerable and not a.abstained)
+
+    precision = tp / (tp + fp) if tp + fp else 0.0
+    recall = tp / (tp + fn) if tp + fn else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    return {
+        "n": len(questions),
+        "true_abstain": tp,
+        "wrong_abstain": fp,
+        "missed_abstain": fn,
+        "true_answer": tn,
+        "precision": round(precision, 4),
+        "recall": round(recall, 4),
+        "f1": round(f1, 4),
+    }
+
+
+def faithfulness_stats(answers: Sequence[AnswerResult]) -> dict[str, Any]:
+    """Faithfulness trước và sau tầng verify, cùng chi phí đã bỏ ra để có nó."""
+    first = [a.support_ratio_first for a in answers if a.support_ratio_first is not None]
+    final = [a.support_ratio_final for a in answers if a.support_ratio_final is not None]
+    stages = [a.abstain_stage for a in answers if a.abstained]
+    return {
+        "n_answered": sum(1 for a in answers if not a.abstained),
+        "n_abstained": sum(1 for a in answers if a.abstained),
+        "support_ratio_first": round(fmean(first), 4) if first else None,
+        "support_ratio_final": round(fmean(final), 4) if final else None,
+        "n_retry": sum(1 for a in answers if len(a.attempts) > 1),
+        "n_check_a_fail": sum(
+            1 for a in answers for at in a.attempts if not at.check_a.ok
+        ),
+        "abstain_stage": {stage: stages.count(stage) for stage in sorted(set(stages))},
+    }
+
+
+def evaluate_answers(
+    questions: Sequence[Question], answers: Sequence[AnswerResult], *, arm: str
+) -> dict[str, Any]:
+    return {
+        "arm": arm,
+        "tau_retrieve": config.TAU_RETRIEVE,
+        "tau_ground": config.TAU_GROUND,
+        "abstain": abstain_stats(questions, answers),
+        "faithfulness": faithfulness_stats(answers),
+        "questions": [
+            {"qid": q.qid, "type": q.type, "answerable": q.answerable, **a.to_dict()}
+            for q, a in zip(questions, answers)
+        ],
+    }
+
+
+def write_answer_report(report: dict[str, Any], directory: Path | None = None) -> Path:
+    target = (directory or config.EVAL_DIR) / "answers.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return target
+
+
+def print_answer_report(report: dict[str, Any]) -> None:
+    abstain, faith = report["abstain"], report["faithfulness"]
+    print(f"arm = {report['arm']}   "
+          f"TAU_RETRIEVE = {report['tau_retrieve']}   TAU_GROUND = {report['tau_ground']}\n")
+    print("Quyết định abstain (lớp dương = đáng lẽ phải abstain)")
+    print(f"  abstain đúng   : {abstain['true_abstain']}")
+    print(f"  từ chối nhầm   : {abstain['wrong_abstain']}   (câu trả lời được nhưng bị từ chối)")
+    print(f"  bỏ sót abstain : {abstain['missed_abstain']}   (câu không có căn cứ nhưng vẫn trả lời)")
+    print(f"  trả lời đúng   : {abstain['true_answer']}")
+    print(f"  P = {abstain['precision']:.3f}  R = {abstain['recall']:.3f}  F1 = {abstain['f1']:.3f}\n")
+    print("Groundedness")
+    print(f"  đã trả lời     : {faith['n_answered']}    đã abstain: {faith['n_abstained']}")
+    print(f"  support_ratio  : trước verify = {faith['support_ratio_first']}, "
+          f"sau verify = {faith['support_ratio_final']}")
+    print(f"  sinh lại       : {faith['n_retry']}    Check A hỏng: {faith['n_check_a_fail']}")
+    if faith["abstain_stage"]:
+        stages = ", ".join(f"{k}={v}" for k, v in faith["abstain_stage"].items())
+        print(f"  abstain ở tầng : {stages}")
 
 
 # --- Bảng in ra ------------------------------------------------------------
